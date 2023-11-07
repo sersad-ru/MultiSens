@@ -3,7 +3,14 @@
 #include "buildid.h"
 
 #include <Arduino.h>
+#include <EEPROM.h>
 
+
+// Начальный адрес хранения настроек в EEPROM
+#define EEPROM_CFG_START 0
+
+// Значения по умолчанию для хранимых в EEPROM настроек
+#define DEFAULT_MENU_CURRENT 0
 
 // Порт и пины Дисплея
 #define LCD_DATA_PORT PORTD // Полупорт обмена данными D0-D4 (Старший полупорт D: PD4-PD7, пины 4-7)
@@ -45,6 +52,11 @@
 #define _INT_ON SREG = _mscore_oldSREG
 uint8_t _mscore_oldSREG;
 
+// Макрос для приведения PROGMEM строк к const __FlashStringHelper*
+#define FF(val) ((const __FlashStringHelper*)val)
+const char MSG_MAIN_TITLE[] PROGMEM = "-=MultiSens=-";
+const char MSG_CLEAR_SETTINGS[] PROGMEM = "Settings cleared.";
+const char MSG_SAVE_SETTINGS[] PROGMEM = "Settings saved";
 
 MultiSensCore::MultiSensCore(){
   _pluginsCount = 0;
@@ -60,6 +72,14 @@ void MultiSensCore::init(MultiSensPlugin* plugins, uint8_t pluginsCount, uint32_
   _plugins = plugins;
   _pluginsCount = pluginsCount;
   _lcd_stored_cursor = 0;  
+
+  // Грузим настройки из EEPROM
+  EEPROM.get(EEPROM_CFG_START, _cfg);
+  if(_cfg.noValue){ // В EEPROM ничего не было, устанавливаем значения по умолчанию
+    _cfg.noValue = 0; //Выставляем флаг, что данные установлены
+    _cfg.mnu_current = DEFAULT_MENU_CURRENT;
+    EEPROM.put(EEPROM_CFG_START, _cfg);    
+  }//if
   
   // Инициализируем дисплей
   // Сначала порты
@@ -97,15 +117,69 @@ void MultiSensCore::init(MultiSensPlugin* plugins, uint8_t pluginsCount, uint32_
   _lcd_create_symbol(MS_SYM_ARROW_DOWN_CODE, MS_SYM_ARROW_DOWN);// Символ стрелки вниз
   _lcd_create_symbol(MS_SYM_ARROW_UP_CODE, MS_SYM_ARROW_UP);// Символ стрелки вверх
   
-  clear(); // Очищаем экран   
    
   // Выводим стартовое сообщение
   Serial.begin(baud);
-  Serial.print(F("\n\nMultiSens by sersad ["));
+  Serial.print(F("\n\n"));
+  Serial.print(FF(MSG_MAIN_TITLE));
+  Serial.print(F(" by sersad ["));
   Serial.print(__build_id);
   Serial.print(F("] Plugins registred: "));
   Serial.println(_pluginsCount);
+
+  // Выводим на экран
+  clear(); // Очищаем экран     
+  moveCursor(2, 0);
+  print(FF(MSG_MAIN_TITLE));       
+  print(F("  ["));
+  print(__build_id);
+  print(F("]"));
+
+  // Сбрасываем настройки EEPROM если надо
+  if(_btn_analog2btn(_btn_read()) == DOWN) {
+    if(_cfg.noValue) return; // Флаг уже не ноль. Сразу выходим, чтоб не циклиться
+    _cfg.noValue = 0xff; //Ставим флаг, как будто во флеше ничего нету
+    EEPROM.put(EEPROM_CFG_START, _cfg); //сохраняем значения   
+    Serial.print(FF(MSG_CLEAR_SETTINGS));
+    Serial.print(F(" Rebooting..."));
+    moveCursor(0, 1);
+    println(FF(MSG_CLEAR_SETTINGS));
+    delay(1000);
+    asm volatile("jmp 0x00"); // soft reboot  
+  }//if
 }//init
+
+
+void MultiSensCore::menu(){
+  // Выводим текущий пункт
+  moveCursor(0, 1);
+  print(F("["));
+  print(_cfg.mnu_current + 1);
+  print(F("/"));
+  print(_pluginsCount);
+  print(F("] "));
+  println(_plugins[_cfg.mnu_current].Title);
+
+  // Ждем команды
+  MultiSensButton btn = core.getButton();
+  switch(btn){
+    case UP: _cfg.mnu_current--; break;// Предыдущий пункт   
+    case DOWN: _cfg.mnu_current++; break;// Следующий
+    case SELECT: core.clear(); _plugins[_cfg.mnu_current].run(*this); break; // Запуск       
+    case SELECT_LONG: // Сохраняем текущий пункт меню и запускаем его 
+        EEPROM.put(EEPROM_CFG_START, _cfg); //сохраняем значения   
+        Serial.println(FF(MSG_SAVE_SETTINGS));
+        moveCursor(0, 1);
+        println(FF(MSG_SAVE_SETTINGS));
+        delay(1000);
+        core.clear(); 
+        _plugins[_cfg.mnu_current].run(*this); 
+      break; // Сохранить выбор и запустить
+    default: break;
+  }//switch
+  if(_cfg.mnu_current < 0 ) _cfg.mnu_current = _pluginsCount - 1;
+  if(_cfg.mnu_current > _pluginsCount - 1) _cfg.mnu_current = 0;  
+}//menu
 
 
 void MultiSensCore::setCursorType(MultiSensCursor ct){
@@ -219,10 +293,10 @@ void MultiSensCore::_btn_isr(){
 
   // Скролл экрана
   switch(buttonPressed()){
-    case LEFT_LONG:
-    case LEFT: _lcd_scroll_left();  break;
-    case RIGHT: _lcd_scroll_right(); break;
-    case RIGHT_LONG: home(); break;
+    case RIGHT_LONG: 
+    case RIGHT: _lcd_scroll_left();  break;
+    case LEFT: _lcd_scroll_right(); break;
+    case LEFT_LONG: home(); break;
     default: break;
   }//switch  
 }//checkButton

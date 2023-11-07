@@ -4,6 +4,7 @@
 #include <Print.h>
 
 #include "mscustomsymbols.h"
+#include "flashcfg.h"
 
 // MultiSens Pins
 
@@ -55,6 +56,10 @@ public:
   //* baud - Baudrate for serial port logs
   void init(MultiSensPlugin* plugins, uint8_t pluginsCount, uint32_t baud = 9600);
 
+
+  //** Runs system menu
+  void menu();
+  
   //** Set cursor type and turn on the screen
   //* ct - new cursor type (OFF, UNDERLINE, BLOCK)
   void setCursorType(MultiSensCursor ct);
@@ -95,6 +100,7 @@ public:
 private:
   MultiSensPlugin * _plugins; // Массив плагинов 
   uint8_t _pluginsCount; // Количество элементов массива плагинов
+  flashcfg _cfg; // Сохраняемые во EEPROM настройки
 
   volatile MultiSensButton _btn_pressed_code; // Текущий код нажатой кнопки
   volatile MultiSensButton _btn_released_code; // Текущий код отпущенной кнопки

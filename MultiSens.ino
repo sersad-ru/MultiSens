@@ -9,26 +9,28 @@
 
 #include "mscore.h"
 #include "pFindPin.h"
+#include "pDigitalRead.h"
 
 /*
- * Меню и работа с EEPROM!
+ * Работа с EEPROM!
+ * Интерфейс чтения/записи EEPROM для плагинов. + резервирование EEPROM при регистрации плагина
 */
 
-MultiSensPlugin plugins[] = {{&pFindPin, "Find Pin"}}; //{{&plugin_b, "/"}, {&plugun_a, "/a"}}; void plugin_a(MultiSensCore& core)
+MultiSensPlugin plugins[] = {
+  {&pFindPin, "Find Pin"},
+  {&pDigitalRead, "Digital Read"}
+}; // void plugin_a(MultiSensCore& core)
 
 
 void setup() {
   core.init(plugins, arraySize(plugins));
-  
-  core.println("The Quick");
-  core.println("The Quick Brown Fox Junping Over The Lazy Dog");
-
 }// setup
 
 void loop() {
-
+  core.menu();
+/*
   MultiSensButton btn = core.getButton();
   Serial.println(btn);
-
+*/
 
 }//loop
