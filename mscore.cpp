@@ -35,9 +35,10 @@
 #define BTN_MASK_BIT TOIE1  // Бит маски перерывания таймера для опроса кнопки (по переполнению 490 раз в секунду)
 
 // Параметры обработки кнопки (обработчик вызывается по таймру 10 раз в секунду)
-#define BTN_COUNT_MIN 1    // Минимальное количество вывовов таймера, чтобы засчитать нажатие (0,1 секунды)
-#define BTN_COUNT_LONG 10  // Количество вызовов таймера, чтобы засчитать длинное нажатие (1 секунда)
-#define BTN_COUNT_MAX 250  // Максимальное количество вызовов (что б счетчик через 0 не переходил)
+#define BTN_COUNT_MIN 1        // Минимальное количество вывовов таймера, чтобы засчитать нажатие (0,1 секунды)
+#define BTN_COUNT_LONG 10      // Количество вызовов таймера, чтобы засчитать длинное нажатие (1 секунда)
+#define BTN_COUNT_MAX 250      // Максимальное количество вызовов (что б счетчик через 0 не переходил)
+#define BTN_LONG_REPEAT_MS 250 // Задержка (в ms) перед повторами удерживаемой кнопки (LONG) для getButton
 
 
 // Манипуляции с портами
@@ -52,11 +53,9 @@
 #define _INT_ON SREG = _mscore_oldSREG
 uint8_t _mscore_oldSREG;
 
-// Макрос для приведения PROGMEM строк к const __FlashStringHelper*
-#define FF(val) ((const __FlashStringHelper*)val)
 const char MSG_MAIN_TITLE[] PROGMEM = "-=MultiSens=-";
 const char MSG_CLEAR_SETTINGS[] PROGMEM = "Settings cleared.";
-const char MSG_SAVE_SETTINGS[] PROGMEM = "Settings saved";
+const char MSG_SAVE_SETTINGS[] PROGMEM = "Settings saved.";
 
 MultiSensCore::MultiSensCore(){
   _pluginsCount = 0;
@@ -80,6 +79,8 @@ void MultiSensCore::init(MultiSensPlugin* plugins, uint8_t pluginsCount, uint32_
     _cfg.mnu_current = DEFAULT_MENU_CURRENT;
     EEPROM.put(EEPROM_CFG_START, _cfg);    
   }//if
+
+  _mnu_current = _cfg.mnu_current; // Текущий пункт меню (из настроек, либо по умлочанию)
   
   // Инициализируем дисплей
   // Сначала порты
@@ -97,7 +98,7 @@ void MultiSensCore::init(MultiSensPlugin* plugins, uint8_t pluginsCount, uint32_
   delayMicroseconds(15000); // Больше 16383 - функция косячит (https://www.arduino.cc/reference/en/language/functions/time/delaymicroseconds/)
 
   // Инитим и настраиваем экран
-  _PORT_SET_LOW(LCD_CTRL_PORT, _BV(LCD_RS_PIN)); // RS низким 
+  _PORT_SET_LOW(LCD_CTRL_PORT, _BV(LCD_RS_PIN)); // RS вниз 
   _lcd_send_half_byte(LCD_INIT_4BIT); // Первая отправка команды инициализация 4-х битного режима
   delayMicroseconds(4500); // Ждем 4.1 ms
   _lcd_send_half_byte(LCD_INIT_4BIT); // Вторая отправка команды инициализация 4-х битного режима
@@ -140,6 +141,8 @@ void MultiSensCore::init(MultiSensPlugin* plugins, uint8_t pluginsCount, uint32_
     if(_cfg.noValue) return; // Флаг уже не ноль. Сразу выходим, чтоб не циклиться
     _cfg.noValue = 0xff; //Ставим флаг, как будто во флеше ничего нету
     EEPROM.put(EEPROM_CFG_START, _cfg); //сохраняем значения   
+    // сбрасываем флаги валидности для всех плагинов
+    for(_mnu_current = 0; _mnu_current < _pluginsCount; _mnu_current++) EEPROM.update(_cfg_calc_offset() - 1, 0xff); // 0xff - значит данные невалидны. Адрес данных - 1 - там лежит флаг 
     Serial.print(FF(MSG_CLEAR_SETTINGS));
     Serial.print(F(" Rebooting..."));
     moveCursor(0, 1);
@@ -154,34 +157,88 @@ void MultiSensCore::menu(){
   // Выводим текущий пункт
   moveCursor(0, 1);
   print(F("["));
-  print(_cfg.mnu_current + 1);
+  print(_mnu_current + 1);
   print(F("/"));
   print(_pluginsCount);
   print(F("] "));
-  println(_plugins[_cfg.mnu_current].Title);
+  println(_plugins[_mnu_current].title);
 
   // Ждем команды
-  MultiSensButton btn = core.getButton();
+  MultiSensButton btn = wait4Button();
+  
   switch(btn){
-    case UP: _cfg.mnu_current--; break;// Предыдущий пункт   
-    case DOWN: _cfg.mnu_current++; break;// Следующий
-    case SELECT: core.clear(); _plugins[_cfg.mnu_current].run(*this); break; // Запуск       
+    case UP: 
+    case UP_LONG: _mnu_current--; break;// Предыдущий пункт   
+    
+    case DOWN:
+    case DOWN_LONG: _mnu_current++; break;// Следующий пункт
+    
+    case SELECT: _run_plugin(); break; // Запуск
+           
     case SELECT_LONG: // Сохраняем текущий пункт меню и запускаем его 
+        _cfg.mnu_current = _mnu_current;
         EEPROM.put(EEPROM_CFG_START, _cfg); //сохраняем значения   
         Serial.println(FF(MSG_SAVE_SETTINGS));
         moveCursor(0, 1);
-        println(FF(MSG_SAVE_SETTINGS));
+        println(FF(MSG_SAVE_SETTINGS));        
         delay(1000);
-        core.clear(); 
-        _plugins[_cfg.mnu_current].run(*this); 
+        _run_plugin();
       break; // Сохранить выбор и запустить
     default: break;
   }//switch
-  if(_cfg.mnu_current < 0 ) _cfg.mnu_current = _pluginsCount - 1;
-  if(_cfg.mnu_current > _pluginsCount - 1) _cfg.mnu_current = 0;  
+  if(_mnu_current < 0 ) _mnu_current = _pluginsCount - 1;
+  if(_mnu_current > _pluginsCount - 1) _mnu_current = 0;  
 }//menu
 
 
+void MultiSensCore::_run_plugin(){
+  clear();// Чистим экран
+  moveCursor((strlen(_plugins[_mnu_current].title) < 16)?(16 - strlen(_plugins[_mnu_current].title)) >> 1 : 0, 0);
+  println(_plugins[_mnu_current].title); // Выводим названия плагина
+  Serial.println(_plugins[_mnu_current].title);
+  _plugins[_mnu_current].run(*this); // Запускаем плагин
+  asm volatile("jmp 0x00");// Если вдруг плагин вышел (хотя не должен), перегружаемся как можем
+}//_run_plugin
+
+
+// == EEPROM ==
+/*
+ * Перед каждым блоком настроек плагина лежит байт флага(по смещению -1) валидный ли этот блок или был сброс.
+ * При сбросе, проходим по цепочки и ставим эти флаги для всех плагинов.
+ * Смещения, естественно, считаются с учетом этого "лишнего" байта.
+*/
+uint16_t MultiSensCore::_cfg_calc_offset(){
+  uint16_t res = sizeof(_cfg) + 1; // Первый байт за базой - флаг валидности для первого плагина
+  for(uint8_t i = 0; i < _mnu_current; i++) 
+    res += (_plugins[i].cfg_size)?(_plugins[i].cfg_size + 1):0; // 1 байт - флаг валидности плагина
+  res = min(res, 1023); // За границы EEPROM не выходим
+  return res;
+}//_cfg_calc_offset
+
+
+void MultiSensCore::saveSettings(uint8_t * data){
+  uint16_t start = _cfg_calc_offset(); // получили начальное смещение для текущего плагина
+  if((start + _plugins[_mnu_current].cfg_size) > 1023) return; // За границы EEPROM-а не лезем
+  EEPROM.update(start - 1, 0); // Ставим флаг валидности
+  // Тут пишем
+  for(uint8_t i = 0; i < _plugins[_mnu_current].cfg_size; i++) EEPROM.update(start + i,  data[i]); 
+}//saveSettings
+
+
+bool MultiSensCore::loadSettings(uint8_t * data){
+  uint16_t start = _cfg_calc_offset(); // получили начальное смещение
+  
+  //Читаем флаг валидности
+  if(EEPROM.read(start - 1)) return false;  // Если там 0 - данные валидны, иначе нет.
+  
+  //Тут читаем
+  for(uint8_t i = 0; i < _plugins[_mnu_current].cfg_size; i++) data[i] = EEPROM.read(start + i); 
+   
+  return true;
+}//loadSettings
+
+
+// == Экран ==
 void MultiSensCore::setCursorType(MultiSensCursor ct){
  switch (ct)
  {
@@ -228,17 +285,32 @@ void MultiSensCore::restoreCursor(){
 
 
 void MultiSensCore::createSymbol(const uint8_t code, MultiSensSymbol* data){
-  _lcd_create_symbol(code & 0x01, data);//Разрешаем любой от 0 до 1
+  _lcd_create_symbol(code & 0x01, data);//Разрешаем любой от 0 до 1 :)
 }//crateSymbol
 
 
+// == Кнопки ==
 MultiSensButton MultiSensCore::getButton(){
+  MultiSensButton result = buttonReleased();
+  if(result != NONE) return result;
+  static uint32_t dt = millis();
+  if((_btn_pressed_code != NONE) && 
+     (_btn_pressed_count > BTN_COUNT_LONG) &&
+     ((millis() - dt) > BTN_LONG_REPEAT_MS)) {
+       dt = millis();
+       return (MultiSensButton)((uint8_t)_btn_pressed_code | MS_BTN_LONG_MASK);
+     }//if
+  return NONE;
+}//getButton
+
+
+MultiSensButton MultiSensCore::wait4Button(){
   MultiSensButton result;
   do {
-    result = buttonReleased();
+    result = getButton();
   }while (result == NONE);
   return result;
-}//getButton
+}//wait4Button
 
   
 MultiSensButton MultiSensCore::buttonPressed(){
@@ -279,7 +351,7 @@ MultiSensButton MultiSensCore::buttonReleased(){
 }//buttonReleased
 
 
-
+// == Внутренности ==
 void MultiSensCore::_btn_isr(){
   MultiSensButton b = _btn_analog2btn(_btn_read()); // Читаем кнопку
   if(_btn_pressed_code != b) { // Новая кнопка
@@ -289,7 +361,7 @@ void MultiSensCore::_btn_isr(){
     _btn_pressed_count = 0;
   }//if
 
-  _btn_pressed_count = min(_btn_pressed_count + 1, BTN_COUNT_MAX);
+  _btn_pressed_count = min(_btn_pressed_count + 1, BTN_COUNT_MAX); // Что б не переполнялось, если слишком долго держат
 
   // Скролл экрана
   switch(buttonPressed()){
@@ -314,7 +386,7 @@ int MultiSensCore::_btn_read(){
   //Ждем окончания преобразования
   while(_PORT_READ(ADCSRA, _BV(ADSC)));
   
-  //Возвращаем результат (важно! сначало читаем младший бит)
+  //Возвращаем результат (важно! сначало читаем младшие биты)
   return (ADCL | (ADCH << 8));
 }//_btn_read
 
@@ -372,7 +444,7 @@ size_t MultiSensCore::write(uint8_t value){
 
 
 void MultiSensCore::_lcd_command(uint8_t value){
-  _PORT_SET_LOW(LCD_CTRL_PORT, _BV(LCD_RS_PIN)); // RS - HIGH
+  _PORT_SET_LOW(LCD_CTRL_PORT, _BV(LCD_RS_PIN)); // RS - LOW
   _lcd_send_byte(value); 
 }//_lcd_data
 
@@ -398,7 +470,7 @@ void MultiSensCore::_lcd_send_half_byte(uint8_t value){
   delayMicroseconds(1); 
   _PORT_SET_LOW(LCD_CTRL_PORT, _BV(LCD_EN_PIN)); 
   delayMicroseconds(50);
-}//_lcd_send_byte
+}//_lcd_send_half_byte
 
 
 MultiSensCore core = MultiSensCore();

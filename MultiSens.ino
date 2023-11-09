@@ -5,6 +5,7 @@
 * (c)2023 by sersad
 * 
 * 01.11.2023
+* 09.11.2023
 */
 
 #include "mscore.h"
@@ -12,14 +13,16 @@
 #include "pDigitalRead.h"
 
 /*
- * Работа с EEPROM!
- * Интерфейс чтения/записи EEPROM для плагинов. + резервирование EEPROM при регистрации плагина
+ * Пишем digitalRead,
+ * Потом analodRead,
+ * и PWM
 */
 
+// Registred plugins
 MultiSensPlugin plugins[] = {
-  {&pFindPin, "Find Pin"},
-  {&pDigitalRead, "Digital Read"}
-}; // void plugin_a(MultiSensCore& core)
+  {&pFindPin, "Find Pin", 0},
+  {&pDigitalRead, "Digital Read", sizeof(pDigitalReadCfg)}
+}; // 
 
 
 void setup() {
@@ -28,9 +31,4 @@ void setup() {
 
 void loop() {
   core.menu();
-/*
-  MultiSensButton btn = core.getButton();
-  Serial.println(btn);
-*/
-
 }//loop

@@ -7,6 +7,14 @@
 #include "flashcfg.h"
 
 // MultiSens Pins
+#define P0 2  // Digital - INT0       - Green
+#define P1 3  // Digital - INT1 - PWM - Blue
+#define P2 11 // Digital - MOSI - PWM - Yellow
+#define P3 12 // Digital - MISO       - Violet
+#define P4 13 // Digital - SCK        - Brown
+#define P5 17 // Analog               - Orange
+#define P6 18 // Analog  - SDA        - Yellow-Black
+#define P7 19 // Analog  - SCL        - Gray-Black
 
 class MultiSensCore;
 
@@ -17,7 +25,8 @@ typedef void (*PluginFunction)(MultiSensCore& core);
 // Plugin element
 typedef struct {
   PluginFunction run; //Plugin function
-  const char* Title; //Plugin title
+  const char* title;  //Plugin title
+  uint8_t cfg_size;   //Size (in bytes) of plugin settings block in EEPROM
 } MultiSensPlugin;
 
 
@@ -46,6 +55,8 @@ typedef enum {
 } MultiSensCursor;
 
 #define arraySize(_array) ( sizeof(_array) / sizeof(*(_array)) )
+// Макрос для приведения PROGMEM строк к const __FlashStringHelper*
+#define FF(val) ((const __FlashStringHelper*)val)
   
 class MultiSensCore : public Print {
 public:
@@ -64,7 +75,7 @@ public:
   //* ct - new cursor type (OFF, UNDERLINE, BLOCK)
   void setCursorType(MultiSensCursor ct);
 
-  //** Clear display
+  //** Clear the display
   void clear();
 
   //** Move cursor to 0,0 and unshift display
@@ -84,15 +95,28 @@ public:
   //* data - custom symbol data array (see mscustomsymbols.h) 
   void createSymbol(const uint8_t code, PMultiSensSymbol data);
 
-  //** Waits for button and returns its code. This function blocks until the button is released.
+  //** Returns single button code if the button was short pressed, and repeats button codes for long pressed button
   MultiSensButton getButton();
+
+  //** Waits for button and returns its code. This function blocks until the button is pressed for long or pressed and released for short.
+  MultiSensButton wait4Button();
 
   //** Returns the code of pressed button. Repeats this code until the button is pressed.
   MultiSensButton buttonPressed();
 
   //** Returns the code of released button. Returns NONE until the button is pressed but not released.
   MultiSensButton buttonReleased();
-  
+
+
+  //** Saves settings block in EEPROM. Size of the block MUST be provided in MultiSensPlugin structire.
+  //* data - pointer for settings block
+  void saveSettings(uint8_t * data);
+
+  //** Loads settings block from EEPROM. Size of the block MUST be provided in MultiSensPlugin structire.
+  //* Returns: False if settings was reseted and default values should be used. True if not. 
+  //* data - pointer for settings block
+  bool loadSettings(uint8_t * data);
+    
   virtual size_t write(uint8_t value);
   using Print::write;
   
@@ -100,6 +124,8 @@ public:
 private:
   MultiSensPlugin * _plugins; // Массив плагинов 
   uint8_t _pluginsCount; // Количество элементов массива плагинов
+  int8_t _mnu_current; // Текущий пункт меню (запущенный плагин)
+
   flashcfg _cfg; // Сохраняемые во EEPROM настройки
 
   volatile MultiSensButton _btn_pressed_code; // Текущий код нажатой кнопки
@@ -110,6 +136,9 @@ private:
   uint8_t _lcd_cursor_offset; // Текущее положение курсора в буфере
   uint8_t _lcd_stored_cursor; // Тут можно сохранить позицию курсора и потом давать кучу принтов в одно место, используя lcdRestoreCursor;
 
+
+  void _run_plugin(); // Запустить плагин
+  uint16_t _cfg_calc_offset(); // Счиает смещение блока настроке для текущего плагина
   int _btn_read(); // Читает аналоговый пин, к которому подключены кнопки
   MultiSensButton _btn_analog2btn(int code); // Преобразовать результат аналогового чтения к коду кнопки
     
