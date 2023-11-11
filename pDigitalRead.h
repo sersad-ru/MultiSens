@@ -8,7 +8,7 @@
 
 //
 struct{
-  uint8_t a;
+  uint8_t scan_mode;
   
 } pDigitalReadCfg;
 

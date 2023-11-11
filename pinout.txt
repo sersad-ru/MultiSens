@@ -1,18 +1,18 @@
 ATMEL ATMEGA328 / ARDUINO
 
                                  +-\/-+
-                      ~RST PC6  1|    |28  PC5 (D 19) [A 5] SCL              =MS7=
-                  RX (D 0) PD0  2|    |27  PC4 (D 18) [A 4] SDA              =MS6=
-                  TX (D 1) PD1  3|    |26  PC3 (D 17) [A 3]                  =MS5=
-=MS0=           INT0 (D 2) PD2  4|    |25  PC2 (D 16) [A 2]                  
-=MS1=       PWM INT1 (D 3) PD3  5|    |24  PC1 (D 15) [A 1]                  
+                      ~RST PC6  1|    |28  PC5 (D 19) [A 5] SCL              =P7=
+                  RX (D 0) PD0  2|    |27  PC4 (D 18) [A 4] SDA              =P6=
+                  TX (D 1) PD1  3|    |26  PC3 (D 17) [A 3]                  =P5=
+=P0=            INT0 (D 2) PD2  4|    |25  PC2 (D 16) [A 2]                  
+=P1=        PWM INT1 (D 3) PD3  5|    |24  PC1 (D 15) [A 1]                  
       {DB4}          (D 4) PD4  6|    |23  PC0 (D 14) [A 0]     {Buttons}
                            VCC  7|    |22  GND
                            GND  8|    |21  AREF
                      XTAL1 PB6  9|    |20  AVCC
-                     XTAL2 PB7 10|    |19  PB5 (D 13) SCK                    =MS4=
-      {DB5}     PWM  (D 5) PD5 11|    |18  PB4 (D 12) MISO                   =MS3=
-      {DB6}     PWM  (D 6) PD6 12|    |17  PB3 (D 11) MOSI PWM               =MS2=
+                     XTAL2 PB7 10|    |19  PB5 (D 13) SCK                    =P4=
+      {DB5}     PWM  (D 5) PD5 11|    |18  PB4 (D 12) MISO                   =P3=
+      {DB6}     PWM  (D 6) PD6 12|    |17  PB3 (D 11) MOSI PWM               =P2=
       {DB7}          (D 7) PD7 13|    |16  PB2 (D 10) SS   PWM  {BkLight}
       {RS}           (D 8) PB0 14|    |15  PB1 (D  9)      PWM  {Enable}
                                  +----+
@@ -23,11 +23,11 @@ ATMEL ATMEGA328 / ARDUINO
 * GND   - Black 
 
 
-* MSP0 / INT0 /     / D2      / PD2 - Digatal  - Green
-* MSP1 / INT1 / PWM / D3      / PD3 - Digital  - Blue
-* MSP2 / MOSI / PWM / D11     / PB3 - Digital  - Yellow
-* MSP3 / MISO /     / D12     / PB4 - Digital  - Violet
-* MSP4 / SCK  /     / D13     / PB5 - Digital  - Brown
-* MSP5 /      /     / D17[A3] / PC3 - Analog   - Orange
-* MSP6 / SDA  /     / D18[A4] / PC4 - Analog   - Yellow-Black
-* MSP7 / SCL  /     / D19[A5] / PC5 - Analog   - Gray-Black
+* P0 / INT0 /     / D2      / PD2 - Digatal  - Green
+* P1 / INT1 / PWM / D3      / PD3 - Digital  - Blue
+* P2 / MOSI / PWM / D11     / PB3 - Digital  - Yellow
+* P3 / MISO /     / D12     / PB4 - Digital  - Violet
+* P4 / SCK  /     / D13     / PB5 - Digital  - Brown
+* P5 /      /     / D17[A3] / PC3 - Analog   - Orange
+* P6 / SDA  /     / D18[A4] / PC4 - Analog   - Yellow-Black
+* P7 / SCL  /     / D19[A5] / PC5 - Analog   - Gray-Black

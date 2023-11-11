@@ -1,6 +1,6 @@
 #include "pDigitalRead.h"
 
-
+//#define WORK_PIN P0
 // == Main plugin function ==
 void pDigitalRead(MultiSensCore& core){
   // Init
@@ -25,7 +25,7 @@ void pDigitalRead(MultiSensCore& core){
     */
     core.moveCursor(0, 1); // First symbol of second line
     core.print(F("P0:"));
-    core.print(digitalRead(P0));
+    core.println(digitalRead(P0));
     Serial.println(digitalRead(P0));
     delay(1000);
   }//while
