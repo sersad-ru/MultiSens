@@ -4,11 +4,13 @@
 
 /*
 * The DigitalRead plugin reads the digital pin. 
+* P0 is configured as INPUT
+* P1 is configured as INPUT_PULLP
 */
 
 //
 struct{
-  uint8_t scan_mode;
+  int8_t scan_mode;
   
 } pDigitalReadCfg;
 

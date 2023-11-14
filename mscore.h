@@ -3,18 +3,21 @@
 #include <stdio.h>
 #include <Print.h>
 
+#include "mspinmap.h"
 #include "mscustomsymbols.h"
 #include "flashcfg.h"
 
 // MultiSens Pins
-#define P0 2  // Digital - INT0       - Green
-#define P1 3  // Digital - INT1 - PWM - Blue
-#define P2 11 // Digital - MOSI - PWM - Yellow
-#define P3 12 // Digital - MISO       - Violet
-#define P4 13 // Digital - SCK        - Brown
-#define P5 17 // Analog               - Orange
-#define P6 18 // Analog  - SDA        - Yellow-Black
-#define P7 19 // Analog  - SCL        - Gray-Black
+
+#define P0 P(0) // 2 Digital - INT0       - Green
+#define P1 P(1) // 3 Digital - INT1 - PWM - Blue
+#define P2 P(2) // 11 Digital - MOSI - PWM - Yellow
+#define P3 P(3) // 12 Digital - MISO       - Violet
+#define P4 P(4) // 13 Digital - SCK        - Brown
+#define P5 P(5) // 17 Analog               - Orange
+#define P6 P(6) // 18 Analog  - SDA        - Yellow-Black
+#define P7 P(7) // 19 Analog  - SCL        - Gray-Black
+
 
 class MultiSensCore;
 
@@ -116,6 +119,10 @@ public:
   //* Returns: False if settings was reseted and default values should be used. True if not. 
   //* data - pointer for settings block
   bool loadSettings(uint8_t * data);
+
+
+  //** Returns pointer to string n format "Px: " where x - pin number from 0 to 7
+  char * getPinName(uint8_t pinNumber);
     
   virtual size_t write(uint8_t value);
   using Print::write;
@@ -127,6 +134,7 @@ private:
   int8_t _mnu_current; // Текущий пункт меню (запущенный плагин)
 
   flashcfg _cfg; // Сохраняемые во EEPROM настройки
+  char _printBuf[12]; // Буфер для подготоаки строк
 
   volatile MultiSensButton _btn_pressed_code; // Текущий код нажатой кнопки
   volatile MultiSensButton _btn_released_code; // Текущий код отпущенной кнопки

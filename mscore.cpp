@@ -56,6 +56,7 @@ uint8_t _mscore_oldSREG;
 const char MSG_MAIN_TITLE[] PROGMEM = "-=MultiSens=-";
 const char MSG_CLEAR_SETTINGS[] PROGMEM = "Settings cleared.";
 const char MSG_SAVE_SETTINGS[] PROGMEM = "Settings saved.";
+const char MSG_PIN_NAME[] PROGMEM = "P0: ";
 
 MultiSensCore::MultiSensCore(){
   _pluginsCount = 0;
@@ -201,6 +202,16 @@ void MultiSensCore::_run_plugin(){
 }//_run_plugin
 
 
+
+// == Строки ==
+char * MultiSensCore::getPinName(uint8_t pinNumber){
+  strcpy_P(_printBuf, MSG_PIN_NAME); // Скопировали базовый текст
+  _printBuf[1] = '0' + (_ms_getP(pinNumber)); // Вписали номер пина
+  return _printBuf; // Вернули указатель на буфер
+}// getPinName
+
+
+
 // == EEPROM ==
 /*
  * Перед каждым блоком настроек плагина лежит байт флага(по смещению -1) валидный ли этот блок или был сброс.
@@ -236,6 +247,7 @@ bool MultiSensCore::loadSettings(uint8_t * data){
    
   return true;
 }//loadSettings
+
 
 
 // == Экран ==
@@ -287,6 +299,7 @@ void MultiSensCore::restoreCursor(){
 void MultiSensCore::createSymbol(const uint8_t code, MultiSensSymbol* data){
   _lcd_create_symbol(code & 0x01, data);//Разрешаем любой от 0 до 1 :)
 }//crateSymbol
+
 
 
 // == Кнопки ==
@@ -349,6 +362,7 @@ MultiSensButton MultiSensCore::buttonReleased(){
     
   return result; // Отдаем результат
 }//buttonReleased
+
 
 
 // == Внутренности ==
