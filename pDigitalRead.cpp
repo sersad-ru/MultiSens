@@ -83,9 +83,9 @@ void pDigitalRead(MultiSensCore& core){
       default: break;
     }//switch
 
-    if(pDigitalReadCfg.scan_mode < 0) pDigitalReadCfg.scan_mode = 0;
-    if(pDigitalReadCfg.scan_mode > (int8_t)arraySize(delays) - 1) pDigitalReadCfg.scan_mode = arraySize(delays) - 1;
-
+    pDigitalReadCfg.scan_mode = max(pDigitalReadCfg.scan_mode, 0);
+    pDigitalReadCfg.scan_mode = min(pDigitalReadCfg.scan_mode, (int8_t)arraySize(delays) - 1);
+    
     // scan mode was changed?
     if(old_mode != pDigitalReadCfg.scan_mode){
       //Scan mode was changed

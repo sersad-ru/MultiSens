@@ -63,8 +63,8 @@ void pAnalogRead(MultiSensCore& core){
       default: break;
     }//switch
 
-    if(pAnalogReadCfg.scan_mode < 0) pAnalogReadCfg.scan_mode = 0;
-    if(pAnalogReadCfg.scan_mode > (int8_t)arraySize(delays) - 1) pAnalogReadCfg.scan_mode = arraySize(delays) - 1;
+    pAnalogReadCfg.scan_mode = max(pAnalogReadCfg.scan_mode, 0);
+    pAnalogReadCfg.scan_mode = min(pAnalogReadCfg.scan_mode, (int8_t)arraySize(delays) - 1);
 
     // scan mode was changed?
     if(old_mode != pAnalogReadCfg.scan_mode){
