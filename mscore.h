@@ -57,6 +57,7 @@ typedef enum {
   BLOCK
 } MultiSensCursor;
 
+
 #define arraySize(_array) ( sizeof(_array) / sizeof(*(_array)) )
 // Макрос для приведения PROGMEM строк к const __FlashStringHelper*
 #define FF(val) ((const __FlashStringHelper*)val)
@@ -122,8 +123,23 @@ public:
 
 
   //** Returns pointer to string n format "Px: " where x - pin number from 0 to 7
+  //* pinNumber - pin number from 0 to 7
   char * getPinName(uint8_t pinNumber);
-    
+
+
+  //** Returns pointer to string representation of val, aligned right.
+  //* val - number
+  //* width - string width
+  //* fill - leading fill symbol
+  //* base - number base (DEC, HEX, OCT, BIN) 
+  char * rAlign(uint32_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+  char * rAlign(int32_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+  char * rAlign(uint16_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+  char * rAlign(int16_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+  char * rAlign(uint8_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+  char * rAlign(int8_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+
+
   virtual size_t write(uint8_t value);
   using Print::write;
   
@@ -134,7 +150,7 @@ private:
   int8_t _mnu_current; // Текущий пункт меню (запущенный плагин)
 
   flashcfg _cfg; // Сохраняемые во EEPROM настройки
-  char _printBuf[12]; // Буфер для подготоаки строк
+  char _printBuf[8 * sizeof(int32_t) + 1]; // Буфер для подготовки строк
 
   volatile MultiSensButton _btn_pressed_code; // Текущий код нажатой кнопки
   volatile MultiSensButton _btn_released_code; // Текущий код отпущенной кнопки
@@ -144,7 +160,7 @@ private:
   uint8_t _lcd_cursor_offset; // Текущее положение курсора в буфере
   uint8_t _lcd_stored_cursor; // Тут можно сохранить позицию курсора и потом давать кучу принтов в одно место, используя lcdRestoreCursor;
 
-
+  char * _rAlign(uint32_t val, uint8_t width, const char fill, uint8_t base, uint8_t isNegative); // Преобразует число в строку с выравниванием вправо.
   void _run_plugin(); // Запустить плагин
   uint16_t _cfg_calc_offset(); // Счиает смещение блока настроке для текущего плагина
   int _btn_read(); // Читает аналоговый пин, к которому подключены кнопки

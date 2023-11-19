@@ -211,6 +211,28 @@ char * MultiSensCore::getPinName(uint8_t pinNumber){
 }// getPinName
 
 
+char * MultiSensCore::rAlign(uint32_t val, const uint8_t width, const char fill, uint8_t base){
+  return _rAlign(val, width, fill, base, 0);
+}// rAlign
+char * MultiSensCore::rAlign(int32_t val, const uint8_t width, const char fill, uint8_t base){
+  if((base == 10) && (val < 0)) return _rAlign(-val, width, fill, base, 1); // Отрицательное число в десятичной системе
+  return _rAlign(val, width, fill, base, 0); // Все остальное
+}// rAlign
+
+char * MultiSensCore::rAlign(uint16_t val, const uint8_t width, const char fill, uint8_t base){
+  return rAlign((uint32_t) val, width, fill, base);
+}// rAlign
+char * MultiSensCore::rAlign(int16_t val, const uint8_t width, const char fill, uint8_t base){
+  return rAlign((int32_t) val, width, fill, base);
+}// rAlign
+
+char * MultiSensCore::rAlign(uint8_t val, const uint8_t width, const char fill, uint8_t base){
+  return rAlign((uint32_t) val, width, fill, base);
+}// rAlign
+char * MultiSensCore::rAlign(int8_t val, const uint8_t width, const char fill, uint8_t base){
+  return rAlign((int32_t) val, width, fill, base);
+}// rAlign
+
 
 // == EEPROM ==
 /*
@@ -366,6 +388,31 @@ MultiSensButton MultiSensCore::buttonReleased(){
 
 
 // == Внутренности ==
+char * MultiSensCore::_rAlign(uint32_t val, uint8_t width, const char fill, uint8_t base, uint8_t isNegative){
+  char *ptr = &_printBuf[sizeof(_printBuf) - 1]; // Указатель на конец строки
+  uint8_t size = 0; // Текущаа длина строки
+  *ptr = '\0'; // Ставим окончание строки
+  if((base < 2) || (isNegative)) base = 10; // Основание не может быть 0 или 1. Для отрицательных чисел основание всегда 10 
+  width = min(width, arraySize(_printBuf) - 1); // Ширина не может быть больше размера буфера  
+  width = max(width, 1); // Ширина не может быть меньше 1
+  do{
+    char c = val % base; //Младшая цифра
+    val /= base; // Сместились на один разряд
+    *--ptr = (c < 10) ? ('0' + c) : ('A' + c - 10); //Хватит только цифр или нужны еше буквы A-F 
+    size++; 
+  } while(val);
+  if((isNegative) && (fill == ' ')){ // Для заполнения пробелами сразу ставим минус
+    *--ptr = '-'; 
+    size++;
+    isNegative = 0; // Больше минусов не надо
+  }//if
+  for(uint8_t i = size; i < width; i++) *--ptr = fill; // Заполнение нужными символами
+  if(isNegative) *ptr = '-'; // Ставим минус вместо первого символа
+  if(size > width) ptr += (size - width); // Больше, чем width не выдавать. Обрезаем.
+  return ptr;
+}//_rAlign
+
+
 void MultiSensCore::_btn_isr(){
   MultiSensButton b = _btn_analog2btn(_btn_read()); // Читаем кнопку
   if(_btn_pressed_code != b) { // Новая кнопка

@@ -14,14 +14,8 @@
 #include "pAnalogRead.h"
 
 /*
- * Сделть в ядре printWidth для чисел с заполнением слева нулями или пробелами. Мак ширина 10(11 если с минусом и 14 если с разделением пробеламы тысяч). Для DEC и HEX
- * Пишем digitalRead (P0 + P1), P0 - INPUT, P1 - INPUT_PULLUP. Прерывания: пр спаду и по фронту 
- * Потом analodRead (P5 + P6),
  * 
- * Для цифры выбор задержки опроса: int 100 250 500 1000 1500 2000 ms
- * Для аналога выбор задержки опроса: 100 250 500 1000 1500 2000 ms
- * 
- * и PWM (P1 + P2 + P3(soft? https://arduino.ru/forum/programmirovanie/analogwrite-na-lyubom-vyvode?ysclid=loukar7shp891808399))
+ * PWM (P1 + P2 + P3(soft? https://arduino.ru/forum/programmirovanie/analogwrite-na-lyubom-vyvode?ysclid=loukar7shp891808399))
  * https://alexgyver.ru/lessons/pwm-signal/
  * 
 */
