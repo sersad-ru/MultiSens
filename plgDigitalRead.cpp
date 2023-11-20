@@ -1,4 +1,4 @@
-#include "pDigitalRead.h"
+#include "plgDigitalRead.h"
 
 #define INPUT_PIN P0
 #define INPUT_PULLUP_PIN P1
@@ -40,18 +40,18 @@ void _process_pin(uint8_t new_val, uint8_t offset, uint8_t &oldVal){
 
 
 // == Main plugin function ==
-void pDigitalRead(MultiSensCore& core){
+void plgDigitalRead(MultiSensCore& core){
   // Init    
   pinMode(INPUT_PIN, INPUT);
   pinMode(INPUT_PULLUP_PIN, INPUT_PULLUP);
 
   // Load settings from EEPROM 
-  if(!core.loadSettings((uint8_t*)&pDigitalReadCfg)){
-    pDigitalReadCfg.scan_mode = DEFAULT_SCAN_MODE;// Settings was reseted. Use default values
-    core.saveSettings((uint8_t*)&pDigitalReadCfg);// Save default value  
+  if(!core.loadSettings((uint8_t*)&plgDigitalReadCfg)){
+    plgDigitalReadCfg.scan_mode = DEFAULT_SCAN_MODE;// Settings was reseted. Use default values
+    core.saveSettings((uint8_t*)&plgDigitalReadCfg);// Save default value  
   }//if  
 
-  uint16_t cur_delay = pgm_read_word(&delays[pDigitalReadCfg.scan_mode]);
+  uint16_t cur_delay = pgm_read_word(&delays[plgDigitalReadCfg.scan_mode]);
   
   // Dispaly init
   core.moveCursor(0, 1); // First symbol of second line
@@ -69,29 +69,28 @@ void pDigitalRead(MultiSensCore& core){
   
   // Main loop
   while(1){
-    // Process user input
-    MultiSensButton btn = core.getButton();
-    switch (btn) {
+    // Process user input    
+    switch (core.getButton()) {
       case UP:
-      case UP_LONG: pDigitalReadCfg.scan_mode++; break;
+      case UP_LONG: plgDigitalReadCfg.scan_mode++; break;
       
       case DOWN:
-      case DOWN_LONG: pDigitalReadCfg.scan_mode--; break;
+      case DOWN_LONG: plgDigitalReadCfg.scan_mode--; break;
         
-      case SELECT_LONG: core.saveSettings((uint8_t*)&pDigitalReadCfg); break; // save settings to EEPROM
+      case SELECT_LONG: core.saveSettings((uint8_t*)&plgDigitalReadCfg); break; // save settings to EEPROM
       
       default: break;
     }//switch
 
-    pDigitalReadCfg.scan_mode = max(pDigitalReadCfg.scan_mode, 0);
-    pDigitalReadCfg.scan_mode = min(pDigitalReadCfg.scan_mode, (int8_t)arraySize(delays) - 1);
+    plgDigitalReadCfg.scan_mode = max(plgDigitalReadCfg.scan_mode, 0);
+    plgDigitalReadCfg.scan_mode = min(plgDigitalReadCfg.scan_mode, (int8_t)arraySize(delays) - 1);
     
     // scan mode was changed?
-    if(old_mode != pDigitalReadCfg.scan_mode){
+    if(old_mode != plgDigitalReadCfg.scan_mode){
       //Scan mode was changed
-      old_mode = pDigitalReadCfg.scan_mode;
+      old_mode = plgDigitalReadCfg.scan_mode;
       core.moveCursor(12, 1);
-      if(pDigitalReadCfg.scan_mode == 0){ // Interrupt mode
+      if(plgDigitalReadCfg.scan_mode == 0){ // Interrupt mode
         core.println(F("INT"));
         Serial.println(F("P0, P1 (Interrup mode.)"));        
         attachInterrupt(digitalPinToInterrupt(INPUT_PIN), _p0_isr, CHANGE);
@@ -101,7 +100,7 @@ void pDigitalRead(MultiSensCore& core){
       // delay mode
       detachInterrupt(digitalPinToInterrupt(INPUT_PIN));
       detachInterrupt(digitalPinToInterrupt(INPUT_PULLUP_PIN));
-      cur_delay = pgm_read_word(&delays[pDigitalReadCfg.scan_mode]);
+      cur_delay = pgm_read_word(&delays[plgDigitalReadCfg.scan_mode]);
       core.println(cur_delay);
       Serial.print(F("P0, P1 ("));
       Serial.print(cur_delay);
@@ -109,7 +108,7 @@ void pDigitalRead(MultiSensCore& core){
     }//if
 
     // Interrupt mode pin values
-    if(pDigitalReadCfg.scan_mode == 0){ 
+    if(plgDigitalReadCfg.scan_mode == 0){ 
       if(newP0 != oldP0){ // P0 interrupt
         _process_pin(newP0, 3, oldP0);
         Serial.print(F(", 1 (P0+"));
@@ -134,4 +133,4 @@ void pDigitalRead(MultiSensCore& core){
     Serial.println();
     delay(cur_delay);
   }//while
-}//pDigitalRead
+}//plgDigitalRead

@@ -1,4 +1,4 @@
-#include "pAnalogRead.h"
+#include "plgAnalogRead.h"
 
 #define WORK_PIN_1 P5
 #define WORK_PIN_2 P6
@@ -24,16 +24,16 @@ void _process_pin(uint16_t new_val, uint8_t offset, uint16_t &oldVal){
 
 
 // == Main plugin function ==
-void pAnalogRead(MultiSensCore& core){
+void plgAnalogRead(MultiSensCore& core){
   // Init
 
   // Load settings from EEPROM 
-  if(!core.loadSettings((uint8_t*)&pAnalogReadCfg)){
-    pAnalogReadCfg.scan_mode = DEFAULT_SCAN_MODE;// Settings was reseted. Use default values
-    core.saveSettings((uint8_t*)&pAnalogReadCfg);// Save default value  
+  if(!core.loadSettings((uint8_t*)&plgAnalogReadCfg)){
+    plgAnalogReadCfg.scan_mode = DEFAULT_SCAN_MODE;// Settings was reseted. Use default values
+    core.saveSettings((uint8_t*)&plgAnalogReadCfg);// Save default value  
   }//if  
 
-  uint16_t cur_delay = pgm_read_word(&delays[pAnalogReadCfg.scan_mode]);
+  uint16_t cur_delay = pgm_read_word(&delays[plgAnalogReadCfg.scan_mode]);
 
   // Dispaly init
   core.moveCursor(0, 1); // First symbol of second line
@@ -49,30 +49,29 @@ void pAnalogRead(MultiSensCore& core){
     
   // Main loop
   while(1){
-    // Process user input
-    MultiSensButton btn = core.getButton();
-    switch (btn) {
+    // Process user input    
+    switch (core.getButton()) {
       case UP:
-      case UP_LONG: pAnalogReadCfg.scan_mode++; break;
+      case UP_LONG: plgAnalogReadCfg.scan_mode++; break;
       
       case DOWN:
-      case DOWN_LONG: pAnalogReadCfg.scan_mode--; break;
+      case DOWN_LONG: plgAnalogReadCfg.scan_mode--; break;
         
-      case SELECT_LONG: core.saveSettings((uint8_t*)&pAnalogReadCfg);break;   // save settings to EEPROM
+      case SELECT_LONG: core.saveSettings((uint8_t*)&plgAnalogReadCfg);break;   // save settings to EEPROM
       
       default: break;
     }//switch
 
-    pAnalogReadCfg.scan_mode = max(pAnalogReadCfg.scan_mode, 0);
-    pAnalogReadCfg.scan_mode = min(pAnalogReadCfg.scan_mode, (int8_t)arraySize(delays) - 1);
+    plgAnalogReadCfg.scan_mode = max(plgAnalogReadCfg.scan_mode, 0);
+    plgAnalogReadCfg.scan_mode = min(plgAnalogReadCfg.scan_mode, (int8_t)arraySize(delays) - 1);
 
     // scan mode was changed?
-    if(old_mode != pAnalogReadCfg.scan_mode){
+    if(old_mode != plgAnalogReadCfg.scan_mode){
       //Scan mode was changed
-      old_mode = pAnalogReadCfg.scan_mode;
+      old_mode = plgAnalogReadCfg.scan_mode;
       core.moveCursor(18, 1);
       // delay mode
-      cur_delay = pgm_read_word(&delays[pAnalogReadCfg.scan_mode]);
+      cur_delay = pgm_read_word(&delays[plgAnalogReadCfg.scan_mode]);
       core.println(cur_delay);
       Serial.print(F("P5, P6 ("));
       Serial.print(cur_delay);
@@ -86,4 +85,4 @@ void pAnalogRead(MultiSensCore& core){
     Serial.println();
     delay(cur_delay);
   }//while  
-}//pAnalogRead
+}//plgAnalogRead

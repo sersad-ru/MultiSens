@@ -1,4 +1,4 @@
-#include "pFindPin.h"
+#include "plgFindPin.h"
 
 const char pFP_NOT_FOUND[] PROGMEM = "Not found";
 
@@ -27,7 +27,7 @@ void _find_pin(MultiSensCore& core){
 
 
 // == Main plugin function ==
-void pFindPin(MultiSensCore& core){
+void plgFindPin(MultiSensCore& core){
   // Init
   core.moveCursor(0, 1); // First symbol of second line
   core.print(F("pin->GND,"));
@@ -45,4 +45,4 @@ void pFindPin(MultiSensCore& core){
     core.print(MS_SYM_SELECT_CODE);
     core.println(F("-next scan"));
   }//while  
-}//pFindPin
+}//plgFindPin

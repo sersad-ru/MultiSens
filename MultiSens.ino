@@ -9,22 +9,26 @@
 */
 
 #include "mscore.h"
-#include "pFindPin.h"
-#include "pDigitalRead.h"
-#include "pAnalogRead.h"
+#include "plgFindPin.h"
+#include "plgDigitalRead.h"
+#include "plgAnalogRead.h"
+#include "plgPWM.h"
 
 /*
  * 
  * PWM (P1 + P2 + P3(soft? https://arduino.ru/forum/programmirovanie/analogwrite-na-lyubom-vyvode?ysclid=loukar7shp891808399))
  * https://alexgyver.ru/lessons/pwm-signal/
  * 
+ * !!! Дописать soft PWM. Хватил ли 490 вызовов. И что там вообще будет. 
+ * 
 */
 
 // Registred plugins
 MultiSensPlugin plugins[] = {
-  {&pFindPin, "FindPin", 0},
-  {&pDigitalRead, "DigitalRead", sizeof(pDigitalReadCfg)},
-  {&pAnalogRead, "AnalogRead", sizeof(pAnalogReadCfg)},
+  {&plgFindPin, "FindPin", 0},
+  {&plgDigitalRead, "DigitalRead", sizeof(plgDigitalReadCfg)},
+  {&plgAnalogRead, "AnalogRead", sizeof(plgAnalogReadCfg)},
+  {&plgPWM, "PWM", sizeof(plgPWMCfg)},
 }; // 
 
 

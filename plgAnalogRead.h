@@ -14,6 +14,6 @@
 struct{
   int8_t scan_mode;
   
-} pAnalogReadCfg;
+} plgAnalogReadCfg;
 
-void pAnalogRead(MultiSensCore& core);
+void plgAnalogRead(MultiSensCore& core);

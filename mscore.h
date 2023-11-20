@@ -98,7 +98,7 @@ public:
   //* code - custom symbol code
   //* data - custom symbol data array (see mscustomsymbols.h) 
   void createSymbol(const uint8_t code, PMultiSensSymbol data);
-
+  
   //** Returns single button code if the button was short pressed, and repeats button codes for long pressed button
   MultiSensButton getButton();
 

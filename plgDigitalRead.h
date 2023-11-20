@@ -20,6 +20,6 @@
 struct{
   int8_t scan_mode;
   
-} pDigitalReadCfg;
+} plgDigitalReadCfg;
 
-void pDigitalRead(MultiSensCore& core);
+void plgDigitalRead(MultiSensCore& core);

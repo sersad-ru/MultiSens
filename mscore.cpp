@@ -46,7 +46,7 @@
 #define _PORT_INPUT(P, M)    (P &= ~(M))           // Сконфигурировать порт на ввод
 #define _PORT_SET_LOW(P, M)  (P &= ~(M))           // Сбросить пин
 #define _PORT_SET_HIGH(P, M) (P |=  (M))           // Установить пин
-#define _PORT_READ(P, M)     ((P &   (M)) ? 1 : 0) // Прочесть пин
+#define _PORT_READ(P, M)    ((P &   (M)) ? 1 : 0)  // Прочесть пин
 
 // Макросы и переменная для сохранения статусного регистра и запрета/разрешения прерываний
 #define _INT_OFF _mscore_oldSREG = SREG; cli()
@@ -429,7 +429,7 @@ void MultiSensCore::_btn_isr(){
     case RIGHT_LONG: 
     case RIGHT: _lcd_scroll_left();  break;
     case LEFT: _lcd_scroll_right(); break;
-    case LEFT_LONG: home(); break;
+    case LEFT_LONG: storeCursor(); home(); restoreCursor(); break;
     default: break;
   }//switch  
 }//checkButton
