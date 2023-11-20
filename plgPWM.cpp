@@ -88,7 +88,10 @@ void plgPWM(MultiSensCore& core){
     _set_pwm(pins[i], plgPWMCfg.duty[i]); // Start pwm
   }//for
   core.moveCursor(offsets[cur_channel] - 3, 1);
-    
+
+  volatile uint8_t _duty3 = 32;
+  static volatile uint8_t cnt = 0;    
+  
   // Main loop
   while(1){
     // Process user input    
@@ -125,15 +128,23 @@ void plgPWM(MultiSensCore& core){
       
       default: break;
     }//switch    
+    
+
+  if(!cnt) digitalWrite(CH3_PIN, HIGH);
+  if(cnt == _duty3) digitalWrite(CH3_PIN, LOW);
+  cnt++;
+    
   }//while
 }//plgPWM
 
-volatile uint8_t _duty3 = 0;
+volatile uint8_t _duty3 = 128;
 // Обработчик прерывания для програмного PWM
 // По пререполнению. По сравнению одновременно с PWM не работает. В результате 490 раз в секунду.
 ISR(TIMER2_OVF_vect){
+/*  
   static volatile uint8_t cnt = 0;
   if(!cnt) digitalWrite(CH3_PIN, HIGH);
   if(cnt == _duty3) digitalWrite(CH3_PIN, LOW);
   cnt++;
+*/  
 }//ISR
