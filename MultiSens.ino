@@ -6,6 +6,8 @@
 * 
 * 01.11.2023
 * 09.11.2023
+* 
+* Arduino AVR Boards / Arduino UNO
 */
 
 #include "mscore.h"
