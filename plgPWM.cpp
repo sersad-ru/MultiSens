@@ -11,23 +11,30 @@
 
 #define DEFAULT_DUTY 0
 
-
-void _set_pwm(uint8_t pin, uint8_t duty){
-  if(pin == CH3_PIN) return; // CH3 - soft PWM
-  analogWrite(pin, duty);
+// const uint8_t (&offsets)[]
+void _set_pwm(uint8_t pin_num, const uint8_t offsets[], const uint8_t pins[]){
+  // Print new value
+  core.moveCursor(offsets[pin_num], 1);
+  core.print(core.rAlign(plgPWMCfg.duty[pin_num], 3));
+  core.moveCursor(offsets[pin_num] - 3, 1);
+  Serial.print(core.getPinName(pins[pin_num]));
+  Serial.println(plgPWMCfg.duty[pin_num]);
+  
+  if(pin_num == CH3_NUM) return; // CH3 - soft PWM
+  analogWrite(pins[pin_num], plgPWMCfg.duty[pin_num]); //set new value
 }//_set_pwm
 
 
 // == Main plugin function ==
-void plgPWM(MultiSensCore& core){
+void plgPWM(){
   // Init
   pinMode(CH3_PIN, OUTPUT);
   
   // Load settings from EEPROM 
   if(!core.loadSettings((uint8_t*)&plgPWMCfg)){
     plgPWMCfg.duty[CH1_NUM] = DEFAULT_DUTY;// Settings was reseted. Use default values
-    plgPWMCfg.duty[CH2_NUM] = DEFAULT_DUTY;// Settings was reseted. Use default values
-    plgPWMCfg.duty[CH3_NUM] = DEFAULT_DUTY;// Settings was reseted. Use default values    
+    plgPWMCfg.duty[CH2_NUM] = DEFAULT_DUTY;
+    plgPWMCfg.duty[CH3_NUM] = DEFAULT_DUTY;
     core.saveSettings((uint8_t*)&plgPWMCfg);// Save default value  
   }//if  
 
@@ -40,57 +47,41 @@ void plgPWM(MultiSensCore& core){
   core.print(core.getPinName(CH3_PIN));
   core.setCursorType(BLOCK);
 
-  //  
+  // Cursor offsets and pins array 
   const uint8_t offsets[] = {3, 10, 17};
-  const uint8_t pins[] = {CH1_PIN, CH2_PIN, CH3_PIN};  
+  const uint8_t pins[] = {CH1_PIN, CH2_PIN, CH3_PIN};
+
   uint8_t cur_channel = 0;
   uint8_t wrk_duty = plgPWMCfg.duty[CH3_NUM];
   uint8_t cnt = 0;    
 
-
   // Start with current duties
-  for(uint8_t i = 0; i < 3; i++){
-    core.moveCursor(offsets[i], 1);
-    core.print(core.rAlign(plgPWMCfg.duty[i], 3));
-    Serial.print(core.getPinName(pins[i]));
-    Serial.println(plgPWMCfg.duty[i]);
-    _set_pwm(pins[i], plgPWMCfg.duty[i]); // Start pwm
-  }//for
-  core.moveCursor(offsets[cur_channel] - 3, 1);
+  for(uint8_t i = 0; i < 3; i++) _set_pwm(i, offsets, pins); // Start pwm
+  core.moveCursor(offsets[cur_channel] - 3, 1); // Return cursor to current channel position
   
   // Main loop
   while(1){
     // Process user input    
     switch (core.getButton()) {
       case UP:
-      case UP_LONG:  
+      case UP_LONG: // Increase duty of current channel
         plgPWMCfg.duty[cur_channel] ++;
-        core.moveCursor(offsets[cur_channel], 1);
-        core.print(core.rAlign(plgPWMCfg.duty[cur_channel], 3));
-        core.moveCursor(offsets[cur_channel] - 3, 1);
-        Serial.print(core.getPinName(pins[cur_channel]));
-        Serial.println(plgPWMCfg.duty[cur_channel]);        
-        _set_pwm(pins[cur_channel], plgPWMCfg.duty[cur_channel]); // Change pwm
+        _set_pwm(cur_channel, offsets, pins);
       break;
       
       case DOWN:
-      case DOWN_LONG:  
+      case DOWN_LONG:  // Decrease duty of current channel
         plgPWMCfg.duty[cur_channel] --;
-        core.moveCursor(offsets[cur_channel], 1);
-        core.print(core.rAlign(plgPWMCfg.duty[cur_channel], 3));
-        core.moveCursor(offsets[cur_channel] - 3, 1);
-        Serial.print(core.getPinName(pins[cur_channel]));
-        Serial.println(plgPWMCfg.duty[cur_channel]);        
-        _set_pwm(pins[cur_channel], plgPWMCfg.duty[cur_channel]); // Change pwm
+        _set_pwm(cur_channel, offsets, pins);
       break;
       
-      case SELECT: 
+      case SELECT: // Change current channel
         cur_channel++;
-        if(cur_channel > 2) cur_channel = 0;
+        if(cur_channel > arraySize(pins) - 1) cur_channel = 0;
         core.moveCursor(offsets[cur_channel] - 3, 1);
       break;  
       
-      case SELECT_LONG: core.saveSettings((uint8_t*)&plgPWMCfg); break;   // save settings to EEPROM
+      case SELECT_LONG: core.saveSettings((uint8_t*)&plgPWMCfg); break;   // Save settings to EEPROM
       
       default: break;
     }//switch       
@@ -100,7 +91,7 @@ void plgPWM(MultiSensCore& core){
      wrk_duty = plgPWMCfg.duty[CH3_NUM];
      if(wrk_duty) digitalWrite(CH3_PIN, HIGH);     
    }//if
-   if(cnt == wrk_duty) digitalWrite(CH3_PIN, LOW);
+   if((cnt == wrk_duty) && (wrk_duty < 255)) digitalWrite(CH3_PIN, LOW);
    cnt++;   
   }//while
 }//plgPWM

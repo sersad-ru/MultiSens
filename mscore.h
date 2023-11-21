@@ -21,8 +21,8 @@
 
 class MultiSensCore;
 
-// Plugin functione type
-typedef void (*PluginFunction)(MultiSensCore& core);
+// Plugin function type (MultiSensCore object is available globally as 'core')
+typedef void (*PluginFunction)(void);
 
 
 // Plugin element
@@ -158,7 +158,10 @@ private:
   volatile uint8_t _btn_released_count; // Сколько вызовов таймера кнопка была нажатой до отпускания
   
   uint8_t _lcd_cursor_offset; // Текущее положение курсора в буфере
-  uint8_t _lcd_stored_cursor; // Тут можно сохранить позицию курсора и потом давать кучу принтов в одно место, используя lcdRestoreCursor;
+  uint8_t _lcd_stored_cursor; // Тут можно сохранить позицию курсора и потом давать кучу принтов в одно место, используя lcdRestoreCursor;  
+  
+  MultiSensCursor _lcd_cursor_type; // Текущий тип курсора
+  MultiSensCursor _lcd_stored_cursor_type; // Сохраненный тип курсора
 
   char * _rAlign(uint32_t val, uint8_t width, const char fill, uint8_t base, uint8_t isNegative); // Преобразует число в строку с выравниванием вправо.
   void _run_plugin(); // Запустить плагин

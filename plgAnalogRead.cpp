@@ -24,7 +24,7 @@ void _process_pin(uint16_t new_val, uint8_t offset, uint16_t &oldVal){
 
 
 // == Main plugin function ==
-void plgAnalogRead(MultiSensCore& core){
+void plgAnalogRead(){
   // Init
 
   // Load settings from EEPROM 
@@ -65,7 +65,7 @@ void plgAnalogRead(MultiSensCore& core){
     plgAnalogReadCfg.scan_mode = max(plgAnalogReadCfg.scan_mode, 0);
     plgAnalogReadCfg.scan_mode = min(plgAnalogReadCfg.scan_mode, (int8_t)arraySize(delays) - 1);
 
-    // scan mode was changed?
+    // was scan mode changed?
     if(old_mode != plgAnalogReadCfg.scan_mode){
       //Scan mode was changed
       old_mode = plgAnalogReadCfg.scan_mode;

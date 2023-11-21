@@ -40,7 +40,7 @@ void _process_pin(uint8_t new_val, uint8_t offset, uint8_t &oldVal){
 
 
 // == Main plugin function ==
-void plgDigitalRead(MultiSensCore& core){
+void plgDigitalRead(){
   // Init    
   pinMode(INPUT_PIN, INPUT);
   pinMode(INPUT_PULLUP_PIN, INPUT_PULLUP);

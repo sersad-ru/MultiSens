@@ -2,7 +2,7 @@
 
 const char pFP_NOT_FOUND[] PROGMEM = "Not found";
 
-void _find_pin(MultiSensCore& core){
+void _find_pin(){
   uint8_t pins[] = {2, 3, 11, 12, 13, 17, 18, 19};
   for(uint8_t i = 0; i < arraySize(pins); i++){
     core.print(MS_SYM_PROGRESS_CODE);
@@ -27,7 +27,7 @@ void _find_pin(MultiSensCore& core){
 
 
 // == Main plugin function ==
-void plgFindPin(MultiSensCore& core){
+void plgFindPin(){
   // Init
   core.moveCursor(0, 1); // First symbol of second line
   core.print(F("pin->GND,"));
@@ -40,7 +40,7 @@ void plgFindPin(MultiSensCore& core){
 
     core.moveCursor(0, 1); // First symbol of second line
     core.println();   
-    _find_pin(core);
+    _find_pin();
     core.print(" | ");
     core.print(MS_SYM_SELECT_CODE);
     core.println(F("-next scan"));

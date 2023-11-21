@@ -8,4 +8,4 @@
 * to see which msPin number is atteached to this wire.
 */
 
-void plgFindPin(MultiSensCore& core);
+void plgFindPin();

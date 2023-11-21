@@ -197,7 +197,7 @@ void MultiSensCore::_run_plugin(){
   moveCursor((strlen(_plugins[_mnu_current].title) < 16)?(16 - strlen(_plugins[_mnu_current].title)) >> 1 : 0, 0);
   println(_plugins[_mnu_current].title); // Выводим названия плагина
   Serial.println(_plugins[_mnu_current].title);
-  _plugins[_mnu_current].run(*this); // Запускаем плагин
+  _plugins[_mnu_current].run(); // Запускаем плагин
   asm volatile("jmp 0x00");// Если вдруг плагин вышел (хотя не должен), перегружаемся как можем
 }//_run_plugin
 
@@ -250,23 +250,34 @@ uint16_t MultiSensCore::_cfg_calc_offset(){
 
 
 void MultiSensCore::saveSettings(uint8_t * data){
+  static uint32_t last_act = 0; // Первый запуск разрешать, а дальше чаще раза в секунду не делать
+  if((millis() - last_act) < 1000) return; 
+  last_act = millis();
+  
   uint16_t start = _cfg_calc_offset(); // получили начальное смещение для текущего плагина
   if((start + _plugins[_mnu_current].cfg_size) > 1023) return; // За границы EEPROM-а не лезем
   EEPROM.update(start - 1, 0); // Ставим флаг валидности
   // Тут пишем
   for(uint8_t i = 0; i < _plugins[_mnu_current].cfg_size; i++) EEPROM.update(start + i,  data[i]); 
+  
+  // Даем сигнал, что записалось
+  for(uint8_t i = LCD_PWM_VALUE; i > 0; i--){
+    LCD_PWM_COUNTER_REG = i;
+    delay(2);
+  }//for
+  for(uint8_t i = 0; i < LCD_PWM_VALUE; i++){
+    LCD_PWM_COUNTER_REG = i;
+    delay(2);
+  }//for
 }//saveSettings
 
 
 bool MultiSensCore::loadSettings(uint8_t * data){
   uint16_t start = _cfg_calc_offset(); // получили начальное смещение
-  
   //Читаем флаг валидности
   if(EEPROM.read(start - 1)) return false;  // Если там 0 - данные валидны, иначе нет.
-  
   //Тут читаем
   for(uint8_t i = 0; i < _plugins[_mnu_current].cfg_size; i++) data[i] = EEPROM.read(start + i); 
-   
   return true;
 }//loadSettings
 
@@ -280,6 +291,7 @@ void MultiSensCore::setCursorType(MultiSensCursor ct){
   case UNDERLINE:  _lcd_command(LCD_DM | LCD_DM_DISPLAY_ON | LCD_DM_LINE_CURSOR_ON  | LCD_DM_BLOCK_CURSOR_OFF); break;
   case BLOCK:      _lcd_command(LCD_DM | LCD_DM_DISPLAY_ON | LCD_DM_LINE_CURSOR_OFF | LCD_DM_BLOCK_CURSOR_ON);  break; 
  }//switch  
+ _lcd_cursor_type = ct;
 }//setCursorType
 
 
@@ -309,12 +321,14 @@ void MultiSensCore::moveCursor(uint8_t col, uint8_t row){
 
 void MultiSensCore::storeCursor(){
   _lcd_stored_cursor = _lcd_cursor_offset;
+  _lcd_stored_cursor_type = _lcd_cursor_type;
 }//lcdStoreCursor
 
 
 void MultiSensCore::restoreCursor(){
   _lcd_cursor_offset = _lcd_stored_cursor; // Восстанавливаем
   _lcd_command(LCD_AC_DDRAM | _lcd_cursor_offset); // Записываем  
+  setCursorType(_lcd_stored_cursor_type); // Восстанавливаем тип курсора 
 }//lcdRestoreCursor
 
 
@@ -534,7 +548,7 @@ void MultiSensCore::_lcd_send_half_byte(uint8_t value){
 }//_lcd_send_half_byte
 
 
-MultiSensCore core = MultiSensCore();
+MultiSensCore core = MultiSensCore(); // Глобальное определение core как экземпляра MultiSensCore
 
 // Обработчик прерывания для опроса кнопки
 // По пререполнению. По сравнению одновременно с PWM не работает. В результате 490 раз в секунду.

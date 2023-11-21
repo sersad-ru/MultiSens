@@ -11,7 +11,7 @@
 * Additional mode is INTERRUPT mode. Interrupts are configured as CHANGE on both pins. In interrupt mode values are printed only if an interrupt occurs.
 * When print to serial no only values are printed but time (in ms) since last changes of values.
 * Current delay is displayed after P1 value (use LEFT and RIGTH buttuns to scrool the screen)
-* Press and hold SELECT button to store curren delay in EEPROM.
+* Press and hold SELECT button to store current delay in EEPROM.
 * Hold DOWN button and pres RESET to clear stored value and return to defaults. (ATTENTION! All stored data will be cleared. FOR ALL plugins!)
 
 */
@@ -22,4 +22,4 @@ struct{
   
 } plgDigitalReadCfg;
 
-void plgDigitalRead(MultiSensCore& core);
+void plgDigitalRead();
