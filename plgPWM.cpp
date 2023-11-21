@@ -11,38 +11,10 @@
 
 #define DEFAULT_DUTY 0
 
-#define PWM_MASK_REG TIMSK2 // Регист маски прерывания таймера для опроса кнопки (TIMER1, канал A, штатный делитеть /64)
-#define PWM_MASK_BIT TOIE1  // Бит маски перерывания таймера для опроса кнопки (по переполнению 490 раз в секунду)
-
-// Манипуляции с портами
-#define _PORT_OUTPUT(P, M)   (P |=  (M))           // Сконфигурировать порт на вывод
-#define _PORT_INPUT(P, M)    (P &= ~(M))           // Сконфигурировать порт на ввод
-#define _PORT_SET_LOW(P, M)  (P &= ~(M))           // Сбросить пин
-#define _PORT_SET_HIGH(P, M) (P |=  (M))           // Установить пин
-#define _PORT_READ(P, M)    ((P &   (M)) ? 1 : 0)  // Прочесть пин
-
-// Макросы и переменная для сохранения статусного регистра и запрета/разрешения прерываний
-#define _INT_OFF _PWM_oldSREG = SREG; cli()
-#define _INT_ON SREG = _PWM_oldSREG
-uint8_t _PWM_oldSREG;
-
 
 void _set_pwm(uint8_t pin, uint8_t duty){
-/*  
-  if(pin == CH3_PIN){ 
-    pinMode(CH3_PIN, OUTPUT);
-    digitalWrite(CH3_PIN, HIGH);
-    return;
-  }
-*/  
+  if(pin == CH3_PIN) return; // CH3 - soft PWM
   analogWrite(pin, duty);
-  Serial.print("TCCR2A: 0x");
-  Serial.println(TCCR2A, HEX);
-  Serial.print("TCCR2B: 0x");
-  Serial.println(TCCR2B, HEX);
-  Serial.print("TIMSK2: 0x");
-  Serial.println(TIMSK2, HEX);
-  
 }//_set_pwm
 
 
@@ -59,12 +31,6 @@ void plgPWM(MultiSensCore& core){
     core.saveSettings((uint8_t*)&plgPWMCfg);// Save default value  
   }//if  
 
-  // Прерывания таймера для опроса клавиатуры
-  _INT_OFF;
-  _PORT_SET_HIGH(PWM_MASK_REG, _BV(PWM_MASK_BIT));  // По переполнению. По сравнению одновременно с PWM не работает. В результате 490 раз в секунду. 
-  _INT_ON;
-
-  
   // Display Init
   core.moveCursor(0, 1); // First symbol of second line
   core.print(core.getPinName(CH1_PIN));  
@@ -78,6 +44,9 @@ void plgPWM(MultiSensCore& core){
   const uint8_t offsets[] = {3, 10, 17};
   const uint8_t pins[] = {CH1_PIN, CH2_PIN, CH3_PIN};  
   uint8_t cur_channel = 0;
+  uint8_t wrk_duty = plgPWMCfg.duty[CH3_NUM];
+  uint8_t cnt = 0;    
+
 
   // Start with current duties
   for(uint8_t i = 0; i < 3; i++){
@@ -88,9 +57,6 @@ void plgPWM(MultiSensCore& core){
     _set_pwm(pins[i], plgPWMCfg.duty[i]); // Start pwm
   }//for
   core.moveCursor(offsets[cur_channel] - 3, 1);
-
-  volatile uint8_t _duty3 = 32;
-  static volatile uint8_t cnt = 0;    
   
   // Main loop
   while(1){
@@ -127,24 +93,14 @@ void plgPWM(MultiSensCore& core){
       case SELECT_LONG: core.saveSettings((uint8_t*)&plgPWMCfg); break;   // save settings to EEPROM
       
       default: break;
-    }//switch    
-    
+    }//switch       
 
-  if(!cnt) digitalWrite(CH3_PIN, HIGH);
-  if(cnt == _duty3) digitalWrite(CH3_PIN, LOW);
-  cnt++;
-    
+   // software PWM
+   if(!cnt){
+     wrk_duty = plgPWMCfg.duty[CH3_NUM];
+     if(wrk_duty) digitalWrite(CH3_PIN, HIGH);     
+   }//if
+   if(cnt == wrk_duty) digitalWrite(CH3_PIN, LOW);
+   cnt++;   
   }//while
 }//plgPWM
-
-volatile uint8_t _duty3 = 128;
-// Обработчик прерывания для програмного PWM
-// По пререполнению. По сравнению одновременно с PWM не работает. В результате 490 раз в секунду.
-ISR(TIMER2_OVF_vect){
-/*  
-  static volatile uint8_t cnt = 0;
-  if(!cnt) digitalWrite(CH3_PIN, HIGH);
-  if(cnt == _duty3) digitalWrite(CH3_PIN, LOW);
-  cnt++;
-*/  
-}//ISR
