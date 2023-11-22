@@ -15,9 +15,9 @@
 #include "plgDigitalRead.h"
 #include "plgAnalogRead.h"
 #include "plgPWM.h"
+#include "plgAM2302.h"
 
 /*
- *  AM3202 (DHT11)
  *  DS18B20 и следом таблетки dallas
  * 
 */
@@ -28,6 +28,7 @@ MultiSensPlugin plugins[] = {
   {&plgDigitalRead, "DigitalRead", sizeof(plgDigitalReadCfg)},
   {&plgAnalogRead, "AnalogRead", sizeof(plgAnalogReadCfg)},
   {&plgPWM, "PWM", sizeof(plgPWMCfg)},
+  {&plgAM2302, "AM2302/DHT22", 0},
 }; // 
 
 

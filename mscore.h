@@ -19,6 +19,9 @@
 #define P7 P(7) // 19 Analog  - SCL        - Gray-Black
 
 
+const char MS_MSG_READ_ERROR[] PROGMEM = "Read error";
+const char MS_MSG_DELAY_END[] PROGMEM = "ms)";
+
 class MultiSensCore;
 
 // Plugin function type (MultiSensCore object is available globally as 'core')

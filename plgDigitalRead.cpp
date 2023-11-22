@@ -104,7 +104,7 @@ void plgDigitalRead(){
       core.println(cur_delay);
       Serial.print(F("P0, P1 ("));
       Serial.print(cur_delay);
-      Serial.println(F("ms)"));   
+      Serial.println(FF(MS_MSG_DELAY_END));   
     }//if
 
     // Interrupt mode pin values
@@ -113,7 +113,7 @@ void plgDigitalRead(){
         _process_pin(newP0, 3, oldP0);
         Serial.print(F(", 1 (P0+"));
         Serial.print(millis() - timeP0);
-        Serial.println(F("ms)"));
+        Serial.println(FF(MS_MSG_DELAY_END));
         timeP0 = millis();
       }//if
       if(newP1 != oldP1){ // P1 interrupt
@@ -121,7 +121,7 @@ void plgDigitalRead(){
         _process_pin(newP1, 8, oldP1);
         Serial.print(F(" (P1+"));
         Serial.print(millis() - timeP1);
-        Serial.println(F("ms)"));
+        Serial.println(FF(MS_MSG_DELAY_END));
       }//if 
       continue;    
     }//if

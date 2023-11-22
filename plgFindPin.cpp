@@ -1,6 +1,6 @@
 #include "plgFindPin.h"
 
-const char pFP_NOT_FOUND[] PROGMEM = "Not found";
+const char plgFP_NOT_FOUND[] PROGMEM = "Not found";
 
 void _find_pin(){
   uint8_t pins[] = {2, 3, 11, 12, 13, 17, 18, 19};
@@ -21,8 +21,8 @@ void _find_pin(){
   }//for
   
   core.moveCursor(0, 1); 
-  core.print(FF(pFP_NOT_FOUND));       
-  Serial.println(FF(pFP_NOT_FOUND));
+  core.print(FF(plgFP_NOT_FOUND));       
+  Serial.println(FF(plgFP_NOT_FOUND));
 }//_findpin
 
 

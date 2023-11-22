@@ -75,7 +75,7 @@ void plgAnalogRead(){
       core.println(cur_delay);
       Serial.print(F("P5, P6 ("));
       Serial.print(cur_delay);
-      Serial.println(F("ms)"));   
+      Serial.println(FF(MS_MSG_DELAY_END));   
     }//if
 
     // Scan Mode pin values
