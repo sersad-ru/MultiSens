@@ -9,7 +9,7 @@
 #define DO_READ          0xFF //Если надо читать, то передаем 0xFF в exchange_byte
 
 //** Сброс шины и ожидание ответа от устройства (1 - ok, 0 - все плохо)
-uint8_t uOW_reset(uint8_t pin){
+uint8_t uOW_reset(const uint8_t pin){
   //Выставляем низкий уровень
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
@@ -27,7 +27,7 @@ uint8_t uOW_reset(uint8_t pin){
 
 
 //** Производит обмен битом данных (для чтения передаем 1 и смотрим результат, для записи на результат забиваем)
-uint8_t _exchange_bit(uint8_t pin, uint8_t data){
+uint8_t _exchange_bit(const uint8_t pin, uint8_t data){
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW); //Выставляем низкий уровень (начинаем таймслот)
   delayMicroseconds(7); //Держим его половину интервала в 15 us
@@ -54,14 +54,14 @@ uint8_t _exchange_bit(uint8_t pin, uint8_t data){
  * 4. Если пришедший бит = 1, ставим его старшим, иначе старшим будет 0
  * 5. Таким образом в цикле данные для записи постепенно заменяются данными чтения
 */
-uint8_t uOW_exchangeByte(uint8_t pin, uint8_t data){
+uint8_t uOW_exchangeByte(const uint8_t pin, uint8_t data){
   for(uint8_t i = 0; i < 8; i++) data = _exchange_bit(pin, data & 0x01) ? (data >> 1) | (1 << 7) : data >> 1;
   return data;  
 }//uOW_exchangeByte
 
 
 //** Чтение блока данных
-void uOW_readBuf(uint8_t pin, uint8_t * data, uint8_t size){
+void uOW_readBuf(const uint8_t pin, uint8_t * data, const uint8_t size){
   for(uint8_t i = 0; i < size; i++) data[i] = uOW_exchangeByte(pin, DO_READ);
 }//uOW_readBuf
 
@@ -84,7 +84,7 @@ uint8_t uOW_crc(uint8_t * addr, uint8_t len){
 
 
 //** Читает ROM в заданный буфер. Возвращает 0 - если ошибка, 1 - если все ok
-uint8_t uOW_readROM(uint8_t pin, uOW_ROM &rom){
+uint8_t uOW_readROM(const uint8_t pin, uOW_ROM &rom){
   if(!uOW_reset(pin)) return 0; // Сброс шины не удался
 
   uOW_exchangeByte(pin, READ_ROM);//Даем команду чтения ROM (у нас всегда только одно устройство на шине!)
