@@ -41,7 +41,7 @@ void plgAnalogRead(){
   core.moveCursor(8, 1);
   core.print(core.getPinName(WORK_PIN_2));
   core.moveCursor(16, 1);
-  core.print(F("D: "));
+  core.print(FF(MS_MSG_DELAY_NAME));
 
   uint16_t oldPin1 = 2;
   uint16_t oldPin2 = 2;
@@ -64,6 +64,7 @@ void plgAnalogRead(){
 
     plgAnalogReadCfg.scan_mode = max(plgAnalogReadCfg.scan_mode, 0);
     plgAnalogReadCfg.scan_mode = min(plgAnalogReadCfg.scan_mode, (int8_t)arraySize(delays) - 1);
+
 
     // was scan mode changed?
     if(old_mode != plgAnalogReadCfg.scan_mode){

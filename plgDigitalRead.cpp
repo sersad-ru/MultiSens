@@ -59,7 +59,7 @@ void plgDigitalRead(){
   core.moveCursor(5, 1);
   core.print(core.getPinName(INPUT_PULLUP_PIN));
   core.moveCursor(10, 1);
-  core.print(F("D: "));
+  core.print(FF(MS_MSG_DELAY_NAME));
 
   uint8_t oldP0 = 2;
   uint8_t oldP1 = 2;

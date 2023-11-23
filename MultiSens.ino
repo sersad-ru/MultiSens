@@ -12,10 +12,12 @@
 
 #include "mscore.h"
 #include "plgFindPin.h"
+#include "plgDigitalAnalog.h"
 #include "plgDigitalRead.h"
 #include "plgAnalogRead.h"
 #include "plgPWM.h"
 #include "plgAM2302.h"
+#include "plgDS18B20.h"
 
 /*
  *  DS18B20 и следом таблетки dallas
@@ -25,10 +27,12 @@
 // Registred plugins
 MultiSensPlugin plugins[] = {
   {&plgFindPin, "FindPin", 0},
+  {&plgDigitalAnalog, "DigAn Read", sizeof(plgDigitalAnalogCfg)},
   {&plgDigitalRead, "DigitalRead", sizeof(plgDigitalReadCfg)},
   {&plgAnalogRead, "AnalogRead", sizeof(plgAnalogReadCfg)},
   {&plgPWM, "PWM", sizeof(plgPWMCfg)},
   {&plgAM2302, "AM2302/DHT22", 0},
+  {&plgDS18B20, "DS18B20", 0},
 }; // 
 
 

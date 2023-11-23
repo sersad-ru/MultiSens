@@ -9,6 +9,8 @@
 * 3. NC
 * 4. GND - black
 * 
+* Results are printed on screen and sends to serial in human readable and SerialPlotter compartible format.
+* 
 * You can specify the delay between sensor calls using READ_DELAY_MS in plgAM2302.cpp
 */
 
