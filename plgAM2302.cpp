@@ -62,42 +62,39 @@ uint8_t _read(int16_t &tmp, int16_t &hum){
 }//_read
 
 
-void _print_val(Print &p, int16_t val){
-  p.print(val / 10);
-  p.print(F("."));
-  p.print(abs(val % 10));
-}//_print_val
-
-
 // == Main plugin function ==
 void plgAM2302(){
   //Init
   int16_t tmp = 0;
   int16_t hum = 0;  
+  uint8_t need_header = 1;
 
-  Serial.print(F("Temperature(°C), Humidity(%), ("));
-  Serial.print(READ_DELAY_MS);
-  Serial.println(FF(MS_MSG_DELAY_END));
   //Main loop
   while(1){
+    core.moveCursor(0, 1);
     if(_read(tmp, hum)){
-      core.moveCursor(0, 1);
       core.print(F("T:"));
-      _print_val(core, tmp);
+      core.printValScale(core, tmp); 
       core.print(MS_SYM_DEGREE_CODE);
       core.print(F("C H:"));
-      _print_val(core, hum);
+      core.printValScale(core, hum);
       core.println(F("%"));
-      
-      _print_val(Serial, tmp);
+
+      if(need_header){
+        Serial.print(F("Temperature(°C), Humidity(%), ("));
+        Serial.print(READ_DELAY_MS);
+        Serial.println(FF(MS_MSG_DELAY_END));
+        need_header = 0;
+      }//if
+      core.printValScale(Serial, tmp);
       Serial.print(", ");      
-      _print_val(Serial, hum);
+      core.printValScale(Serial, hum);
       Serial.println();
     }//if
     else{
-      core.moveCursor(0, 1);
       core.println(FF(MS_MSG_READ_ERROR));
       Serial.println(FF(MS_MSG_READ_ERROR));
+      need_header = 1;
     }//if..else
     
     delay(READ_DELAY_MS);

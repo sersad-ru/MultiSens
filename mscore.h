@@ -20,7 +20,7 @@
 
 
 const char MS_MSG_READ_ERROR[] PROGMEM = "** Read error **";
-const char MS_MSG_DELAY_END[] PROGMEM = "ms)";
+const char MS_MSG_DELAY_END[]  PROGMEM = "ms)";
 const char MS_MSG_DELAY_NAME[] PROGMEM = "D: ";
 
 class MultiSensCore;
@@ -144,6 +144,10 @@ public:
   char * rAlign(int8_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
 
 
+  //** Prints integer value as a float. Value must be multiplyed by base. If you need to print -25.7, value shold be = -257 and scale = 10
+  void printValScale(Print &p, int32_t value, int16_t scale = 10);
+
+  
   virtual size_t write(uint8_t value);
   using Print::write;
   

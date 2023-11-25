@@ -2,18 +2,21 @@
 #include "uOneWire.h"
 
 #define WORK_PIN P0
+#define READ_DELAY_MS 2000 // 2 seconds betwen reading
+#define DS18B20_CODE 0x28  // Family code for DS18B20
 
-/*
- * Точность pad.conf
-* #define SSDS18B20_09BIT 0x1F  1/2 от raw
-* #define SSDS18B20_10BIT 0x3F  1/4
-* #define SSDS18B20_11BIT 0x5F  1/8
-* #define SSDS18B20_12BIT 0x7F  1/16
+// Команды DS18B20 
+#define SKIP_ROM         0xCC //Пропустить выбор устройства по адресу (обратиться ко всем устройствам сразу)
+#define READ_SCRATCHPAD  0xBE //Прочесть данные
+#define CONVERT          0x44 //Получить температуру
 
-*//** Код семейства
-*#define SSDS18B20_CODE 0x28
-
+/*Точность из поля conf: 
+* 0x1f - сдвиг на 1
+* 0x3f - сдвиг на 2
+* 0x5f - сдвиг на 3
+* 0x7f - сдвиг на 4
 */
+#define CONF2SHIFT(x) (((x >> 4) + 1) >> 1)
 
 // Структура Scratchpad
 typedef struct {
@@ -26,94 +29,96 @@ typedef struct {
  uint8_t res2; // Зарезервировано (0C)
  uint8_t res3; // Зарезервировано (10)
  uint8_t crc; // CRC
-} uOW_Scratchpad;
+} Scratchpad;
 
 
-// Команды DS18B20 
-#define SKIP_ROM         0xCC //Пропустить выбор устройства по адресу (обратиться ко всем устройствам сразу)
-#define READ_SCRATCHPAD  0xBE //Прочесть данные
-#define WRITE_SCRATCHPAD 0x4E //Записать данные в ОЗУ
-#define CONVERT          0x44 //Получить температуру
-#define COPY_SCRATCHPAD  0x48 //Скопировать данные из ОЗУ в ПЗУ
-
-
-
-
-//** Читает Scratchpad в заданный буфер.  Возвращает 0 - если была ошибка, 1 - если все ок
-uint8_t uOW_readScratchpad(uint8_t pin, uOW_Scratchpad &data){
-  if(!uOW_reset(pin)) return 0; // Сброс шины не удался
+uint8_t _read(int16_t &temp, uint8_t &conf){
+  Scratchpad data;
   
-  uOW_exchangeByte(pin, SKIP_ROM);//Выдаем команду SKIP_ROM, т.к. устройство всего одно
-  uOW_exchangeByte(pin, READ_SCRATCHPAD); //Выдаем команду чтения скратчпада
-  uOW_readBuf(pin, (uint8_t*)&data, sizeof(data)); // Читаем данный в буфер
+  if(!uOW_reset(WORK_PIN)) return 0; // Bus reset error
 
-  return data.crc == uOW_crc((uint8_t*)&data, sizeof(data) - 1); // CRC сошлось или нет
-}//uOW_readScratchpad  
+  uOW_exchangeByte(WORK_PIN, SKIP_ROM);//Send SKIP_ROM. Because we have only ONE connected sensor
+  uOW_exchangeByte(WORK_PIN, CONVERT); //Send CONVERT to request temperature from the sensor
 
+  digitalWrite(WORK_PIN, HIGH); //Set HIGH because the sensor needs some power to perform conversion
+  delay(800); //Maximum time to execute CONVERT command
 
-//** Отдает команду получения температуры. Ждет 800ms пока дело сделается. Потом надо читать scratchpad.
-//   Возвращает 0 - если была ошибка, 1 - если все ок
-uint8_t uOW_prepareTemp(uint8_t pin){
-  if(!uOW_reset(pin)) return 0; // Сброс шины не удался
+  if(!uOW_reset(WORK_PIN)) return 0; // Bus reset error
   
-  uOW_exchangeByte(pin, SKIP_ROM);//Выдаем команду SKIP_ROM, т.к. устройство всего одно
-  uOW_exchangeByte(pin, CONVERT); //Выдаем команду получения температуры
-
-  digitalWrite(pin, HIGH); //Переводим шину в высокое состояние, чтобы у датчика была энергия на получение температуры
-  delay(800); //Ждем 800 милисекунд до окончания получения температуры
-
-  return 1;
-}//uOW_prepareTemp
-
-
-//** Отдает команду копирования скратчпада в ПЗУ
-uint8_t uOW_copyScratchpad(uint8_t pin){
-  if(!uOW_reset(pin)) return 0; // Сброс шины не удался
+  uOW_exchangeByte(WORK_PIN, SKIP_ROM);//Send SKIP_ROM. Because we have only ONE connected sensor
+  uOW_exchangeByte(WORK_PIN, READ_SCRATCHPAD); //Send READ_SCRATCHPAD to get the data
+  uOW_readBuf(WORK_PIN, (uint8_t*)&data, sizeof(data)); // Read the data
   
-  uOW_exchangeByte(pin, SKIP_ROM);//Выдаем команду SKIP_ROM, т.к. устройство всего одно
-  uOW_exchangeByte(pin, COPY_SCRATCHPAD); //Выдаем команду копирования скратчпада
-
-  digitalWrite(pin, HIGH); //Переводим шину в высокое состояние, чтобы у датчика была энергия на получение температуры
-  delay(15); //Ждем 15 милисекунд до окончания команды
+  temp = (data.tempMSB << 8) | data.tempLSB; 
+  conf = data.conf;
   
-  uOW_reset(pin); // Заканчиваем объмен 
-  return 1; 
-}//uOW_copyScratchpad
-
+  return data.crc == uOW_crc((uint8_t*)&data, sizeof(data) - 1); // CRC check
+}//_read
 
 
 // == Main plugin function ==
 void plgDS18B20(){
   // Init 
   uOW_ROM rom;
-  uOW_Scratchpad pad;
-   
-  Serial.print(uOW_readROM(WORK_PIN, rom));
-  Serial.print(": ");
-  Serial.println(rom.familyCode, HEX);
-    
-  for(byte i = 0; i < sizeof(rom.serialNumber); i++){
-    Serial.print(rom.serialNumber[i], HEX);
-    Serial.print(" ");
-  }
-  Serial.println();
+  uOW_Errors err;
 
-  Serial.println(uOW_prepareTemp(WORK_PIN));
+  core.moveCursor(0, 1);
   
-  Serial.print(uOW_readScratchpad(WORK_PIN, pad));
-  Serial.print(": ");
-  Serial.println(pad.conf, HEX);
+  if(!uOW_readROM(WORK_PIN, rom, err)){ // readROM error
+    uOW_printError(core, err);
+    core.println();
+    uOW_printError(Serial, err);
+    Serial.println();
+    while(1); // stop until reboot
+  }//if
+
+  if(rom.familyCode != DS18B20_CODE){ // Wrong family code
+    uOW_printError(core, WRONG_FAMILY_CODE, rom.familyCode);
+    core.println();
+    uOW_printError(Serial, WRONG_FAMILY_CODE, rom.familyCode);
+    Serial.println();
+    while(1); // stop until reboot   
+  }//if
   
-  int32_t raw = (pad.tempMSB << 8) | pad.tempLSB;  
-  Serial.println(raw);
-  //Serial.println((int32_t)(raw * 100));
-  Serial.print((int32_t)((raw) / 16));
-  Serial.print(".");
-  Serial.println((int32_t)((raw * 100) % 16));
-  //Serial.println((float)raw * 0.0625);
+  int16_t temp;
+  uint8_t conf;
+  uint8_t need_header = 1; 
   
+  Serial.print(F("S/N: "));
+  uOW_printSerial(Serial, rom.serialNumber);
+  Serial.println();
   
   // Main loop
   while(1){
+    core.moveCursor(0, 1);
+    
+    // Request temperature from the sensor
+    if(_read(temp, conf)){ 
+      // Read successfull
+      core.print(F("T:"));
+      core.printValScale(core, (temp * 10) >> CONF2SHIFT(conf));
+      core.print(MS_SYM_DEGREE_CODE);
+      core.print(F("C SN:"));
+      uOW_printSerial(core, rom.serialNumber);
+      core.println();
+
+      if(need_header){ // Need to print header for serial plotter
+        Serial.print(F("Temperature(°C), ("));
+        Serial.print(READ_DELAY_MS);
+        Serial.println(FF(MS_MSG_DELAY_END));
+        need_header = 0;
+      }//if
+      core.printValScale(Serial, (temp * 10) >> CONF2SHIFT(conf));
+      Serial.println(" ");
+    }//if
+    else {
+      uOW_printSerial(core, rom.serialNumber); // Just print S/N if we can't read temperature
+      core.println();
+
+      Serial.println(FF(MS_MSG_READ_ERROR));  // Print error message to the serial  
+      need_header = 1; //Next time print header again
+    }//if..else
+  
+    delay(READ_DELAY_MS);  
   }//while
 }//

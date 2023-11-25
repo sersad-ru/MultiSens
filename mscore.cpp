@@ -199,6 +199,13 @@ char * MultiSensCore::getPinName(uint8_t pinNumber){
 }// getPinName
 
 
+void MultiSensCore::printValScale(Print &p, int32_t value, int16_t scale){
+  p.print(value / scale);
+  p.print(F("."));
+  p.print(abs(value % scale)); 
+}//printValx10
+
+  
 char * MultiSensCore::rAlign(uint32_t val, const uint8_t width, const char fill, uint8_t base){
   return _rAlign(val, width, fill, base, 0);
 }// rAlign

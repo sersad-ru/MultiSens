@@ -18,9 +18,13 @@
 #include "plgPWM.h"
 #include "plgAM2302.h"
 #include "plgDS18B20.h"
+#include "plgIButton.h"
 
 /*
- *  DS18B20 и следом таблетки dallas
+ * Lfnxbr CO2 по Serial
+ * Дальше сенсоры расстояния
+ * Еще акселерометр по I2C
+ * На закуску Ethernet в режима DHCP?
  * 
 */
 
@@ -33,6 +37,7 @@ MultiSensPlugin plugins[] = {
   {&plgPWM, "PWM", sizeof(plgPWMCfg)},
   {&plgAM2302, "AM2302/DHT22", 0},
   {&plgDS18B20, "DS18B20", 0},
+  {&plgIButton, "iButton", 0},
 }; // 
 
 
