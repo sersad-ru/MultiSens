@@ -19,6 +19,7 @@
 #include "plgAM2302.h"
 #include "plgDS18B20.h"
 #include "plgIButton.h"
+#include "plgMHZ19.h"
 
 /*
  * Lfnxbr CO2 по Serial
@@ -38,6 +39,7 @@ MultiSensPlugin plugins[] = {
   {&plgAM2302, "AM2302/DHT22", 0},
   {&plgDS18B20, "DS18B20", 0},
   {&plgIButton, "iButton", 0},
+  {&plgMHZ19, "MH-Z19b", 0},
 }; // 
 
 
