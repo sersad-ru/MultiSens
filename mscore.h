@@ -18,6 +18,7 @@
 #define P6 P(6) // 18 Analog  - SDA        - Yellow-Black
 #define P7 P(7) // 19 Analog  - SCL        - Gray-Black
 
+const uint16_t MS_STD_DELAYS[] PROGMEM = {10, 50, 100, 250, 500, 1000, 1500, 2000}; // Variants of delays
 
 const char MS_MSG_READ_ERROR[] PROGMEM = "** Read error **";
 const char MS_MSG_DELAY_END[]  PROGMEM = "ms)";

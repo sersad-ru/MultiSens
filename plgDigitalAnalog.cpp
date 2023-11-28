@@ -3,9 +3,7 @@
 #define DIG_PIN P0
 #define AN_PIN P5
 
-#define DEFAULT_SCAN_MODE 4 //Use 500ms delay as default 
-const uint16_t delays[] PROGMEM = {10, 50, 100, 250, 500, 1000, 1500, 2000}; // Variants of delays
-
+#define DEFAULT_SCAN_MODE 4 //Use 500ms delay as default. See MS_STD_DELAYS in mscore.h 
 
 void _process_pin(int16_t new_val, uint8_t offset, int16_t &oldVal, uint8_t is_analog){    
   //to serial
@@ -35,7 +33,7 @@ void plgDigitalAnalog(){
     core.saveSettings((uint8_t*)&plgDigitalAnalogCfg);// Save default value  
   }//if  
 
-  uint16_t cur_delay = pgm_read_word(&delays[plgDigitalAnalogCfg.scan_mode]);
+  uint16_t cur_delay = pgm_read_word(&MS_STD_DELAYS[plgDigitalAnalogCfg.scan_mode]);
 
   // Dispaly init
   core.moveCursor(0, 1); // First symbol of second line
@@ -65,7 +63,7 @@ void plgDigitalAnalog(){
     }//switch
 
     plgDigitalAnalogCfg.scan_mode = max(plgDigitalAnalogCfg.scan_mode, 0);
-    plgDigitalAnalogCfg.scan_mode = min(plgDigitalAnalogCfg.scan_mode, (int8_t)arraySize(delays) - 1);
+    plgDigitalAnalogCfg.scan_mode = min(plgDigitalAnalogCfg.scan_mode, (int8_t)arraySize(MS_STD_DELAYS) - 1);
 
     // was scan mode changed?
     if(old_mode != plgDigitalAnalogCfg.scan_mode){
@@ -73,7 +71,7 @@ void plgDigitalAnalog(){
       old_mode = plgDigitalAnalogCfg.scan_mode;
       core.moveCursor(15, 1);
       // delay mode
-      cur_delay = pgm_read_word(&delays[plgDigitalAnalogCfg.scan_mode]);
+      cur_delay = pgm_read_word(&MS_STD_DELAYS[plgDigitalAnalogCfg.scan_mode]);
       core.println(cur_delay);
       Serial.print(F("P0, P5 ("));
       Serial.print(cur_delay);

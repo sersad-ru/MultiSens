@@ -20,9 +20,9 @@
 #include "plgDS18B20.h"
 #include "plgIButton.h"
 #include "plgMHZ19.h"
+#include "plgQRE1113.h"
 
 /*
- * Lfnxbr CO2 по Serial
  * Дальше сенсоры расстояния
  * Еще акселерометр по I2C
  * На закуску Ethernet в режима DHCP?
@@ -40,6 +40,7 @@ MultiSensPlugin plugins[] = {
   {&plgDS18B20, "DS18B20", 0},
   {&plgIButton, "iButton", 0},
   {&plgMHZ19, "MH-Z19b", 0},
+  {&plgQRE1113, "QRE1113", sizeof(plgQRE1113Cfg)},
 }; // 
 
 

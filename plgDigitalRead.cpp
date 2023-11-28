@@ -3,9 +3,7 @@
 #define INPUT_PIN P0
 #define INPUT_PULLUP_PIN P1
 
-#define DEFAULT_SCAN_MODE 5 //Use 500ms delay as default 
-
-const uint16_t delays[] PROGMEM = {0, 10, 50, 100, 250, 500, 1000, 1500, 2000}; // Variants of delays
+#define DEFAULT_SCAN_MODE 4 //Use 500ms delay as default. See MS_STD_DELAYS in mscore.h
 
 // Pin values for interrupt mode
 volatile uint8_t newP0 = 0;
@@ -51,7 +49,7 @@ void plgDigitalRead(){
     core.saveSettings((uint8_t*)&plgDigitalReadCfg);// Save default value  
   }//if  
 
-  uint16_t cur_delay = pgm_read_word(&delays[plgDigitalReadCfg.scan_mode]);
+  uint16_t cur_delay = pgm_read_word(&MS_STD_DELAYS[plgDigitalReadCfg.scan_mode]);
   
   // Dispaly init
   core.moveCursor(0, 1); // First symbol of second line
@@ -65,7 +63,7 @@ void plgDigitalRead(){
   uint8_t oldP1 = 2;
   uint32_t timeP0 = millis();
   uint32_t timeP1 = millis();
-  int8_t old_mode = -1;
+  int8_t old_mode = -2;
   
   // Main loop
   while(1){
@@ -82,15 +80,15 @@ void plgDigitalRead(){
       default: break;
     }//switch
 
-    plgDigitalReadCfg.scan_mode = max(plgDigitalReadCfg.scan_mode, 0);
-    plgDigitalReadCfg.scan_mode = min(plgDigitalReadCfg.scan_mode, (int8_t)arraySize(delays) - 1);
+    plgDigitalReadCfg.scan_mode = max(plgDigitalReadCfg.scan_mode, -1);
+    plgDigitalReadCfg.scan_mode = min(plgDigitalReadCfg.scan_mode, (int8_t)arraySize(MS_STD_DELAYS) - 1);
     
     // scan mode was changed?
     if(old_mode != plgDigitalReadCfg.scan_mode){
       //Scan mode was changed
       old_mode = plgDigitalReadCfg.scan_mode;
       core.moveCursor(12, 1);
-      if(plgDigitalReadCfg.scan_mode == 0){ // Interrupt mode
+      if(plgDigitalReadCfg.scan_mode == -1){ // Interrupt mode
         core.println(F("INT"));
         Serial.println(F("P0, P1 (Interrup mode.)"));        
         attachInterrupt(digitalPinToInterrupt(INPUT_PIN), _p0_isr, CHANGE);
@@ -100,7 +98,7 @@ void plgDigitalRead(){
       // delay mode
       detachInterrupt(digitalPinToInterrupt(INPUT_PIN));
       detachInterrupt(digitalPinToInterrupt(INPUT_PULLUP_PIN));
-      cur_delay = pgm_read_word(&delays[plgDigitalReadCfg.scan_mode]);
+      cur_delay = pgm_read_word(&MS_STD_DELAYS[plgDigitalReadCfg.scan_mode]);
       core.println(cur_delay);
       Serial.print(F("P0, P1 ("));
       Serial.print(cur_delay);
@@ -108,7 +106,7 @@ void plgDigitalRead(){
     }//if
 
     // Interrupt mode pin values
-    if(plgDigitalReadCfg.scan_mode == 0){ 
+    if(plgDigitalReadCfg.scan_mode == -1){ 
       if(newP0 != oldP0){ // P0 interrupt
         _process_pin(newP0, 3, oldP0);
         Serial.print(F(", 1 (P0+"));
