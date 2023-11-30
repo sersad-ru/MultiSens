@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* RDM6300 plugin recieve .... 125kHz concentration from RDM6300.
+* RDM6300 plugin recieve 125kHz RFID card ID from RDM6300 sensor.
 * Connection:
 * GND - GND - black
 * VIN - +5V - red
@@ -12,7 +12,7 @@
 * 
 * Results are printed on the screen and sends to serial in human readable format.* 
 * 
-* * You can specify the delay between sensor calls using READ_DELAY_MS in plgMHZ19.cpp
+* You can specify the delay between sensor calls using READ_DELAY_MS in plgRDM6300.cpp
 */
 
 /*

@@ -5,6 +5,7 @@
 
 #define DEFAULT_SCAN_MODE 4 //Use 500ms delay as default. See MS_STD_DELAYS in mscore.h
 
+namespace AnalogRead {
 
 void _process_pin(uint16_t new_val, uint8_t offset, uint16_t &oldVal){
   //to serial
@@ -20,6 +21,9 @@ void _process_pin(uint16_t new_val, uint8_t offset, uint16_t &oldVal){
   oldVal = new_val;
 }//_process_pin
 
+} // namespace
+
+using namespace AnalogRead;
 
 // == Main plugin function ==
 void plgAnalogRead(){

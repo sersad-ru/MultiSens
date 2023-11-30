@@ -12,6 +12,8 @@
 #define BIT_ZERO_ONE   45 //45us  Пороговое значение отличающее передачу нуля от единицы. Ноль [22; 30], единица [68;75] 
 #define BIT_TIMEOUT   100 //100us Таймаут при передаче битов
 
+namespace AM2302 {
+
 uint8_t _get_time(uint8_t level, uint8_t timeout){
   uint32_t s = micros();
   while(digitalRead(DATA_PIN) == level){
@@ -61,6 +63,9 @@ uint8_t _read(int16_t &tmp, int16_t &hum){
   return crc == _read_byte(); // Compare calculated CRC with CRC from sensor
 }//_read
 
+}//namespase
+
+using namespace AM2302;
 
 // == Main plugin function ==
 void plgAM2302(){

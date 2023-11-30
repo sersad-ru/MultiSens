@@ -4,6 +4,8 @@
 #define TIMEOUT_MS 3000 //Sensor timeout
 #define DEFAULT_SCAN_MODE 4 //Use 500ms delay as default. See MS_STD_DELAYS in mscore.h
 
+namespace QRE1113 {
+
 const char plgQRE_TOO_LONG[] PROGMEM = "Too long distance";
 
 uint16_t _read(){
@@ -17,6 +19,9 @@ uint16_t _read(){
   return micros() - t;
 }//_read
 
+} // namespace
+
+using namespace QRE1113;
 
 // == Main plugin function ==
 void plgQRE1113(){

@@ -11,6 +11,8 @@
 
 #define DEFAULT_DUTY 0
 
+namespace PWM {
+
 // const uint8_t (&offsets)[]
 void _set_pwm(uint8_t pin_num, const uint8_t offsets[], const uint8_t pins[]){
   // Print new value
@@ -24,6 +26,9 @@ void _set_pwm(uint8_t pin_num, const uint8_t offsets[], const uint8_t pins[]){
   analogWrite(pins[pin_num], plgPWMCfg.duty[pin_num]); //set new value
 }//_set_pwm
 
+} //namespace
+
+using namespace PWM;
 
 // == Main plugin function ==
 void plgPWM(){

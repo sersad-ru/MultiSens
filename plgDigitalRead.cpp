@@ -5,6 +5,8 @@
 
 #define DEFAULT_SCAN_MODE 4 //Use 500ms delay as default. See MS_STD_DELAYS in mscore.h
 
+namespace DigitalRead {
+
 // Pin values for interrupt mode
 volatile uint8_t newP0 = 0;
 volatile uint8_t newP1 = 1;
@@ -35,7 +37,9 @@ void _process_pin(uint8_t new_val, uint8_t offset, uint8_t &oldVal){
   oldVal = new_val;
 }//_process_pin
 
+} // namespace
 
+using namespace DigitalRead;
 
 // == Main plugin function ==
 void plgDigitalRead(){

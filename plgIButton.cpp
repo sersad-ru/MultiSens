@@ -3,6 +3,7 @@
 
 #define WORK_PIN P0
 
+namespace iButton {
 
 void _print_family(Print &p, const uint8_t code){
   p.print(F("DS19"));
@@ -24,6 +25,9 @@ void _print_family(Print &p, const uint8_t code){
   p.print(")");
 }//_print_family
 
+} // namespace
+
+using namespace iButton;
 
 // == Main plugin function ==
 void plgIButton(){

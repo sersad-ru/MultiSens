@@ -1,5 +1,7 @@
 #include "plgFindPin.h"
 
+namespace FindPin {
+  
 const char plgFP_NOT_FOUND[] PROGMEM = "Not found";
 
 void _find_pin(){
@@ -25,7 +27,9 @@ void _find_pin(){
   Serial.println(FF(plgFP_NOT_FOUND));
 }//_findpin
 
+} //namespace
 
+using namespace FindPin;
 // == Main plugin function ==
 void plgFindPin(){
   // Init

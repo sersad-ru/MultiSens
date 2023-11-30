@@ -11,6 +11,7 @@
 #define START_BYTE 0xff
 #define CMD_READ   0x86
 
+namespace MHZ19 { 
 
 // MH-Z19 packet, presetted for CO2 read command 
 typedef struct {
@@ -46,6 +47,9 @@ int16_t _read(SoftwareSerial &ser){
   return (pkt.cmd_co2high) << 8 | pkt.data_high_co2low;
 }//_read
 
+} // namespace
+
+using namespace MHZ19;
 
 // == Main plugin function ==
 void plgMHZ19(){

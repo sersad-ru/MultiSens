@@ -3,9 +3,11 @@
 
 #define RX_PIN P0
 #define TX_PIN P1
-#define READ_DELAY_MS 500 // 0.5 seconds betwen reading
+#define READ_DELAY_MS 500 // 0.5 seconds between attempt
 
 namespace RDM6300 {
+  
+const char ID_TITLE[] PROGMEM = "ID:";
   
 // RDM6300 packet
 typedef struct {
@@ -56,15 +58,28 @@ void plgRDM6300(){
   // Init
   SoftwareSerial ser(RX_PIN, TX_PIN);
   ser.begin(9600);
-   
-  uint32_t old_id = 0;
+
   // Main loop
   while(1){
-    uint32_t id = _read_id(ser);
-    if((id) && id != old_id){
-     old_id = id;
-     Serial.println(id);
-    } 
-    delay(READ_DELAY_MS);
+    core.moveCursor(0, 1);                    
+    core.println(F(" Place the card"));        
+        
+    // Tryint to read ID
+    uint32_t id;
+    while(!(id = _read_id(ser))) delay(READ_DELAY_MS);
+
+    // ID to the screen
+    core.print(FF(ID_TITLE));
+    core.print(id);
+    core.print(" ");
+    core.print(MS_SYM_SELECT_CODE);
+    core.print(F("-nxt"));
+
+    // ID to the serial
+    Serial.print(FF(ID_TITLE));
+    Serial.print(" ");
+    Serial.println(id);
+
+    if(core.wait4Button() != SELECT) continue; // Waitin for <SELECT> for next card
   }//while  
 }//plgRDM6300

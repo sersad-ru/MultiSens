@@ -5,6 +5,8 @@
 
 #define DEFAULT_SCAN_MODE 4 //Use 500ms delay as default. See MS_STD_DELAYS in mscore.h 
 
+namespace DigitalAnalog {
+
 void _process_pin(int16_t new_val, uint8_t offset, int16_t &oldVal, uint8_t is_analog){    
   //to serial
   if(is_analog) Serial.print(new_val);
@@ -20,6 +22,10 @@ void _process_pin(int16_t new_val, uint8_t offset, int16_t &oldVal, uint8_t is_a
   //save time
   oldVal = new_val;
 }//_process_pin
+
+}//namespace
+
+using namespace DigitalAnalog;
 
 
 // == Main plugin function ==

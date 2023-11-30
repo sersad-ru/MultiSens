@@ -23,29 +23,31 @@
 #include "plgQRE1113.h"
 #include "plgHCSR04.h"
 #include "plgRDM6300.h"
+#include "plgADXL345.h"
 
 /*
- * Везде namespace!!!
- * RFID - RDM6300 дописать и причесать!!!
- * Еще акселерометр по I2C
+ *
+ * Еще акселерометр ADXL345 по I2C. 
+ * Ну и нормально причесать код его
  * На закуску Ethernet в режима DHCP?
  * 
 */
 
 // Registred plugins
 MultiSensPlugin plugins[] = {
-  {&plgFindPin,       "FindPin",      0},
-  {&plgDigitalAnalog, "DigAn Read",   sizeof(plgDigitalAnalogCfg)},
-  {&plgDigitalRead,   "DigitalRead",  sizeof(plgDigitalReadCfg)},
-  {&plgAnalogRead,    "AnalogRead",   sizeof(plgAnalogReadCfg)},
-  {&plgPWM,           "PWM",          sizeof(plgPWMCfg)},
-  {&plgAM2302,        "AM2302/DHT22", 0},
-  {&plgDS18B20,       "DS18B20",      0},
-  {&plgIButton,       "iButton",      0},
-  {&plgMHZ19,         "MH-Z19b",      0},
-  {&plgQRE1113,       "QRE1113",      sizeof(plgQRE1113Cfg)},
-  {&plgHCSR04,        "HC-SR04",      sizeof(plgHCSR04Cfg)},
-  {&plgRDM6300,       "RDM-6300",     0},
+  {&plgFindPin,       "FindPin",          0},
+  {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)},
+  {&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
+  {&plgAnalogRead,    "AnalogRead",       sizeof(plgAnalogReadCfg)},
+  {&plgPWM,           "PWM",              sizeof(plgPWMCfg)},
+  {&plgAM2302,        "AM2302/DHT22",     0},
+  {&plgDS18B20,       "DS18B20",          0},
+  {&plgIButton,       "iButton",          0},
+  {&plgMHZ19,         "MH-Z19b",          0},
+  {&plgQRE1113,       "QRE1113",          sizeof(plgQRE1113Cfg)},
+  {&plgHCSR04,        "HC-SR04",          sizeof(plgHCSR04Cfg)},
+  {&plgRDM6300,       "RDM-6300(125kHz)", 0},
+  {&plgADXL345,       "ADXL345",          sizeof(plgADXL345)},
 }; // 
 
 

@@ -6,14 +6,8 @@
 #define READ_DELAY_MS 500 // 0.5 seconds betwen reading
 #define DEFAULT_TEMP 25 // Default temperature 25
 
-//const char plgQRE_TOO_LONG[] PROGMEM = "Too long distance";
+namespace HCSR04 {
 
-/*
- * Добавить фильтрацию (https://alexgyver.ru/lessons/filters/)
- * Сделать настройку времени опроса и температуры
- * Сохранение настроек в EEPROM
- * И нормальный вывод на экран и в порт
-*/
 uint16_t _read(const int8_t temp){
   //Send a pulse
   digitalWrite(TRIG_PIN, HIGH);
@@ -32,6 +26,9 @@ uint16_t _read_filtered(const int8_t temp){
   return res;
 }//_read_filtered
 
+}//namespace
+
+using namespace HCSR04;
   
 // == Main plugin function ==
 void plgHCSR04(){

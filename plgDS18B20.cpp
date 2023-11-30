@@ -18,6 +18,8 @@
 */
 #define CONF2SHIFT(x) (((x >> 4) + 1) >> 1)
 
+namespace DS18B20 {
+
 // Структура Scratchpad
 typedef struct {
  uint8_t tempLSB; // Младший байт температуры
@@ -55,6 +57,9 @@ uint8_t _read(int16_t &temp, uint8_t &conf){
   return data.crc == uOW_crc((uint8_t*)&data, sizeof(data) - 1); // CRC check
 }//_read
 
+} //namespace
+
+using namespace DS18B20;
 
 // == Main plugin function ==
 void plgDS18B20(){
