@@ -27,8 +27,7 @@
 
 /*
  *
- * Еще акселерометр ADXL345 по I2C. 
- * Ну и нормально причесать код его
+ * Адресные ленты
  * На закуску Ethernet в режима DHCP?
  * 
 */
@@ -47,7 +46,7 @@ MultiSensPlugin plugins[] = {
   {&plgQRE1113,       "QRE1113",          sizeof(plgQRE1113Cfg)},
   {&plgHCSR04,        "HC-SR04",          sizeof(plgHCSR04Cfg)},
   {&plgRDM6300,       "RDM-6300(125kHz)", 0},
-  {&plgADXL345,       "ADXL345",          sizeof(plgADXL345)},
+  {&plgADXL345,       "ADXL345",          sizeof(plgADXL345Cfg)},
 }; // 
 
 

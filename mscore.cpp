@@ -200,10 +200,14 @@ char * MultiSensCore::getPinName(uint8_t pinNumber){
 
 
 void MultiSensCore::printValScale(Print &p, int32_t value, int16_t scale){
+  if(!value){
+    p.print(0);
+    return;
+  }//if
   p.print(value / scale);
   p.print(F("."));
   p.print(abs(value % scale)); 
-}//printValx10
+}//printValScale
 
   
 char * MultiSensCore::rAlign(uint32_t val, const uint8_t width, const char fill, uint8_t base){

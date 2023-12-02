@@ -2,47 +2,128 @@
 #include <Wire.h>
 
 
-#define SDA_PIN P6 //Ж
-#define SCL_PIN P7 //С
+#define SDA_PIN P6 //Yellow-Black
+#define SCL_PIN P7 //Gray-Black
 #define READ_DELAY_MS 500 // 0.5 seconds between attempt
+
+#define OFFSET_DEFAULT 0 // Default offset for all axis
 
 #define ADXL_ADDRESS 0x53  // ADXL I2C address
 #define POWER_CTL 0x2D //Power register
-#define MEASURE_MASK 0x08 // Set D3 bit to 1 to start measure
+#define POWER_CTL_VALUE 0x08 // Set D3 bit to 1 to start measure
 
 #define DATA_FORMAT 0x31 // Data format register
-#define RANGE_MASK_16 0x0b // 16g range (b) Z: 50 = +1 40 = 0 30 = -1. 
-/*
- * Разобраться с осью Z
- * При разрешении 2g не работает. При 4/8/16 - работает
- * На 16g:
- * +1 - 50 (1300)
- * 0  - 40 (1030)
- * -1 - 30 (800)
- * 
- * На 8g:
- * +1  - 1300
- * 0   - 1030
- * -1  - 800
- * 
- * Сделать калибровку по <SELECT>
- * Калибровка (https://microkontroller.ru/arduino-projects/opredelenie-orientaczii-s-pomoshhyu-akselerometra-adxl345-i-arduino/?ysclid=lpl423o8ly906304703)
- * Ну и datasheet глянуть и adafruit
- * 
- * Домножение по adafruit: 9.80665 * 0.004 ?
-*/
+#define DATA_FORMAT_VALUE 0x0b // 16g range
 
+#define OFSX 0x1e // X-offset register
+#define OFSY 0x1f // Y-offset register
+#define OFSZ 0x20 // Z-offset register
 
 #define DATA_REG_START 0x32 // First data register
 #define DATA_REG_SIZE 0x06  // Size of data register block
+
+#define MODE_NORM 0 // Display current values
+#define MODE_MIN -1 // Display minimal valuse
+#define MODE_MAX +1 // Display maximal values
 
 namespace ADXL345 {
 typedef struct {
   int16_t x;
   int16_t y;
   int16_t z;
-} acc;  
+} accPkt;  
 
+typedef struct {
+  int16_t minX;
+  int16_t minY;
+  int16_t minZ;
+  int16_t maxX;
+  int16_t maxY;
+  int16_t maxZ;  
+} accMinMax;
+
+
+void _write_reg(const uint8_t reg, const uint8_t val){
+  Wire.beginTransmission(ADXL_ADDRESS);
+  Wire.write(reg);
+  Wire.write(val);
+  Wire.endTransmission();
+}//_write_reg
+
+
+accPkt _read_acc(){
+  accPkt res;
+  Wire.beginTransmission(ADXL_ADDRESS);
+  Wire.write(DATA_REG_START);
+  Wire.endTransmission(false);
+    
+  Wire.requestFrom(ADXL_ADDRESS, DATA_REG_SIZE); // stop = true by default
+  res.x = Wire.read() | Wire.read() << 8; //LSB | HSB
+  res.y = Wire.read() | Wire.read() << 8; //LSB | HSB
+  res.z = Wire.read() | Wire.read() << 8; //LSB | HSB  
+  return res;
+}//_read_acc
+
+
+accMinMax _set_minmax(const accPkt pkt){
+  accMinMax res;
+  res.minX = pkt.x;
+  res.maxX = pkt.x;
+  res.minY = pkt.y;
+  res.maxY = pkt.y;
+  res.minZ = pkt.z;
+  res.maxZ = pkt.z;
+  return res;
+}//_set_minmax
+
+
+accMinMax _calc_minmax(accMinMax minmax, const accPkt pkt){
+  minmax.minX = min(pkt.x, minmax.minX);
+  minmax.minY = min(pkt.y, minmax.minY);
+  minmax.minZ = min(pkt.z, minmax.minZ);
+  minmax.maxX = max(pkt.x, minmax.maxX);
+  minmax.maxY = max(pkt.y, minmax.maxY);
+  minmax.maxZ = max(pkt.z, minmax.maxZ);  
+  return minmax;
+}//_calc_minmax
+
+
+void _print_val(const char name, const char sym, const int16_t val){
+  core.print(name);
+  core.print(sym);
+  core.printValScale(core, (val + 5) / 10);
+  core.print(" ");
+  core.printValScale(Serial, val, 100);
+  Serial.print(" ");
+}//_print_val
+
+
+int8_t _calibrate(const char axis){
+  core.moveCursor(0, 1);
+  core.print(axis);
+  core.print(MS_SYM_ARROW_UP_CODE);
+  core.print(" ");
+  core.print(MS_SYM_SELECT_CODE);
+  core.println(F("-start"));
+  while(core.wait4Button() != SELECT);
+
+  core.moveCursor(0, 1);
+  uint32_t value = 0;
+  for(uint8_t i = 0; i < 16; i++)
+  {
+    accPkt acc = _read_acc(); 
+    switch(axis){
+      case 'X': value += acc.x; break;
+      case 'Y': value += acc.y; break;
+      case 'Z': value += acc.z; break;
+      default: break;
+    }//switch 
+    core.print(MS_SYM_PROGRESS_CODE);
+    delay(100);
+  }//for
+  
+  return (256 - (value >> 4)) >> 2; // middle = 16 reads / 16(>>4). 256 - middle / 4(>>2)
+}//_calibrate
 } //namespace
 
 
@@ -51,57 +132,76 @@ using namespace ADXL345;
 // == Main plugin function ==
 void plgADXL345(){
   // Init
+  // Load settings from EEPROM 
+  if(!core.loadSettings((uint8_t*)&plgADXL345Cfg)){
+    plgADXL345Cfg.offX = OFFSET_DEFAULT;// Settings was reseted. Use default values
+    plgADXL345Cfg.offY = OFFSET_DEFAULT;
+    plgADXL345Cfg.offZ = OFFSET_DEFAULT;
+    core.saveSettings((uint8_t*)&plgADXL345Cfg);// Save default value  
+  }//if  
+
+  // Init device
   Wire.begin();
+  _write_reg(POWER_CTL, POWER_CTL_VALUE);
+  _write_reg(DATA_FORMAT, DATA_FORMAT_VALUE);  
+  _write_reg(OFSX, plgADXL345Cfg.offX);  
+  _write_reg(OFSY, plgADXL345Cfg.offY);  
+  _write_reg(OFSZ, plgADXL345Cfg.offZ);  
+  
+  accMinMax minmax = _set_minmax(_read_acc());// Read first values
 
-  // Switch sensor to measurement mode
-  Wire.beginTransmission(ADXL_ADDRESS);
-  Wire.write(POWER_CTL);
-  Wire.write(MEASURE_MASK);
-  Wire.endTransmission();
-  delay(10);
+  Serial.print(F("X(g), Y(g), Z(g), ("));
+  Serial.print(READ_DELAY_MS);
+  Serial.println(FF(MS_MSG_DELAY_END));
 
-  
-  Wire.beginTransmission(ADXL_ADDRESS);
-  Wire.write(DATA_FORMAT);
-  Wire.write(RANGE_MASK_16);
-  Wire.endTransmission();
-  
-  Wire.beginTransmission(ADXL_ADDRESS);
-  Wire.write(DATA_FORMAT);
-  Wire.requestFrom(ADXL_ADDRESS, 1, true);
-  Serial.println(Wire.read(), HEX);
-  
-
-  
-  
-  
+  int8_t mode = MODE_NORM;  
   // Main loop
   while(1){
-    Wire.beginTransmission(ADXL_ADDRESS);
-    Wire.write(DATA_REG_START);
-    Wire.endTransmission(false);
-    
-    Wire.requestFrom(ADXL_ADDRESS, DATA_REG_SIZE, true);
-    int16_t X = Wire.read() | Wire.read() << 8; //LSB | HSB
-    int16_t Y = Wire.read() | Wire.read() << 8; //LSB | HSB
-    int16_t Z = Wire.read() | Wire.read() << 8; //LSB | HSB
+    // Process user input    
+    switch (core.getButton()) {
+      case UP:
+      case UP_LONG: mode = (mode == MODE_MAX) ? MODE_NORM : MODE_MAX; break;
+      
+      case DOWN:
+      case DOWN_LONG: mode = (mode == MODE_MIN) ? MODE_NORM : MODE_MIN; break;
 
-    //Wire.endTransmission();
-
-    Serial.print("X: ");
-    Serial.println(X);
-    //Serial.println(X / (float)64);
-    
-    Serial.print("Y: ");
-    Serial.println(Y);
-    //Serial.println(Y / (float)64);
-    
-    Serial.print("Z: ");
-    Serial.println(Z);
- //   Serial.println(Z / (float)64);
-
-    Serial.println();
+      case SELECT: 
+        plgADXL345Cfg.offX = _calibrate('X');
+        plgADXL345Cfg.offY = _calibrate('Y');
+        plgADXL345Cfg.offZ = _calibrate('Z');
+        _write_reg(OFSX, plgADXL345Cfg.offX);  
+        _write_reg(OFSY, plgADXL345Cfg.offY);  
+        _write_reg(OFSZ, plgADXL345Cfg.offZ);          
+      break;  
+      case SELECT_LONG: core.saveSettings((uint8_t*)&plgADXL345Cfg);break;   // save settings to EEPROM
+      
+      default: break;
+    }//switch
    
+    accPkt acc = _read_acc(); // Read values
+    minmax = _calc_minmax(minmax, acc);
+    core.moveCursor(0, 1); // First symbol of second line
+
+    switch(mode) {
+      case MODE_NORM:
+        _print_val('X', ':', (acc.x * 100) >> 8);
+        _print_val('Y', ':', (acc.y * 100) >> 8);
+        _print_val('Z', ':', (acc.z * 100) >> 8);
+      break;
+      case MODE_MAX:
+        _print_val('X', MS_SYM_ARROW_UP_CODE, (minmax.maxX * 100) >> 8);
+        _print_val('Y', MS_SYM_ARROW_UP_CODE, (minmax.maxY * 100) >> 8);
+        _print_val('Z', MS_SYM_ARROW_UP_CODE, (minmax.maxZ * 100) >> 8);      
+      break;
+      case MODE_MIN:
+        _print_val('X', MS_SYM_ARROW_DOWN_CODE, (minmax.minX * 100) >> 8);
+        _print_val('Y', MS_SYM_ARROW_DOWN_CODE, (minmax.minY * 100) >> 8);
+        _print_val('Z', MS_SYM_ARROW_DOWN_CODE, (minmax.minZ * 100) >> 8);      
+      break;     
+      default: break;
+    }//switch
+    core.println();
+    Serial.println();
     delay(READ_DELAY_MS);
   }//while  
 }//plgADXL345
