@@ -24,10 +24,11 @@
 #include "plgHCSR04.h"
 #include "plgRDM6300.h"
 #include "plgADXL345.h"
+#include "plgWS2812.h"
 
 /*
  *
- * Адресные ленты
+ * Адресные ленты. Дописать и прическать.
  * На закуску Ethernet в режима DHCP?
  * 
 */
@@ -47,6 +48,7 @@ MultiSensPlugin plugins[] = {
   {&plgHCSR04,        "HC-SR04",          sizeof(plgHCSR04Cfg)},
   {&plgRDM6300,       "RDM-6300(125kHz)", 0},
   {&plgADXL345,       "ADXL345",          sizeof(plgADXL345Cfg)},
+  {&plgWS2812,        "WS2812b",          sizeof(plgWS2812Cfg)},
 }; // 
 
 
