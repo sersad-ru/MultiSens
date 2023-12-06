@@ -12,9 +12,18 @@
 * 
 */
 
+#define WS_LED_CNT 2 // LED count (2-3 max)
+
+// WS2812 color space
+typedef struct {
+  uint8_t g;
+  uint8_t r;
+  uint8_t b;
+} WS_LED;
+
 
 struct{
-  uint8_t data;  
+  WS_LED leds[WS_LED_CNT];  
 } plgWS2812Cfg;
 
 void plgWS2812();
