@@ -62,8 +62,7 @@ void plgHCSR04(){
       default: break;
     }//switch
 
-    plgHCSR04Cfg.temp = max(plgHCSR04Cfg.temp, -50); // -50 min
-    plgHCSR04Cfg.temp = min(plgHCSR04Cfg.temp, 50);  // +50 max 
+    plgHCSR04Cfg.temp = constrain(plgHCSR04Cfg.temp, -50, 50); // -50..50
   
     uint16_t dist = _read_filtered(plgHCSR04Cfg.temp);
     core.moveCursor(0, 1); 

@@ -406,8 +406,7 @@ char * MultiSensCore::_rAlign(uint32_t val, uint8_t width, const char fill, uint
   uint8_t size = 0; // Текущаа длина строки
   *ptr = '\0'; // Ставим окончание строки
   if((base < 2) || (isNegative)) base = 10; // Основание не может быть 0 или 1. Для отрицательных чисел основание всегда 10 
-  width = min(width, arraySize(_printBuf) - 1); // Ширина не может быть больше размера буфера  
-  width = max(width, 1); // Ширина не может быть меньше 1
+  width = constrain(width, 1, arraySize(_printBuf) - 1); // В диапазоне 1..размер буфера
   do{
     char c = val % base; //Младшая цифра
     val /= base; // Сместились на один разряд

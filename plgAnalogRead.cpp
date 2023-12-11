@@ -64,9 +64,7 @@ void plgAnalogRead(){
       default: break;
     }//switch
 
-    plgAnalogReadCfg.scan_mode = max(plgAnalogReadCfg.scan_mode, 0);
-    plgAnalogReadCfg.scan_mode = min(plgAnalogReadCfg.scan_mode, (int8_t)arraySize(MS_STD_DELAYS) - 1);
-
+    plgAnalogReadCfg.scan_mode = constrain(plgAnalogReadCfg.scan_mode, 0, (int8_t)arraySize(MS_STD_DELAYS) - 1);
 
     // was scan mode changed?
     if(old_mode != plgAnalogReadCfg.scan_mode){

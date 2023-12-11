@@ -68,8 +68,7 @@ void plgDigitalAnalog(){
       default: break;
     }//switch
 
-    plgDigitalAnalogCfg.scan_mode = max(plgDigitalAnalogCfg.scan_mode, 0);
-    plgDigitalAnalogCfg.scan_mode = min(plgDigitalAnalogCfg.scan_mode, (int8_t)arraySize(MS_STD_DELAYS) - 1);
+    plgDigitalAnalogCfg.scan_mode = constrain(plgDigitalAnalogCfg.scan_mode, 0, (int8_t)arraySize(MS_STD_DELAYS) - 1);
 
     // was scan mode changed?
     if(old_mode != plgDigitalAnalogCfg.scan_mode){

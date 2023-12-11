@@ -52,8 +52,7 @@ void plgQRE1113(){
       default: break;
     }//switch
 
-    plgQRE1113Cfg.scan_mode = max(plgQRE1113Cfg.scan_mode, 0);
-    plgQRE1113Cfg.scan_mode = min(plgQRE1113Cfg.scan_mode, (int8_t)arraySize(MS_STD_DELAYS) - 1);
+    plgQRE1113Cfg.scan_mode = constrain(plgQRE1113Cfg.scan_mode, 0, (int8_t)arraySize(MS_STD_DELAYS) - 1);
 
     // was scan mode changed?
     if(old_mode != plgQRE1113Cfg.scan_mode){

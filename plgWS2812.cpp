@@ -55,7 +55,7 @@ void _write_buf(const uint8_t buf[WS_LED_CNT * 3]){
 
 void _update_item(int8_t &cur_led, const uint8_t item, const int8_t delta){
   switch(item){
-    case 0: cur_led += delta; cur_led = max(cur_led, 0); cur_led = min(cur_led, WS_LED_CNT - 1); break;
+    case 0: cur_led += delta; cur_led = constrain(cur_led, 0, WS_LED_CNT - 1); break;
     case 1: plgWS2812Cfg.leds[cur_led].r += delta; break;
     case 2: plgWS2812Cfg.leds[cur_led].g += delta; break;     
     case 3: plgWS2812Cfg.leds[cur_led].b += delta; break;     

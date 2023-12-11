@@ -84,8 +84,7 @@ void plgDigitalRead(){
       default: break;
     }//switch
 
-    plgDigitalReadCfg.scan_mode = max(plgDigitalReadCfg.scan_mode, -1);
-    plgDigitalReadCfg.scan_mode = min(plgDigitalReadCfg.scan_mode, (int8_t)arraySize(MS_STD_DELAYS) - 1);
+    plgDigitalReadCfg.scan_mode = constrain(plgDigitalReadCfg.scan_mode, -1, (int8_t)arraySize(MS_STD_DELAYS) - 1);
     
     // scan mode was changed?
     if(old_mode != plgDigitalReadCfg.scan_mode){
