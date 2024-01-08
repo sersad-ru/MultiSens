@@ -25,6 +25,7 @@ typedef MultiSensSymbol* PMultiSensSymbol;
 
 
 // Коды дополнительных символов
+#define MS_SYM_SQUARED_CODE      (char)0x01 // В квадрате
 #define MS_SYM_BACKSLASH_CODE    (char)0x02 // Обратный слеш 
 #define MS_SYM_RESET_CODE        (char)0x03 // Сброс
 #define MS_SYM_SELECT_CODE       (char)0x04 // Выбор
@@ -34,6 +35,18 @@ typedef MultiSensSymbol* PMultiSensSymbol;
 
 
 // Дополнительные символы
+// В квадрате (в смысле вторая степень)
+MultiSensSymbol MS_SYM_SQUARED[] = {
+  0b01100,
+  0b10010,
+  0b00100,
+  0b01000,
+  0b11110,
+  0b00000,
+  0b00000,
+  0b00000
+};
+
 // Обратный слеш
 MultiSensSymbol MS_SYM_BACKSLASH[] = {
   0b00000,

@@ -100,6 +100,7 @@ void MultiSensCore::init(MultiSensPlugin* plugins, uint8_t pluginsCount, uint32_
   _lcd_command(LCD_CMDS | LCD_CMDS_INC | LCD_CMDS_CUR);//Включить перемещение курсора слева направо
  
   // Загружаем свои символы
+  _lcd_create_symbol(MS_SYM_SQUARED_CODE, MS_SYM_SQUARED);// Символ второй степени (квадрата)
   _lcd_create_symbol(MS_SYM_BACKSLASH_CODE, MS_SYM_BACKSLASH);// Символ обратной косой черты
   _lcd_create_symbol(MS_SYM_RESET_CODE, MS_SYM_RESET);// Символ сброса
   _lcd_create_symbol(MS_SYM_SELECT_CODE, MS_SYM_SELECT);// Символ выбора
@@ -111,7 +112,7 @@ void MultiSensCore::init(MultiSensPlugin* plugins, uint8_t pluginsCount, uint32_
   // Выводим стартовое сообщение
   Serial.begin(baud);
   Serial.print(F("\n\n"));
-  Serial.print(FF(MSG_MAIN_TITLE));
+  Serial.print(FF(MSG_MAIN_TITLE));  
   Serial.print(F(" by sersad ["));
   Serial.print(__build_id);
   Serial.print(F("] Plugins registred: "));
