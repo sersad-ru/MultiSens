@@ -6,6 +6,7 @@
 * 
 * 01.11.2023
 * 11.12.2023
+* 09.01.2024
 * 
 * Arduino AVR Boards / Arduino UNO
 */
@@ -25,9 +26,12 @@
 #include "plgRDM6300.h"
 #include "plgADXL345.h"
 #include "plgWS2812.h"
+#include "plgI2CScan.h"
 
 /*
- * I2C сканирование (https://robotchip.ru/i2c-skaner-na-arduino/?ysclid=lr5cdh1lur846355185) от 8(16?) до 128?
+ * BMP280 + AHT20
+ * SHT21 + HTU21
+ * MPU6050
  * Адресные ленты. Описать кнопки в хидере и прическать.
  * На закуску Ethernet в режима DHCP?
  * 
@@ -49,6 +53,7 @@ MultiSensPlugin plugins[] = {
   {&plgRDM6300,       "RDM-6300(125kHz)", 0},
   {&plgADXL345,       "ADXL345",          sizeof(plgADXL345Cfg)},
   {&plgWS2812,        "WS2812b",          sizeof(plgWS2812Cfg)},
+  {&plgI2CScan,       "I\1C Scanner",      0},
 }; // 
 
 
