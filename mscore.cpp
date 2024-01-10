@@ -185,7 +185,16 @@ void MultiSensCore::_run_plugin(){
   clear();// Чистим экран
   moveCursor((strlen(_plugins[_mnu_current].title) < 16)?(16 - strlen(_plugins[_mnu_current].title)) >> 1 : 0, 0);
   println(_plugins[_mnu_current].title); // Выводим названия плагина
-  Serial.println(_plugins[_mnu_current].title);
+
+  //Выводим посимвольно, что б обрабатывать спец-символы
+  uint8_t i = 0;
+  while(_plugins[_mnu_current].title[i])
+    switch(_plugins[_mnu_current].title[i]){
+      case MS_SYM_SQUARED_CODE: Serial.print("²"); i++; break; // "²"
+      default: Serial.print(_plugins[_mnu_current].title[i++]); break;
+    }//switch
+  Serial.println();
+  
   _plugins[_mnu_current].run(); // Запускаем плагин
   asm volatile("jmp 0x00");// Если вдруг плагин вышел (хотя не должен), перегружаемся как можем
 }//_run_plugin

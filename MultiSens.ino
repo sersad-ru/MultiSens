@@ -27,6 +27,7 @@
 #include "plgADXL345.h"
 #include "plgWS2812.h"
 #include "plgI2CScan.h"
+#include "plgBMP280AHT20.h"
 
 /*
  * BMP280 + AHT20
@@ -53,7 +54,8 @@ MultiSensPlugin plugins[] = {
   {&plgRDM6300,       "RDM-6300(125kHz)", 0},
   {&plgADXL345,       "ADXL345",          sizeof(plgADXL345Cfg)},
   {&plgWS2812,        "WS2812b",          sizeof(plgWS2812Cfg)},
-  {&plgI2CScan,       "I\1C Scanner",      0},
+  {&plgI2CScan,       "I\1C Scanner",     0}, // custom symbol /1 is "²"
+  {&plgBMP280AHT20,   "BMP280+AHT20",     0},
 }; // 
 
 
