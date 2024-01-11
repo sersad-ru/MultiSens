@@ -63,6 +63,15 @@ typedef enum {
 } MultiSensCursor;
 
 
+//I2C register size
+typedef enum {
+  SIZE_8  = 1,
+  SIZE_16 = 2,
+  SIZE_24 = 3,
+  SIZE_32 = 4
+} MultiSensI2CRegSize;
+
+
 #define arraySize(_array) ( sizeof(_array) / sizeof(*(_array)) )
 // Макрос для приведения PROGMEM строк к const __FlashStringHelper*
 #define FF(val) ((const __FlashStringHelper*)val)
@@ -151,6 +160,26 @@ public:
   
   virtual size_t write(uint8_t value);
   using Print::write;
+
+  //I2C utils. ATTENTION!  Wire.begin() should be called from plugin
+  //** Write I2C register
+  //* i2c_addr - address of I2C device
+  //* reg - register number
+  //* val - register value
+  //* reg_size - register size (SIZE_8, SIZE_16, SIZE_24 or SIZE_32 bits). Bit endian (сначала старший)  
+  void i2cWriteReg(const uint8_t i2c_addr, const uint8_t reg, const uint32_t val, const MultiSensI2CRegSize reg_size = SIZE_8);// Big endian (сначала старший)
+
+  //** Read I2C register
+  //* i2c_addr - address of I2C device
+  //* reg - register number
+  //* reg_size - register size (SIZE_8, SIZE_16, SIZE_24 or SIZE_32 bits). Bit endian (сначала старший)
+  uint32_t i2cReadReg(const uint8_t i2c_addr, const uint8_t reg, const MultiSensI2CRegSize reg_size = SIZE_8);// Big endian (сначала старший)
+
+  //** Send I2C register address and waits for reading. Wire.read() should be next call 
+  //* i2c_addr - address of I2C device
+  //* reg - register number
+  //* cnt - number of requested bytes
+  void i2cRequestRead(const uint8_t i2c_addr, const uint8_t reg, const uint8_t cnt);
   
   void _btn_isr(); // Обработчик перывания, читающий кнопки
 private:

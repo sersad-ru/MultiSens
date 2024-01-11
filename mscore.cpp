@@ -5,6 +5,7 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
+#include <Wire.h>
 
 
 // Начальный адрес хранения настроек в EEPROM
@@ -408,6 +409,30 @@ MultiSensButton MultiSensCore::buttonReleased(){
   return result; // Отдаем результат
 }//buttonReleased
 
+
+// == I2C ==
+void MultiSensCore::i2cWriteReg(const uint8_t i2c_addr, const uint8_t reg, const uint32_t val, const MultiSensI2CRegSize reg_size){
+  Wire.beginTransmission(i2c_addr);
+  Wire.write(reg);
+  for(uint8_t i = reg_size; i > 0; i--) Wire.write((val >> (8 * (i - 1))) & 0xFF);
+  Wire.endTransmission();
+}//i2cWriteReg
+
+
+void MultiSensCore::i2cRequestRead(const uint8_t i2c_addr, const uint8_t reg, const uint8_t cnt){
+  Wire.beginTransmission(i2c_addr);
+  Wire.write(reg);
+  Wire.endTransmission(false);
+  Wire.requestFrom(i2c_addr, cnt);
+}//i2cBeginRead
+
+
+uint32_t MultiSensCore::i2cReadReg(const uint8_t i2c_addr, const uint8_t reg, const MultiSensI2CRegSize reg_size){
+  i2cRequestRead(i2c_addr, reg, reg_size);
+  uint32_t res = (uint32_t)Wire.read();
+  for(uint8_t i = 1; i < reg_size; i++) res = (res << 8) | (uint32_t)Wire.read();
+  return res;
+}//i2cReadReg
 
 
 // == Внутренности ==

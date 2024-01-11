@@ -42,22 +42,9 @@ typedef struct {
   int16_t maxZ;  
 } accMinMax;
 
-
-void _write_reg(const uint8_t reg, const uint8_t val){
-  Wire.beginTransmission(ADXL_ADDRESS);
-  Wire.write(reg);
-  Wire.write(val);
-  Wire.endTransmission();
-}//_write_reg
-
-
 accPkt _read_acc(){
   accPkt res;
-  Wire.beginTransmission(ADXL_ADDRESS);
-  Wire.write(DATA_REG_START);
-  Wire.endTransmission(false);
-    
-  Wire.requestFrom(ADXL_ADDRESS, DATA_REG_SIZE); // stop = true by default
+  core.i2cRequestRead(ADXL_ADDRESS, DATA_REG_START, DATA_REG_SIZE);
   res.x = Wire.read() | Wire.read() << 8; //LSB | HSB
   res.y = Wire.read() | Wire.read() << 8; //LSB | HSB
   res.z = Wire.read() | Wire.read() << 8; //LSB | HSB  
@@ -142,11 +129,11 @@ void plgADXL345(){
 
   // Init device
   Wire.begin();
-  _write_reg(POWER_CTL, POWER_CTL_VALUE);
-  _write_reg(DATA_FORMAT, DATA_FORMAT_VALUE);  
-  _write_reg(OFSX, plgADXL345Cfg.offX);  
-  _write_reg(OFSY, plgADXL345Cfg.offY);  
-  _write_reg(OFSZ, plgADXL345Cfg.offZ);  
+  core.i2cWriteReg(ADXL_ADDRESS, POWER_CTL, POWER_CTL_VALUE);  
+  core.i2cWriteReg(ADXL_ADDRESS, DATA_FORMAT, DATA_FORMAT_VALUE);  
+  core.i2cWriteReg(ADXL_ADDRESS, OFSX, plgADXL345Cfg.offX);  
+  core.i2cWriteReg(ADXL_ADDRESS, OFSY, plgADXL345Cfg.offY);  
+  core.i2cWriteReg(ADXL_ADDRESS, OFSZ, plgADXL345Cfg.offZ);  
   
   accMinMax minmax = _set_minmax(_read_acc());// Read first values
 
@@ -168,10 +155,11 @@ void plgADXL345(){
       case SELECT: 
         plgADXL345Cfg.offX = _calibrate('X');
         plgADXL345Cfg.offY = _calibrate('Y');
-        plgADXL345Cfg.offZ = _calibrate('Z');
-        _write_reg(OFSX, plgADXL345Cfg.offX);  
-        _write_reg(OFSY, plgADXL345Cfg.offY);  
-        _write_reg(OFSZ, plgADXL345Cfg.offZ);          
+        plgADXL345Cfg.offZ = _calibrate('Z');       
+        core.i2cWriteReg(ADXL_ADDRESS, OFSX, plgADXL345Cfg.offX);  
+        core.i2cWriteReg(ADXL_ADDRESS, OFSY, plgADXL345Cfg.offY);  
+        core.i2cWriteReg(ADXL_ADDRESS, OFSZ, plgADXL345Cfg.offZ);  
+
       break;  
       case SELECT_LONG: core.saveSettings((uint8_t*)&plgADXL345Cfg);break;   // save settings to EEPROM
       
