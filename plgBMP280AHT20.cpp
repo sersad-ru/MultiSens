@@ -8,6 +8,8 @@
 #define BMP_ADDRESS 0x77 // BMP280 I2C address
 #define AHT_ADDRESS 0x38 // AHT20 I2C address 
 
+// -------------- Переписать с микролибами. И сделать еще два плагина на отдельные устройства (там возможны другие сетевые адреса)
+
 // -- BMP(E)--
 #define BMP_ID 0x58 // BMP280 ID 
 #define BME_ID 0x60 // BME280 ID

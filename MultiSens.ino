@@ -27,10 +27,12 @@
 #include "plgADXL345.h"
 #include "plgWS2812.h"
 #include "plgI2CScan.h"
+#include "plgBME280.h"
+#include "plgAHT20.h"
 #include "plgBMP280AHT20.h"
 
 /*
- * BMP280 + AHT20
+ * BMP280 + AHT20  Переписать с микролибами. И сделать еще два плагина на отдельные устройства (там возможны другие сетевые адреса)
  * SHT21 + HTU21
  * MPU6050
  * Адресные ленты. Описать кнопки в хидере и прическать.
@@ -55,6 +57,8 @@ MultiSensPlugin plugins[] = {
   {&plgADXL345,       "ADXL345",          sizeof(plgADXL345Cfg)},
   {&plgWS2812,        "WS2812b",          sizeof(plgWS2812Cfg)},
   {&plgI2CScan,       "I\1C Scanner",     0}, // custom symbol /1 is "²"
+//  {&plgBME280,        "BME280",           0},
+//  {&plgAHT20,         "AHT20",            0},  
   {&plgBMP280AHT20,   "BMP280+AHT20",     0},
 }; // 
 
