@@ -6,19 +6,19 @@
 #define uBME280_BMP_ID 0x58 // BMP280 ID 
 #define uBME280_BME_ID 0x60 // BME280 ID
 
-#define uBME280_RESET_REG       0xE0 // Reset register
-#define uBME280_RESET_VAL       0xB6 // Reset value
+#define uBME280_RESET_REG         0xE0 // Reset register
+#define uBME280_RESET_VAL         0xB6 // Reset value
 
-#define uBME280_ID_REG          0xD0 // ID register
-#define uBME280_CALIBRATION_REG 0x88 // First Calibration register (BMP + BME) 25 bytes
-#define uBME280_CALIBRATION_REG 0xE1 // Second Calibration register (BME only) 8 bytes
-#define uBME280_HUM_CTRL_REG    0xF2 // Humidity cpntrol register (BME only)
-#define uBME280_STATUS_REG      0xF3 // Status register
-#define uBME280_CONTROL_REG     0xF4 // Control register
-#define uBME280_CONFIG_REG      0xF5 // Config register
-#define uBME280_TEMPERATURE_REG 0xFA // Temperature register (3 bytes) 
-#define uBME280_PRESSURE_REG    0xF7 // Pressure register (3 bytes) 
-#define uBME280_HUMIDITY_REG    0xFD // Humidity register (2 bytes)
+#define uBME280_ID_REG            0xD0 // ID register
+#define uBME280_CALIBRATION_REG_1 0x88 // First Calibration register (BMP + BME) 25 bytes
+#define uBME280_CALIBRATION_REG_2 0xE1 // Second Calibration register (BME only) 8 bytes
+#define uBME280_HUM_CTRL_REG      0xF2 // Humidity cpntrol register (BME only)
+#define uBME280_STATUS_REG        0xF3 // Status register
+#define uBME280_CONTROL_REG       0xF4 // Control register
+#define uBME280_CONFIG_REG        0xF5 // Config register
+#define uBME280_TEMPERATURE_REG   0xFA // Temperature register (3 bytes) 
+#define uBME280_PRESSURE_REG      0xF7 // Pressure register (3 bytes) 
+#define uBME280_HUMIDITY_REG      0xFD // Humidity register (2 bytes)
 
 // Oversampling
 #define uBME280_OVERSAMPLING_1  0x01
@@ -63,7 +63,7 @@ uint8_t uBME280_Init(const uint8_t i2c_addr, uBME280_Config &cfg){
   delay(10);
 
   // Дальше читаем калибровку 
-  core.i2cRequestRead(i2c_addr, uBME280_CALIBRATION_REG, 25);
+  core.i2cRequestRead(i2c_addr, uBME280_CALIBRATION_REG_1, 25);
   cfg.t1 = (Wire.read() | (Wire.read() << 8));
   cfg.t2 = (Wire.read() | (Wire.read() << 8));
   cfg.t3 = (Wire.read() | (Wire.read() << 8));
@@ -78,7 +78,7 @@ uint8_t uBME280_Init(const uint8_t i2c_addr, uBME280_Config &cfg){
   cfg.p9 = (Wire.read() | (Wire.read() << 8));
   cfg.h1 = Wire.read();
 
-  core.i2cRequestRead(i2c_addr, uBME280_CALIBRATION_REG, 8);
+  core.i2cRequestRead(i2c_addr, uBME280_CALIBRATION_REG_2, 8);
   cfg.h2 = (Wire.read() | (Wire.read() << 8));
   cfg.h3 = Wire.read();
   cfg.h4 = (Wire.read() << 4);
@@ -101,7 +101,7 @@ uint8_t uBME280_Init(const uint8_t i2c_addr, uBME280_Config &cfg){
 //** Внутренняя функция получения необработанной темеаратуры
 int32_t _uBME280_get_temp_int(const uint8_t i2c_addr, const uBME280_Config cfg){
   int32_t raw = core.i2cReadReg(i2c_addr, uBME280_TEMPERATURE_REG, SIZE_24);
-    
+
   if(raw == 0x800000) return 0;
   raw >>= 4;
   int32_t part1 = (((raw >> 3) - ((int32_t)cfg.t1 << 1)) * (int32_t)cfg.t2) >> 11;
@@ -112,18 +112,19 @@ int32_t _uBME280_get_temp_int(const uint8_t i2c_addr, const uBME280_Config cfg){
 
 //** Возвращает температуру в градусах цельсия, умноженную на 1024. Т.е 27,54°С вернет как 2754  
 int16_t uBME280_GetTemperature(const uint8_t i2c_addr, const uBME280_Config cfg){
-  return (int16_t)((_uBME280_get_temp_int(i2c_addr, cfg) * 5 + 128) >> 8);
+  return (int32_t)((_uBME280_get_temp_int(i2c_addr, cfg) * 5 + 128) >> 8);
 }//uBME280_GetTemperature
 
 
 //** Возвращает давление в паскалях. Для перевода в мм рт. ст. делим на 133.
 uint32_t uBME280_GetPressure(const uint8_t i2c_addr, const uBME280_Config cfg){
   uint32_t raw = core.i2cReadReg(i2c_addr, uBME280_PRESSURE_REG, SIZE_24);
-      
+  
   if(raw == 0x800000) return 0;
     
   raw >>= 4;
   int64_t part1 = (int64_t)_uBME280_get_temp_int(i2c_addr, cfg) - 128000;
+
   int64_t part2 = part1 * part1 * (int64_t)cfg.p6; 
   part2 = part2 + ((part1 * (int64_t)cfg.p5) << 17);
   part2 = part2 + ((int64_t)cfg.p4 << 35);
@@ -137,6 +138,7 @@ uint32_t uBME280_GetPressure(const uint8_t i2c_addr, const uBME280_Config cfg){
   part1 = (((int64_t)cfg.p9) * (res >> 13) * (res >> 13)) >> 25;
   part2 = (((int64_t)cfg.p8) * res) >> 19;
   res = ((res + part1 + part2) >> 8) + (((int64_t)cfg.p7) << 4);
+
   return (uint32_t)(res >> 8);
 }//uBME280_GetPressure
 
