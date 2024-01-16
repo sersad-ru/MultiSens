@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* BMP280/AHT20 plugin recieve temperature, humidity and pressure from BMP280+AHT20 module.
+* BMP280/AHT20 plugin receive temperature, humidity and pressure from BMP280+AHT20 module.
 * Connection:
 * GND - black* 
 * VCC (+5V) - red

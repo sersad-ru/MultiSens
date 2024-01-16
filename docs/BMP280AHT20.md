@@ -18,6 +18,13 @@ Arduino `SerialPlotter` compartible format.
 * AHT20 I²C address in `AHT_ADDRESS` in [plgBMP280AHT20.cpp](/plgBMP280AHT20.cpp)
 
 ### Connection
+|Sensor Pin|MultiSens Pin|Color|
+|:---:|:---:|:---|
+|GND|GND|Black|
+|VCC|+5V|Red|
+|SDA|P6|Yellow-Black|
+|SCL|P7|Gray-Black|
+
 
 
 [Back to Home](/#supported-devices)
