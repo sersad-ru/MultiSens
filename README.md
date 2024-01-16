@@ -15,7 +15,12 @@ The story of project.
 
 
 ## Supported Devices
-Device list.
+Currently MuliSens supports following list of devises:
+
+|Plugin|Description|
+|---|---|
+|FindPin|Displays the *msPin* number of selected wire|
+|BMP280+AHT20|Temperature, Humidity and Pressure module| 
 
 
 ## Hardware
@@ -23,7 +28,8 @@ How to build.
 
 
 ## Software
-How to install
+How to install.
 
 
 ## Adding plugins
+How to write your own plugin.
