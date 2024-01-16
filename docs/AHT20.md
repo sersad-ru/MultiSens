@@ -1,19 +1,19 @@
-# BME280 Plugin
-<p align="center"><img src="BME280.png"/></p>
+# AHT20 Plugin
+<p align="center"><img src="AHT20.png"/></p>
 
-BME280 plugin receive temperature, humidity and air pressure from I²C module with 
-BME280 sensor.
+AHT20 plugin receive temperature and humidity from I²C module with 
+AHT20 sensor.
 
 Results are displayed on the device screen and sends to serial in human-readable and 
 Arduino `SerialPlotter` compartible format.
 
 * You can specify the delay between sensors calls using `READ_DELAY_MS` 
-  in [plgBME280.cpp](/plgBME280.cpp)
+  in [plgAHT20.cpp](/plgAHT20.cpp)
 
-* BME280 I²C address in `BME_ADDRESS` in [plgBME280.cpp](/plgBME280.cpp)
+* AHT20 I²C address in `AHT_ADDRESS` in [plgAHT20.cpp](/plgAHT20.cpp)
 
 ### Connection
-![BME280Connection](BME280-CONN.png)
+![AHT20Connection](AHT20-CONN.png)
 |Sensor Pin|MultiSens Pin|Color|
 |:---:|:---:|:---|
 |GND|GND|Black|
