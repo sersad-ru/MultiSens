@@ -1,7 +1,7 @@
 # DigitalRead Plugin
 
 The DigitalRead plugin reads digital pin `P0` and `P1`.
-`P0` is configured as `INPUT`. 'P1' is configured as `INPUT_PULLUP`.
+`P0` is configured as `INPUT`. `P1` is configured as `INPUT_PULLUP`.
 Results are displayed on the device screen and sends to serial in human-readable and 
 Arduino `SerialPlotter` compartible format.
 
