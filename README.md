@@ -4,7 +4,7 @@ Arduino Multi Sensor Tester
 
 ## Table of contents
 * [Overview](#overview)
-* [Supporded devices](#supported-devises)
+* [Supporded devices](#supported-devices)
 * [Hardware](#hardware)
 * [Software](#software)
 * [Adding plugins](#adding-plugins)

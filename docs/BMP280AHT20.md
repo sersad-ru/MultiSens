@@ -7,5 +7,5 @@ Arduino Multi Sensor Tester
 ### Connection
 
 
-[Back to Home](/)
+[Back to Home](/#supported-devices)
 
