@@ -10,20 +10,20 @@ Arduino Multi Sensor Tester
 * [Adding plugins](#adding-plugins)
 
 
-##Overview
+## Overview
 The story of project.
 
 
-##Supported Devices
+## Supported Devices
 Device list.
 
 
-##Hardware
+## Hardware
 How to build.
 
 
-##Software
+## Software
 How to install
 
 
-#Adding plugins
+## Adding plugins
