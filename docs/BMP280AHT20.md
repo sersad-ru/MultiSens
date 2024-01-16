@@ -1,5 +1,5 @@
 # BMP280 and AHT20 Plugin
-<p align="center">![BMP280AHT20](BMP280AHT20.png)</p>
+<p align="center"><img src="BMP280AHT20.png"/></p>
 
 BMP280+AHT20 plugin receuve temperature, humidity and pressure air from I²C module with 
 BMP280 and AHT20 sensors.
