@@ -1,8 +1,5 @@
-# MultiSens
-
-Arduino Multi Sensor Tester
-
-## BMP280 and AHT20 Plugin
+# BMP280 and AHT20 Plugin
+![BMP280+AHT20](BMP280AHT20.png)
 BMP280+AHT20 plugin receuve temperature, humidity and pressure air from I²C module with 
 BMP280 and AHT20 sensors.
 
