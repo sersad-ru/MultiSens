@@ -1,19 +1,13 @@
-# DigitalAnalog Plugin
+# AnalogRead Plugin
 
-The DigitalAnalog plugin reads digital pin `P0` and analog pin `P5`.
-`P0` is configured as `INPUT`.
+The AnalogRead plugin reads analog values from pin `P5` and `P6`.
 Results are displayed on the device screen and sends to serial in human-readable and 
 Arduino `SerialPlotter` compartible format.
 
 * Use `UP` and `DOWN` buttons to change poll delay. 
   Avaible values are 10, 50, 100, 250, 500, 1000, 1500 and 2000 ms
 
-* Additional mode is `INTERRUPT` mode. Interrupts are configured as **CHANGE** on both pins. 
-  In interrupt mode values are printed only if an interrupt occurs.
-
-* Not only values are printed to serial but time (in ms) since last changes of values.
-
-* Current delay is displayed after `P5` value (use `LEFT` and `RIGTH` buttuns to scrool the screen)
+* Current delay is displayed after `P6` value (use `LEFT` and `RIGTH` buttuns to scrool the screen)
 
 * Press and hold `SELECT` button to store current delay in `EEPROM`.
 

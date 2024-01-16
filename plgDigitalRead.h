@@ -3,7 +3,7 @@
 #include "mscore.h"
 
 /*
-* The DigitalRead plugin reads the digital pin. 
+* The DigitalRead plugin reads the digital pins. 
 * P0 is configured as INPUT
 * P1 is configured as INPUT_PULLP
 * Results are printed on screen and sends to serial in human readable and SerialPlotter compartible format.

@@ -1,7 +1,7 @@
-# DigitalAnalog Plugin
+# DigitalRead Plugin
 
-The DigitalAnalog plugin reads digital pin `P0` and analog pin `P5`.
-`P0` is configured as `INPUT`.
+The DigitalRead plugin reads digital pin `P0` and `P1`.
+`P0` is configured as `INPUT`. 'P1' is configured as `INPUT_PULLUP`.
 Results are displayed on the device screen and sends to serial in human-readable and 
 Arduino `SerialPlotter` compartible format.
 
@@ -13,7 +13,7 @@ Arduino `SerialPlotter` compartible format.
 
 * Not only values are printed to serial but time (in ms) since last changes of values.
 
-* Current delay is displayed after `P5` value (use `LEFT` and `RIGTH` buttuns to scrool the screen)
+* Current delay is displayed after `P1` value (use `LEFT` and `RIGTH` buttuns to scrool the screen)
 
 * Press and hold `SELECT` button to store current delay in `EEPROM`.
 
