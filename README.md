@@ -20,6 +20,7 @@ Currently MuliSens supports following list of devises:
 |Plugin|Description|
 |---|---|
 |[FindPin](docs/FindPin.md)|Displays the `msPin` number of selected wire|
+|[DigitalAnalog](docs/DigitalAnalog.md)|Reads one digital and one analog pin|
 |[AHT20](docs/AHT20.md)|Temperature and Humidity sensor|
 |[BME280](docs/BME280.md)|Temperature, Humidity and Pressure sensor|
 |[BMP280+AHT20](docs/BMP280AHT20.md)|Temperature, Humidity and Pressure module| 
