@@ -10,7 +10,7 @@ Arduino `SerialPlotter` compartible format.
 * You can specify the delay between sensors calls using `READ_DELAY_MS` 
   in [plgAHT20.cpp](/plgAHT20.cpp)
 
-* AHT20 I²C address in `AHT_ADDRESS` in [plgAHT20.cpp](/plgAHT20.cpp)
+* AHT20 I²C address is stored in `AHT_ADDRESS` in [plgAHT20.cpp](/plgAHT20.cpp)
 
 ### Connection
 ![AHT20Connection](AHT20-CONN.png)

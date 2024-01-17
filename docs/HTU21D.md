@@ -10,7 +10,7 @@ Arduino `SerialPlotter` compartible format.
 * You can specify the delay between sensors calls using `READ_DELAY_MS` 
   in [plgHTU21D.cpp](/plgHTU21D.cpp)
 
-* HTU21D I²C address in `HTU_ADDRESS` in [plgHTU21D.cpp](/plgHTU21D.cpp)
+* HTU21D I²C address is stored in `HTU_ADDRESS` in [plgHTU21D.cpp](/plgHTU21D.cpp)
 
 ### Connection
 ![HTU21DConnection](HTU21D-CONN.png)
