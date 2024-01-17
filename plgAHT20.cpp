@@ -42,6 +42,7 @@ void plgAHT20(){
         Serial.println();                    
       }//if
       else {
+        core.println(FF(MS_MSG_READ_ERROR));
         Serial.println(FF(MS_MSG_READ_ERROR));        
         need_header = 1;
       }//if..else

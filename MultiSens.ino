@@ -30,10 +30,9 @@
 #include "plgBME280.h"
 #include "plgAHT20.h"
 #include "plgBMP280AHT20.h"
+#include "plgHTU21D.h"
 
 /*
- * BMP280 + AHT20  Переписать с микролибами. И сделать еще два плагина на отдельные устройства (там возможны другие сетевые адреса)
- * SHT21 + HTU21
  * MPU6050
  * Адресные ленты. Описать кнопки в хидере и прическать.
  * На закуску Ethernet в режима DHCP?
@@ -60,6 +59,7 @@ MultiSensPlugin plugins[] = {
   {&plgBMP280AHT20,   "BMP280+AHT20",     0},
   {&plgBME280,        "BME280",           0},  
   {&plgAHT20,         "AHT20",            0},    
+  {&plgHTU21D,        "HTU21D",           0},      
 }; // 
 
 

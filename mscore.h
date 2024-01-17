@@ -65,6 +65,7 @@ typedef enum {
 
 //I2C register size
 typedef enum {
+  SIZE_0  = 0,
   SIZE_8  = 1,
   SIZE_16 = 2,
   SIZE_24 = 3,

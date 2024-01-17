@@ -2,23 +2,23 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* AHT20 plugin recieve temperature and humidity from AHT20.
+* HTU21D plugin recieve temperature and humidity from HTU21D.
 * Connection:
 * GND - black 
-* VCC (+5V) - red
+* VIN (+5V) - red
 * SDA - P6 - yellow-black
 * SCL - P7 - gray-black
 * 
 * Results are printed on screen and sends to serial in human readable and SerialPlotter compartible format.
 * 
-* You can specify the delay between sensor calls using READ_DELAY_MS in plgAHT20.cpp
-* AHT20 I²C address in AHT_ADDRESS (plgAHT20.cpp)
+* You can specify the delay between sensor calls using READ_DELAY_MS in plgHTU21D.cpp
+* HTU21D I²C address in HTU_ADDRESS (plgHTU21D.cpp)
 * 
 */
 
 /*
 struct{
     
-} plgAHT20Cfg;
+} plgHTU21DCfg;
 */
-void plgAHT20();
+void plgHTU21D();
