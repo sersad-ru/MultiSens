@@ -20,6 +20,7 @@ Currently MuliSens supports following list of devises:
 |Plugin|Description|
 |---|---|
 |[FindPin](docs/FindPin.md)|Displays the `msPin` number of selected wire|
+|[I²CScan](docs/I2CScan.md)|Searches for I²C devises|
 |[DigitalAnalog](docs/DigitalAnalog.md)|Reads one digital and one analog pin|
 |[DigitalRead](docs/DigitalRead.md)|Reads digital pins|
 |[AnalogRead](docs/AnalogRead.md)|Reads analog pins|
