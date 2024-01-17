@@ -1,8 +1,9 @@
 # MultiSens
 
+Arduino Multi Sensor Tester
+
 <p align="center"><img src="docs/MultiSens.jpg"/></p>
 
-Arduino Multi Sensor Tester
 
 ## Table of contents
 * [Overview](#overview)
