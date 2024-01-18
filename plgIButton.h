@@ -8,7 +8,7 @@
 * Center - Data - P0 + 2k2 (4k7 works too) Ohm to VCC
 *
 * 
-* Results are printed on screen and sends to serial in human readable format.* 
+* Results are printed on screen and sends to serial in human readable format. 
 */
 
 /*
