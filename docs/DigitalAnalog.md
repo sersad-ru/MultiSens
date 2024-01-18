@@ -13,7 +13,7 @@ Arduino `SerialPlotter` compartible format.
 
 * Not only values are printed to serial but time (in ms) since last changes of values.
 
-* Current delay is displayed after `P5` value (use `LEFT` and `RIGTH` buttuns to scrool the screen)
+* Current delay is displayed after `P5` value (use `LEFT` and `RIGTH` buttons to scrool the screen)
 
 * Press and hold `SELECT` button to store current delay in `EEPROM`.
 

@@ -36,6 +36,7 @@ Currently MuliSens supports following list of devises:
 |[HTU21D](docs/HTU21D.md)|Temperature and Humidity sensor|
 |[iButton](docs/IButton.md)|DS19xx S/N reader|
 |[MH-Z19b](docs/MH-Z19.md)|CO₂ concentration sensor|
+|[QRE1113](docs/QRE1113.md)|Distance sensor|
 
 
 ## Hardware
