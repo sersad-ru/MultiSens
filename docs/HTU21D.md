@@ -1,7 +1,7 @@
 # HTU21D Plugin
 <p align="center"><img src="HTU21D.png"/></p>
 
-HTU21D plugin receives temperature and humidity from the I²C module with 
+The HTU21D plugin receives temperature and humidity from the I²C module with 
 HTU21D sensor.
 
 Results are displayed on the device screen and sends to serial in human-readable and 

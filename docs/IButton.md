@@ -1,7 +1,7 @@
 # iButton Plugin
 <p align="center"><img src="iButton.png"/></p>
 
-iButton plugin receives serial number from the Dallas DS19xx iButton key.
+The iButton plugin receives serial number from the Dallas DS19xx iButton key.
 
 Results are displayed on the device screen and sends to serial in human-readable format.
 

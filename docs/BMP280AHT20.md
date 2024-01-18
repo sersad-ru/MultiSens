@@ -1,7 +1,7 @@
 # BMP280 and AHT20 Plugin
 <p align="center"><img src="BMP280AHT20.png"/></p>
 
-BMP280+AHT20 plugin receives temperature, humidity and air pressure from the I²C module with 
+The BMP280+AHT20 plugin receives temperature, humidity and air pressure from the I²C module with 
 BMP280 and AHT20 sensors.
 
 Results are displayed on the device screen and sends to serial in human-readable and 

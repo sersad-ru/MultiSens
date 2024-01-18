@@ -1,7 +1,7 @@
 # MH-Z19 Plugin
 <p align="center"><img src="MH-Z19.png"/></p>
 
-MHZ19 plugin recieves CO₂ concentration from the MH-Z19b sensor.
+The MHZ19 plugin recieves CO₂ concentration from the MH-Z19b sensor.
 
 Results are displayed on the device screen and sends to serial in human-readable and 
 Arduino `SerialPlotter` compartible format.
