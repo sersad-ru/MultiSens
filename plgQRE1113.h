@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* QRE1113 plugin recieve distance information QRE1113 from sensor.
+* QRE1113 plugin recieves distance information from the QRE1113 sensor.
 * Connection:
 * GND - GND - black
 * VCC - +5V - red

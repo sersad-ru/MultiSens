@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* DS18B20 plugin recieve temperature from Dallas DS18B20 sensor.
+* DS18B20 plugin recieves temperature from the Dallas DS18B20 sensor.
 * Connection:
 * 1. GND - black
 * 2. Data - P0 + 4k7 Ohm to VCC

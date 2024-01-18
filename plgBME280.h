@@ -3,7 +3,7 @@
 #include "mscore.h"
 
 /*
-* BME280 plugin recieve temperature, humidity and pressure from BME280.
+* BME280 plugin recieves temperature, humidity and pressure from the BME280 sensor.
 * Connection:
 * GND - black* 
 * VCC (+5V) - red

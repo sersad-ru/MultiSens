@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* MHZ19 plugin recieve CO2 concentration from MH-Z19b sensor.
+* MHZ19 plugin recieves CO2 concentration from the MH-Z19b sensor.
 * Connection:
 * GND - GND - black
 * VIN - +5V - red

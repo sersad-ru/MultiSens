@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* WS2812 plugin can srnd commands to WE2812 LEDs. 
+* WS2812 plugin can send commands to WE2812 LEDs. 
 * ATTENTION! To prevent current overload don't use MultiSens on LED Strip. Only a few (2-3) leds can be used.
 * 
 * Connection:

@@ -1,6 +1,6 @@
 # PWM Plugin
 
-The PWM plugin create the PWM signal on `P1`, `P2` and `P3(software PWM)` pins.
+The PWM plugin creates the PWM signal on `P1`, `P2` and `P3(software PWM)` pins.
 
 * Use `SELECT` button to change the channel.
 

@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* AHT20 plugin recieve temperature and humidity from AHT20.
+* AHT20 plugin recieves temperature and humidity from the AHT20 sensor.
 * Connection:
 * GND - black 
 * VCC (+5V) - red

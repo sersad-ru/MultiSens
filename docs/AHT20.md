@@ -1,7 +1,7 @@
 # AHT20 Plugin
 <p align="center"><img src="AHT20.png"/></p>
 
-AHT20 plugin receive temperature and humidity from I²C module with 
+AHT20 plugin receives temperature and humidity from the I²C module with 
 AHT20 sensor.
 
 Results are displayed on the device screen and sends to serial in human-readable and 

@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* ADXL345 plugin recieve acceleration on X, Y and Z axis from the ASXL345 accelerometer.
+* ADXL345 plugin recieves acceleration on X, Y and Z axis from the ASXL345 accelerometer.
 * Connection:
 * GND - GND - black
 * VCC - +5V - red

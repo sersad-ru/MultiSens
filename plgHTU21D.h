@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* HTU21D plugin recieve temperature and humidity from HTU21D.
+* HTU21D plugin recieves temperature and humidity from the HTU21D sensor.
 * Connection:
 * GND - black 
 * VIN (+5V) - red
