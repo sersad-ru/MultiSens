@@ -28,6 +28,7 @@ Currently MuliSens supports following list of devises:
 |[DigitalRead](docs/DigitalRead.md)|Reads digital pins|
 |[AnalogRead](docs/AnalogRead.md)|Reads analog pins|
 |[PWM](docs/PWM.md)|Creates the PWM signal on pins|
+|[DS18B20](docs/DS18b20.md)|Temperature sensor|
 |[AM2320/DHT22](docs/AM2302.md)|Temperature and Humidity sensor|
 |[AHT20](docs/AHT20.md)|Temperature and Humidity sensor|
 |[BME280](docs/BME280.md)|Temperature, Humidity and Pressure sensor|
