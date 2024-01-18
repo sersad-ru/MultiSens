@@ -34,7 +34,7 @@ Currently MuliSens supports following list of devises:
 |[BME280](docs/BME280.md)|Temperature, Humidity and Pressure sensor|
 |[BMP280+AHT20](docs/BMP280AHT20.md)|Temperature, Humidity and Pressure module| 
 |[HTU21D](docs/HTU21D.md)|Temperature and Humidity sensor|
-|[iButton](docs/IButton.md)|DS19xx S/N reader|
+|[iButton](docs/IButton.md)|DS19xx Serial Number reader|
 |[MH-Z19b](docs/MH-Z19.md)|CO₂ concentration sensor|
 |[QRE1113](docs/QRE1113.md)|Distance sensor|
 
