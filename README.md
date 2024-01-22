@@ -1,3 +1,5 @@
+.. image:: https://img.shields.io/badge/ArduinoIDE-%3E%3D1.6.10-lightgrey.svg
+    :target: `compatible ide`_
 # MultiSens
 
 Arduino Multi Sensor Tester
