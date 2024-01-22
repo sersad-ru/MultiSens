@@ -37,6 +37,7 @@ Currently MuliSens supports following list of devises:
 |[iButton](docs/IButton.md)|DS19xx Serial Number reader|
 |[MH-Z19b](docs/MH-Z19.md)|CO₂ concentration sensor|
 |[QRE1113](docs/QRE1113.md)|Distance sensor|
+|[HC-SR04](docs/HC-SR04.md)|Distance sensor|
 
 
 ## Hardware

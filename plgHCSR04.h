@@ -12,10 +12,10 @@
 * 
 * Results are printed on the screen and sends to serial in human readable format.* 
 *  
-* You can specify the delay between sensor calls using READ_DELAY_MS in plgHSR04.cpp
+* You can specify the delay between sensor calls using READ_DELAY_MS in plgHCSR04.cpp
 * 
-* Use UP and DOWN buttons to change current temperature. Avaible rangea is -50 - +50C. 
-* Press and hold SELECT button to store current delay in EEPROM.
+* Use UP and DOWN buttons to change current temperature. Available range is -50 - +50C. 
+* Press and hold SELECT button to store current temperature in EEPROM.
 * Hold DOWN button and pres RESET to clear stored value and return to defaults. (ATTENTION! All stored data will be cleared. FOR ALL plugins!)
 *
 */
