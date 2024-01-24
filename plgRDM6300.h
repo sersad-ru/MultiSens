@@ -10,7 +10,7 @@
 * Rx - P1 - blue
 *
 * 
-* Results are printed on the screen and sends to serial in human readable format.* 
+* Results are printed on the screen and sends to serial in human readable format. 
 * 
 * You can specify the delay between sensor calls using READ_DELAY_MS in plgRDM6300.cpp
 */

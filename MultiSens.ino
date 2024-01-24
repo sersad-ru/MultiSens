@@ -31,8 +31,11 @@
 #include "plgAHT20.h"
 #include "plgBMP280AHT20.h"
 #include "plgHTU21D.h"
+#include "plgRC522.h"
 
 /*
+ * RFID RC522 - дописать и причесать
+ * В ядро добавить печать массива из 4/6 байт разделенных двоеточикм. Им выводить серийник в RC522 и iButton
  * MPU6050
  * Адресные ленты. Описать кнопки в хидере и прическать.
  * На закуску Ethernet в режима DHCP?
@@ -60,6 +63,7 @@ MultiSensPlugin plugins[] = {
   {&plgBME280,        "BME280",           0},  
   {&plgAHT20,         "AHT20",            0},    
   {&plgHTU21D,        "HTU21D",           0},      
+  {&plgRC522,         "RC522",            0},      
 }; // 
 
 
