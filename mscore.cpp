@@ -220,6 +220,21 @@ void MultiSensCore::printValScale(Print &p, int32_t value, int16_t scale){
   p.print(abs(value % scale)); 
 }//printValScale
 
+
+void MultiSensCore::printHexArray(Print &p, uint8_t* arr, const uint8_t arrSize, const char spacer){
+  for(uint8_t i = 0; i < arrSize; i++){
+    if(arr[i] < 0x10) p.print(0);
+    p.print(arr[i], HEX);
+    if(i < (arrSize - 1)) p.print(spacer);
+  }//for
+}//printHexArray   
+
+
+void MultiSensCore::printLongAsArray(Print &p, const uint32_t val, const char spacer){
+  uint8_t arr[] = {val >> 24, val >> 16, val >> 8, val};
+  printHexArray(p, arr, 4, spacer);
+}//printLongAsArray
+
   
 char * MultiSensCore::rAlign(uint32_t val, const uint8_t width, const char fill, uint8_t base){
   return _rAlign(val, width, fill, base, 0);

@@ -90,7 +90,7 @@ void plgDS18B20(){
   uint8_t need_header = 1; 
   
   Serial.print(F("S/N: "));
-  uOW_printSerial(Serial, rom.serialNumber);
+  core.printHexArray(Serial, rom.serialNumber, arraySize(rom.serialNumber)); 
   Serial.println();
   
   // Main loop
@@ -104,7 +104,7 @@ void plgDS18B20(){
       core.printValScale(core, (temp * 10) >> CONF2SHIFT(conf));
       core.print(MS_SYM_DEGREE_CODE);
       core.print(F("C SN:"));
-      uOW_printSerial(core, rom.serialNumber);
+      core.printHexArray(core, rom.serialNumber, arraySize(rom.serialNumber)); // Print S/N
       core.println();
 
       if(need_header){ // Need to print header for serial plotter
@@ -117,7 +117,7 @@ void plgDS18B20(){
       Serial.println(" ");
     }//if
     else {
-      uOW_printSerial(core, rom.serialNumber); // Just print S/N if we can't read temperature
+      core.printHexArray(core, rom.serialNumber, arraySize(rom.serialNumber));
       core.println();
 
       Serial.println(FF(MS_MSG_READ_ERROR));  // Print error message to the serial  

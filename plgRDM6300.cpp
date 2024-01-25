@@ -1,19 +1,18 @@
 #include "plgRDM6300.h"
+#include "mscardmsg.h"
 #include <SoftwareSerial.h>
 
 #define RX_PIN P0
 #define TX_PIN P1
 #define READ_DELAY_MS 500 // 0.5 seconds between attempt
 
-namespace RDM6300 {
-  
-const char ID_TITLE[] PROGMEM = "ID:";
-  
+namespace RDM6300 { 
+ 
 // RDM6300 packet
 typedef struct {
   uint8_t  head;   // Pkt Header (0x02 - tag incoming, 0x03 - tag has been fully transmitted)
   uint8_t  ver[2]; // Verson
-  uint8_t  id[8];  // Cared ID
+  uint8_t  id[8];  // Card ID
   uint8_t  crc[2]; // CRC
   uint8_t  tail;   // Pkt Tail
 } rdmPacket;
@@ -59,27 +58,24 @@ void plgRDM6300(){
   SoftwareSerial ser(RX_PIN, TX_PIN);
   ser.begin(9600);
 
+  uint32_t id;
+  core.moveCursor(0, 1);
+  core.println(FF(MS_MSG_CARD_PLACE)); 
+
   // Main loop
-  while(1){
-    core.moveCursor(0, 1);                    
-    core.println(F(" Place the card"));        
-        
-    // Tryint to read ID
-    uint32_t id;
+  while(1){       
+    // Tryint to read ID   
     while(!(id = _read_id(ser))) delay(READ_DELAY_MS);
 
     // ID to the screen
-    core.print(FF(ID_TITLE));
-    core.print(id);
-    core.print(" ");
-    core.print(MS_SYM_SELECT_CODE);
-    core.print(F("-nxt"));
+    core.moveCursor(0, 1);
+    core.print(FF(MS_MSG_CARD_ID));
+    core.printLongAsArray(core, id);
+    core.println();
 
     // ID to the serial
-    Serial.print(FF(ID_TITLE));
-    Serial.print(" ");
-    Serial.println(id);
-
-    if(core.wait4Button() != SELECT) continue; // Waitin for <SELECT> for next card
+    Serial.print(FF(MS_MSG_CARD_ID));
+    core.printLongAsArray(Serial, id);
+    Serial.println();
   }//while  
 }//plgRDM6300

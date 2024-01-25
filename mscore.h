@@ -158,6 +158,18 @@ public:
   //** Prints integer value as a float. Value must be multiplyed by base. If you need to print -25.7, value shold be = -257 and scale = 10
   void printValScale(Print &p, int32_t value, int16_t scale = 10);
 
+
+  //** Prints array of bytes in HEX using specified spacer
+  //* arr - array of bytes
+  //* arrSize - size of array
+  //* spacer - spacer symbol.
+  void printHexArray(Print &p, uint8_t* arr, const uint8_t arrSize, const char spacer = ':');   
+
+
+  //** Prints uint32_t as array of four bytes in HEX using secified spacer 
+  //* val - 32-bit unsigned value
+  //* spacer - spacer symbol.
+  void printLongAsArray(Print &p, const uint32_t val, const char spacer = ':');
   
   virtual size_t write(uint8_t value);
   using Print::write;

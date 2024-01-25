@@ -56,12 +56,14 @@ void plgIButton(){
     }//if
 
    // Serial number and family code to the screen
-   uOW_printSerial(core, rom.serialNumber);
+   //uOW_printSerial(core, rom.serialNumber);
+   core.printHexArray(core, rom.serialNumber, arraySize(rom.serialNumber));
    core.print(" ");
    _print_family(core, rom.familyCode);
 
    // Serial number and family code to the serial
-   uOW_printSerial(Serial, rom.serialNumber);
+   //uOW_printSerial(Serial, rom.serialNumber);
+   core.printHexArray(Serial, rom.serialNumber, arraySize(rom.serialNumber));
    Serial.print(" ");
    _print_family(Serial, rom.familyCode);
    Serial.println();

@@ -54,7 +54,7 @@ namespace HTU21D {
 
 
  int16_t _get_hum(const uint32_t val){ // hum * 100
-  return constrain((uint16_t)(((val * 12500) >> 16) - 600), 0, 10000);
+  return constrain((int16_t)(((val * 12500) >> 16) - 600), 0, 10000);
  }//_get_hum
 } //namespace
 

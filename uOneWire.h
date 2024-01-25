@@ -48,7 +48,7 @@ uint8_t uOW_crc(uint8_t * addr, uint8_t len);
 uint8_t uOW_readROM(const uint8_t pin, uOW_ROM &rom, uOW_Errors &errCode);
 
 //** Выводит в поток печати серийный номер в формате xx:xx:xx:xx:xx:xx
-void uOW_printSerial(Print &p, uint8_t ser[6]);
+//void uOW_printSerial(Print &p, uint8_t ser[6]);
 
 //** Выводит в поток печати сообщение об ошибке
 void uOW_printError(Print &p, const uint8_t errCode, const uint8_t wrong_val = 0);

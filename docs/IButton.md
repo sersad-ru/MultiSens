@@ -20,4 +20,3 @@ Results are displayed on the device screen and sends to serial in human-readable
 
 
 [Back to Home](/#supported-devices)
-

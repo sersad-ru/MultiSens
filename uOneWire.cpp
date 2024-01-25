@@ -131,7 +131,7 @@ void uOW_hex2dig(Print &p, uint8_t hex){
   p.print(hex, HEX);
 }//uOW__hex2dig
 
-
+/*
 //** Выводит в поток печати серийный номер в формате xx:xx:xx:xx:xx:xx
 void uOW_printSerial(Print &p, uint8_t ser[6]){
   for(uint8_t i = 0; i < 6; i++){
@@ -139,7 +139,7 @@ void uOW_printSerial(Print &p, uint8_t ser[6]){
     if(i < 5) p.print(":");
   }//for
 }//uOW_printSerial
-
+*/
 
 //** Выводит в поток печати сообщение об ошибке
 void uOW_printError(Print &p, const uint8_t errCode, const uint8_t wrong_val){
