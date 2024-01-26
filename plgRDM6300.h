@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* RDM6300 plugin recieves 125kHz RFID card ID from the RDM6300 sensor.
+* The RDM6300 plugin recieves 125kHz RFID card ID from the RDM6300 module.
 * Connection:
 * GND - GND - black
 * VIN - +5V - red

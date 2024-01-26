@@ -39,6 +39,7 @@ Currently MuliSens supports following list of devises:
 |[QRE1113](docs/QRE1113.md)|Distance sensor|
 |[HC-SR04](docs/HC-SR04.md)|Distance sensor|
 |[RC522](docs/RC522.md)|RFID 13.56 MHz Card reader|
+|[RDM6300](docs/RDM6300.md)|RFID 125 kHz Card reader|
 
 
 ## Hardware
