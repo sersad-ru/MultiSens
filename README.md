@@ -70,7 +70,12 @@ LCD Keypad Shield. That's all.
 ### Case
 You can print a case with mini breadboard, cables compartment and power bank holder.
 А power consumption was too low for my power bank. 
-So i decided to add a small flashlight (LED with a resistor and switch) to prevent my power bank from automatically turning off in a few seconds.
+So i decided to add a small flashlight (LED with a resistor and switch) to prevent my power bank 
+from automatically turning off in a few seconds.
+
+To use this version of the case you need an Arduino Uno with a `USB Type-C` connector 
+(a regular `USB-B` connector doesn't fit this enclosure). And you should unsolder the 
+arduino power jack socket.
 
 <p align="center"><img src="docs/CaseModel.jpg"/></p>
 Link to the thingverse.
