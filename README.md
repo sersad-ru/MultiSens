@@ -16,7 +16,7 @@ Arduino Multi Sensor Tester
 ## Overview
 Sometimes something goes wrong in your project. Maybe you have an error in your schematic.
 Maybe there are some bugs in your code. Or your new sensor is damaged. 
-This simple tool can helps you to solve one of this problem: the sensor.
+This simple tool can helps you to solve one of this problem: *the sensor*.
 You can easily connect a sensor to the Multisens and check if it working properly.
 
 
