@@ -18,7 +18,8 @@ Sometimes something goes wrong in your project. Maybe you have an error in your 
 Maybe there are some bugs in your code. Or your new sensor is damaged. 
 
 This simple tool can helps you to solve one of this problem: **the sensor**.
-You can easily connect a sensor to the Multisens and check if it working properly.
+You can easily connect a sensor to the Multisens, select compartible plugin and check 
+if the sensor works properly or not.
 
 
 ## Supported Devices
