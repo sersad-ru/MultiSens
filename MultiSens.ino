@@ -34,9 +34,8 @@
 #include "plgRC522.h"
 
 /*
- * RFID RC522 - дописать и причесать
- * В ядро добавить печать массива из 4/6 байт разделенных двоеточикм. Им выводить серийник в RC522 и iButton
  * MPU6050
+ * Датчик веса
  * Адресные ленты. Описать кнопки в хидере и прическать.
  * На закуску Ethernet в режима DHCP?
  * 
@@ -55,7 +54,7 @@ MultiSensPlugin plugins[] = {
   {&plgMHZ19,         "MH-Z19b",          0},
   {&plgQRE1113,       "QRE1113",          sizeof(plgQRE1113Cfg)},
   {&plgHCSR04,        "HC-SR04",          sizeof(plgHCSR04Cfg)},
-  {&plgRDM6300,       "RDM-6300(125kHz)", 0},
+  {&plgRDM6300,       "RDM6300 (125kHz)", 0},
   {&plgADXL345,       "ADXL345",          sizeof(plgADXL345Cfg)},
   {&plgWS2812,        "WS2812b",          sizeof(plgWS2812Cfg)},
   {&plgI2CScan,       "I\1C Scanner",     0}, // custom symbol /1 is "²"
@@ -63,7 +62,7 @@ MultiSensPlugin plugins[] = {
   {&plgBME280,        "BME280",           0},  
   {&plgAHT20,         "AHT20",            0},    
   {&plgHTU21D,        "HTU21D",           0},      
-  {&plgRC522,         "RC522",            0},      
+  {&plgRC522,         "RC522 (13.56MHz)", 0},      
 }; // 
 
 

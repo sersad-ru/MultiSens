@@ -14,7 +14,10 @@ Arduino Multi Sensor Tester
 
 
 ## Overview
-The story of project.
+Sometimes something goes wrong in your project. Maybe you have an error in your schematic.
+Maybe there are some bugs in your code. Or your new sensor is damaged. 
+This simple tool can helps you to solve one of this problem: the sensor.
+You can easily connect a sensor to the Multisens and check if it working properly.
 
 
 ## Supported Devices
@@ -43,8 +46,32 @@ Currently MuliSens supports following list of devises:
 
 
 ## Hardware
-How to build.
+The hardware is pretty simple. In minimal configuration you need only two modules: `Arduino Uno` 
+and `Adruino LCD Keypad Shield`. Just solder 11 wires to Arduino according following table and connect
+LCD Keypad Shield. That's all.
 
+|Arduino Pin|MultiSens Pin|Color|Function|
+|:---:|:---:|:---|:---|
+|GND|GND|Black|Ground|
+|5v|+5V|Red|+5V power source|
+|3v3|+3.3V|White|+3.3V power source|
+|D2|P0|Green|Digital I/O, INT0|
+|D3|P1|Blue|Digital I/O, INT1, PWM|
+|D11|P2|Yellow|Digital I/O, MOSI, PWM|
+|D12|P3|Violet|Digital I/O, MISO|
+|D13|P4|Brown|Digital I/O, SCK|
+|D17[A3]|P5|Orange|Analog In|
+|D18[A4]|P6|Yellow-Black|Analog In, SDA|
+|D19[A5]|P7|Gray-Black|Analog In, SCL|
+
+
+### Case
+You can print a case with mini breadboard, cables compartment and power bank holder.
+А power consumption was too low for my power bank. 
+So i decided to add a small flashlight (LED with a resistor and switch) to prevent my power bank from automatically turning off in a few seconds.
+
+<p align="center"><img src="docs/CaseModel.jpg"/></p>
+Link to the thingverse.
 
 ## Software
 How to install.
