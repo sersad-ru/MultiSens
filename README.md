@@ -23,7 +23,7 @@ if the sensor works properly or not.
 
 
 ## Supported Devices
-Currently MuliSens supports following list of devises:
+Currently MuliSens supports following list of devices:
 
 |Plugin|Description|
 |---|---|
