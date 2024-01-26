@@ -67,7 +67,7 @@ LCD Keypad Shield. That's all.
 |D19[A5]|P7|Gray-Black|Analog In, SCL|
 
 
-### Case
+### The Case
 You can print a case with mini breadboard, cables compartment and power bank holder.
 А power consumption was too low for my power bank. 
 So i decided to add a small flashlight (LED with a resistor and switch) to prevent my power bank 
