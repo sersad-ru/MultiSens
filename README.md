@@ -83,6 +83,11 @@ Link to the thingverse.
 ## Software
 How to install.
 
+How to use.
+
+<p align="center"><img src="docs/Buttons.jpg"/></p>
+
+How to add/remove plugins.
 
 ## Adding plugins
 How to write your own plugin.
