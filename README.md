@@ -48,6 +48,7 @@ Currently MuliSens supports following list of devices:
 
 
 ## Hardware
+<p align="center"><img src="docs/Minimal.jpg"/></p>
 The hardware is pretty simple. In minimal configuration you need only two modules: `Arduino Uno` 
 and `Adruino LCD Keypad Shield`. Just solder 11 wires to Arduino according following table and connect
 LCD Keypad Shield. That's all.
