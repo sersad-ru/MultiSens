@@ -128,7 +128,9 @@ settings in `EEPROM`.
 You can select a plugin using the `UP` and `DOWN` buttons. To launch the plugin, press the
 `SELECT` button.
 * If you hold the `SELECT` button, the current plugin number will be stored in `EEPROM`. 
-The plugins list will be scrolled automatically to stored position after reboot.
+The plugins list will be scrolled automatically to stored position after reboot. To clear
+this setting you can erase all settings by holding the `DOWN` button and pressing the `RESET` button,
+or you can just select plugin number one and store it to `EEPROM`.
 * The `UP`, `DOWN` and `SELECT` buttons usually used inside plugins to change values and to start
 actions.  
 
