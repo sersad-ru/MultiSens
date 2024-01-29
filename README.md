@@ -141,7 +141,7 @@ actions.
 
 Due to the memory limit of the hardware you may need to activate/deactivate some plugins.
 To do this, open [MultiSens.ino](/MultiSens.ino) and comment required line in plugin registration
-section.
+section. After that recompile the code and upload it to the board. 
 
 ```c++
 // Registred plugins
@@ -161,7 +161,7 @@ MultiSensPlugin plugins[] = {
 
 ```
 
-** Attention! ** Don't forget to clear `EEPROM` settings after changing active plugin 
+**Attention!** Don't forget to clear `EEPROM` settings after changing active plugin 
 list or order of plugins in this list. To do this hold down the `DOWN` button then press the 
 `RESET` button.
 
