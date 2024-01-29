@@ -121,6 +121,22 @@ The MultiSens has 16x2 LCD display and six buttons:
 * `UP`
 * `DOWN`
 
+Some button functions depends from plugin logic and some have system-wide functionality.
+
+* The `LEFT` and `RIGTH` buttons are always used to scroll the screen. 
+* To scoll the display to the start position, press and hold the `LEFT` button.
+* The `RESET` button always terminates the current plugin and reboot the system.
+* Holding the `DOWN` button and pressing the `RESET` button will erase **all** plugins 
+settings in `EEPROM`.
+* In the root menu (after reboot) you can see the system name and a list of registered plugins.
+You can select a plugin using the `UP` and `DOWN` buttons. To launch the plugin, press the
+`SELECT` button.
+* If you hold the `SELECT` button, the current plugin number will be stored in `EEPROM`. 
+The plugins list will be scrolled automatically to stored position after reboot.
+* The `UP`, `DOWN` and `SELECT` buttons usually used inside plugins to change values and to start
+actions.  
+
+
 How to add/remove plugins.
 
 ## Adding plugins
