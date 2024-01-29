@@ -102,7 +102,8 @@ git clone https://github.com/sersad-ru/MultiSens
 
 This software depens from Arduino standart libraries only. It uses `Software Serial`, `Wire` and
 `SPI` libraries. All plugins code uses minimal subset of functions required only for testing sensors.
-You need full size libraries from the Arduino Community to use full range of abilities of sensors.
+To take advantage of the full range of sensor capabilities, you'll need full-size libraries from
+the Arduino community.
 
 For example, all RFID plugins only reads manufacturer predefined card ID. 
 No functions for key manipulation or data writing. 
