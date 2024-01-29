@@ -137,7 +137,30 @@ The plugins list will be scrolled automatically to stored position after reboot.
 actions.  
 
 
-How to add/remove plugins.
+#### Plugin activation
+
+Due to the memory limit of the hardware you may need to activate/deactivate some plugins.
+To do this, open [MultiSens.ino](/MultiSens.ino) and comment required line in plugin registration
+section.
+
+```c++
+// Registred plugins
+MultiSensPlugin plugins[] = {
+  {&plgFindPin,       "FindPin",          0},  // Active plugin
+  {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)}, // Active plugin
+//  {&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)}, // Inactive plugin
+//  {&plgAnalogRead,    "AnalogRead",       sizeof(plgAnalogReadCfg)}, // Inactive plugin
+
+...
+
+  {&plgRC522,         "RC522 (13.56MHz)", 0},  // Active plugin   
+}; // 
+
+```
+
+** Attention! ** Don't forget to clear `EEPROM` settings after changing active plugin 
+list or order of plugins in this list. 
+
 
 ## Adding plugins
 How to write your own plugin.
