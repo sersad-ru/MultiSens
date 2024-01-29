@@ -84,7 +84,19 @@ arduino power jack socket.
 Link to the thingverse.
 
 ## Software
-How to install.
+
+#### Install
+
+* Create MultiSens folder in your Arduino sketch directory.
+* Open it
+* Clone this repository
+* Run Arduino environment, compile the code and upload it to the board.
+
+```bash
+mkdir MultiSens
+cd MultiSens
+git clone https://github.com/sersad-ru/MultiSens
+```
 
 How to use.
 
