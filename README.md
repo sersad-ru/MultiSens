@@ -147,9 +147,12 @@ section.
 // Registred plugins
 MultiSensPlugin plugins[] = {
   {&plgFindPin,       "FindPin",          0},  // Active plugin
-  {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)}, // Active plugin
-//  {&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)}, // Inactive plugin
-//  {&plgAnalogRead,    "AnalogRead",       sizeof(plgAnalogReadCfg)}, // Inactive plugin
+  // Active plugin
+  {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)}, 
+  // Inactive plugin
+//  {&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
+  // Inactive plugin 
+//  {&plgAnalogRead,    "AnalogRead",       sizeof(plgAnalogReadCfg)}, 
 
 ...
 
@@ -159,7 +162,8 @@ MultiSensPlugin plugins[] = {
 ```
 
 ** Attention! ** Don't forget to clear `EEPROM` settings after changing active plugin 
-list or order of plugins in this list. 
+list or order of plugins in this list. To do this hold down the `DOWN` button then press the 
+`RESET` button.
 
 
 ## Adding plugins
