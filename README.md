@@ -114,12 +114,7 @@ have no functions to setup sensor resolution and so on.
 <p align="center"><img src="docs/Buttons.jpg"/></p>
 
 The MultiSens has 16x2 LCD display and six buttons:
-* `SELECT`
-* `RESET`
-* `LEFT`
-* `RIGHT`
-* `UP`
-* `DOWN`
+`SELECT`, `RESET`, `LEFT`, `RIGHT`, `UP` and `DOWN`.
 
 Some button functions depends from plugin logic and some have system-wide functionality.
 
