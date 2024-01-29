@@ -142,7 +142,7 @@ To do this, open [MultiSens.ino](/MultiSens.ino) and comment required line in pl
 section. After that recompile the code and upload it to the board. 
 
 ```c++
-// Registred plugins
+// Registered plugins
 MultiSensPlugin plugins[] = {
   {&plgFindPin,       "FindPin",          0},  // Active plugin
   // Active plugin
@@ -159,7 +159,7 @@ MultiSensPlugin plugins[] = {
 
 ```
 
-**Attention!** Don't forget to clear `EEPROM` settings after changing active plugin 
+**Attention!** Don't forget to clear `EEPROM` settings after changing registered plugin 
 list or order of plugins in this list. To do this hold down the `DOWN` button then press the 
 `RESET` button.
 
