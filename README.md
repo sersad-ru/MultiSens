@@ -88,8 +88,8 @@ Link to the thingverse.
 #### Installation
 
 * Create MultiSens folder in your Arduino sketch directory.
-* Open it
-* Clone this repository
+* Open it.
+* Clone this repository.
 * Run Arduino environment, compile the code and upload it to the board.
 
 ```bash
@@ -102,16 +102,24 @@ git clone https://github.com/sersad-ru/MultiSens
 
 This software depens from Arduino standart libraries only. It uses `Software Serial`, `Wire` and
 `SPI` libraries. All plugins code uses minimal subset of functions required only for testing sensors.
-You need The full size libraries from the Arduino Community to use full range of abilities of sensors.
+You need full size libraries from the Arduino Community to use full range of abilities of sensors.
 
 For example, all RFID plugins only reads manufacturer predefined card ID. 
 No functions for key manipulation or data writing. 
 All plugins for temperature sensors can read current temperature only and 
 have no functions to setup sensor resolution and so on.
 
-#### 
+#### User interface
 
 <p align="center"><img src="docs/Buttons.jpg"/></p>
+
+The MultiSens has 16x2 LCD display and six buttons:
+* `SELECT`
+* `RESET`
+* `LEFT`
+* `RIGHT`
+* `UP`
+* `DOWN`
 
 How to add/remove plugins.
 
