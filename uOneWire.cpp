@@ -131,8 +131,9 @@ void uOW_hex2dig(Print &p, uint8_t hex){
   p.print(hex, HEX);
 }//uOW__hex2dig
 
-/*
+
 //** Выводит в поток печати серийный номер в формате xx:xx:xx:xx:xx:xx
+/*
 void uOW_printSerial(Print &p, uint8_t ser[6]){
   for(uint8_t i = 0; i < 6; i++){
     uOW_hex2dig(p, ser[i]); // печать с ведущим нулем

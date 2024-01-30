@@ -32,11 +32,13 @@
 #include "plgBMP280AHT20.h"
 #include "plgHTU21D.h"
 #include "plgRC522.h"
+#include "plgMPU6050.h"
 
 /*
  * MPU6050
  * Датчик веса
  * Адресные ленты. Описать кнопки в хидере и прическать.
+ * Шаговик и Серва
  * На закуску Ethernet в режима DHCP?
  * 
 */
@@ -63,6 +65,7 @@ MultiSensPlugin plugins[] = {
   {&plgAHT20,         "AHT20",            0},    
   {&plgHTU21D,        "HTU21D",           0},      
   {&plgRC522,         "RC522 (13.56MHz)", 0},      
+  {&plgMPU6050,       "MPU6050",          sizeof(plgMPU6050Cfg)},
 }; // 
 
 

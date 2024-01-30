@@ -8,7 +8,7 @@
 
 #define OFFSET_DEFAULT 0 // Default offset for all axis
 
-#define ADXL_ADDRESS 0x53  // ADXL I2C address
+#define ADXL_ADDRESS 0x53  // ADXL I²C address 
 #define POWER_CTL 0x2D //Power register
 #define POWER_CTL_VALUE 0x08 // Set D3 bit to 1 to start measure
 

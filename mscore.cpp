@@ -231,7 +231,7 @@ void MultiSensCore::printHexArray(Print &p, uint8_t* arr, const uint8_t arrSize,
 
 
 void MultiSensCore::printLongAsArray(Print &p, const uint32_t val, const char spacer){
-  uint8_t arr[] = {val >> 24, val >> 16, val >> 8, val};
+  uint8_t arr[] = {(uint8_t)(val >> 24), (uint8_t)(val >> 16), (uint8_t)(val >> 8), (uint8_t)val};
   printHexArray(p, arr, 4, spacer);
 }//printLongAsArray
 
