@@ -45,6 +45,7 @@ Currently MuliSens supports following list of devices:
 |[HC-SR04](docs/HC-SR04.md)|Distance sensor|
 |[RC522](docs/RC522.md)|RFID 13.56 MHz Card reader|
 |[RDM6300](docs/RDM6300.md)|RFID 125 kHz Card reader|
+|[MPU6050](docs/MPU6050.md)|3-axes accelerometer and gyroscope|
 
 
 ## Hardware

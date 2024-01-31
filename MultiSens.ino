@@ -65,7 +65,7 @@ MultiSensPlugin plugins[] = {
   {&plgAHT20,         "AHT20",            0},    
   {&plgHTU21D,        "HTU21D",           0},      
   {&plgRC522,         "RC522 (13.56MHz)", 0},      
-  {&plgMPU6050,       "MPU6050",          sizeof(plgMPU6050Cfg)},
+  {&plgMPU6050,       "MPU6050",          0},
 }; // 
 
 

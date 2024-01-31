@@ -35,14 +35,13 @@ namespace MPU6050 {
   dataPkt _read(){
     dataPkt data;
     core.i2cRequestRead(MPU_ADDRESS, REG_DATA_START, 14); // Читаем пакет даннх 14 байт  HSB | LSB
-    data.accX = (((int32_t)((Wire.read() << 8) | Wire.read())) * 100) >> 14; // Умножаем на 100 и потом делитим на 16384
+    data.accX = (((int32_t)((Wire.read() << 8) | Wire.read())) * 100) >> 14; // Умножаем на 100 и потом делиим на 16384
     data.accY = (((int32_t)((Wire.read() << 8) | Wire.read())) * 100) >> 14;
     data.accZ = (((int32_t)((Wire.read() << 8) | Wire.read())) * 100) >> 14;
     data.temp = (((int32_t)((Wire.read() << 8) | Wire.read())) * 10) / 34 + 3653; //temp / 340 + 36.53, умноженное на 100
     data.gyrX = (((int32_t)((Wire.read() << 8) | Wire.read())) * 250) >> 15; // val * 250 / 32768
     data.gyrY = (((int32_t)((Wire.read() << 8) | Wire.read())) * 250) >> 15;
     data.gyrZ = (((int32_t)((Wire.read() << 8) | Wire.read())) * 250) >> 15;
-    // преобразовываем данные 
     return data;
   }//_read
 
@@ -50,12 +49,12 @@ namespace MPU6050 {
     core.print(name);
     core.print(':');
     if(direct){ 
-      core.print(val); // Прямая печать, без огруглений и пересчетов
+      core.print(val); // Прямая печать, без округлений и пересчетов
       Serial.print(val);
     }//..if
     else{
       core.printValScale(core, (val + 5) / 10); // одна цифра после запятой для экрана (с округлением)
-      core.printValScale(Serial, val, 100); // две цифры после запятой для сериала      
+      core.printValScale(Serial, val, 100); // две цифры после запятой для компорта
     }//if..else
     core.print(' ');    
     Serial.print(' ');
@@ -75,12 +74,17 @@ void plgMPU6050(){
     core.println(FF(MS_MSG_READ_ERROR));
     while(1);
   }//if
+
+  Serial.print(F("X(g), Y(g), Z(g), Ax(°/s), By(°/s), Cz(°/s), T(°C),("));
+  Serial.print(READ_DELAY_MS);
+  Serial.println(FF(MS_MSG_DELAY_END));
     
 
   dataPkt data;
   // Main loop
   while(1){
     data = _read();
+    core.moveCursor(0, 1);
     _print_val('X', data.accX);
     _print_val('Y', data.accY);
     _print_val('Z', data.accZ);
@@ -94,22 +98,6 @@ void plgMPU6050(){
     core.println();
     Serial.println();
     
-    /*
-    Serial.print(data.accX);
-    Serial.print(", ");
-    Serial.print(data.accY);
-    Serial.print(", ");
-    Serial.println(data.accZ);
-    
-    _print_val('T', data.temp);
-    Serial.println(data.temp);
-    
-    Serial.print(data.gyrX);
-    Serial.print(", ");
-    Serial.print(data.gyrY);
-    Serial.print(", ");
-    Serial.println(data.gyrZ);
-*/    
     delay(READ_DELAY_MS);
   }//while  
 }//plgMPU6050

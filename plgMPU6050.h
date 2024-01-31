@@ -11,21 +11,17 @@
 *
 * 
 * Results are printed on the screen and sends to serial in human readable and SerialPlotter compartible format. 
-
-* Use UP and DOWN buttons to display maximum and minimum values. Press UP/DOWN again to return to normal mode.
-* Press SELECT to enter calibration mode. In this mode place sensor X-axis UP and press select, then repeat it for Y and Z axis.
-* Press and hold SELECT button to store calibration offsets in EEPROM. It will be auto loaded and applied next time. 
-* Hold DOWN button and pres RESET to clear stored value and return to defaults. (ATTENTION! All stored data will be cleared. FOR ALL plugins!)
+* 
+* X, Y and Z show the acceleration along x, y, and z axes. Values range from -2 to +2 G.
+* A, B and C show the rotation around x, y and z axes. In degrees/s. Values range from -250 to 250.
+* T shows the current temperature in °C
 * 
 * You can specify the delay between sensor calls using READ_DELAY_MS in plgMPU6050.cpp
-* MPU6050 I²C address in HTU_ADDRESS (plgMPU6050.cpp)
+* MPU6050 I²C address in MPU_ADDRESS (plgMPU6050.cpp)
 */
 
-
+/*
 struct{
-  int8_t offX; // offset X
-  int8_t offY; // offset Y
-  int8_t offZ; // offset Z           
 } plgMPU6050Cfg;
-
+*/
 void plgMPU6050();
