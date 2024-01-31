@@ -4,7 +4,7 @@
 The AHT20 plugin receives temperature and humidity from the I²C module with 
 AHT20 sensor.
 
-Results are displayed on the device screen and sends to serial in human-readable and 
+Results are displayed on the device screen and sends to the serial in human-readable and 
 Arduino `SerialPlotter` compartible format.
 
 * You can specify the delay between sensors calls using `READ_DELAY_MS` 

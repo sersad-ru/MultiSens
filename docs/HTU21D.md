@@ -4,7 +4,7 @@
 The HTU21D plugin receives temperature and humidity from the I²C module with 
 HTU21D sensor.
 
-Results are displayed on the device screen and sends to serial in human-readable and 
+Results are displayed on the device screen and sends to the serial in human-readable and 
 Arduino `SerialPlotter` compartible format.
 
 * You can specify the delay between sensors calls using `READ_DELAY_MS` 

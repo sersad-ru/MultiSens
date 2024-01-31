@@ -4,7 +4,7 @@
 The BMP280+AHT20 plugin receives temperature, humidity and air pressure from the I²C module with 
 BMP280 and AHT20 sensors.
 
-Results are displayed on the device screen and sends to serial in human-readable and 
+Results are displayed on the device screen and sends to the serial in human-readable and 
 Arduino `SerialPlotter` compartible format.
 
 `BMP280` used for air pressure only and `AHT20` for temperature and humidity.

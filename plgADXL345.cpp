@@ -5,10 +5,11 @@
 #define SDA_PIN P6 //Yellow-Black
 #define SCL_PIN P7 //Gray-Black
 #define READ_DELAY_MS 500 // 0.5 seconds between attempt
+#define ADXL_ADDRESS 0x53  // ADXL I²C address 
+
 
 #define OFFSET_DEFAULT 0 // Default offset for all axis
 
-#define ADXL_ADDRESS 0x53  // ADXL I²C address 
 #define POWER_CTL 0x2D //Power register
 #define POWER_CTL_VALUE 0x08 // Set D3 bit to 1 to start measure
 

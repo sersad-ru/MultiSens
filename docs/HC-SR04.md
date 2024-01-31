@@ -3,17 +3,17 @@
 
 The HC-SR04 plugin recieves distance information from the HC-SR04 sensor.
 
-Results are displayed on the device screen and sends to serial in human-readable and 
+Results are displayed on the device screen and sends to the serial in human-readable and 
 Arduino `SerialPlotter` compartible format.
 
 * You can specify the delay between sensors calls using `READ_DELAY_MS` 
   in [plgHCSR04.cpp](/plgHCSR04.cpp)
 
-* Use `UP` and `DOWN` buttons to change current temperature. Available range is -50°C - +50°C. 
+* Use the `UP` and `DOWN` buttons to change current temperature. Available range is -50°C - +50°C. 
 
-* Press and hold `SELECT` button to store current temperature in `EEPROM`.
+* Press and hold the `SELECT` button to store current temperature in the the `EEPROM`.
 
-* Hold `DOWN` button and pres `RESET` to clear stored value and return to defaults. 
+* Hold the `DOWN` button and press `RESET` to clear stored value and return to defaults. 
   (**ATTENTION!** All stored data will be cleared. **FOR ALL** plugins!)
 
 ### Connection

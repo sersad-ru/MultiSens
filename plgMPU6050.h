@@ -2,7 +2,9 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* MPU6050 plugin recieves acceleration on X, Y and Z axis from the MPU6050 sensor.
+* MPU6050 plugin recieves the acceleration on X, Y and Z axis, the rotation around axes and 
+the temperature from the MPU6050 sensor.
+
 * Connection:
 * GND - GND - black
 * VCC - +5V - red
