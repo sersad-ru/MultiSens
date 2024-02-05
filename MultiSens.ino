@@ -33,10 +33,11 @@
 #include "plgHTU21D.h"
 #include "plgRC522.h"
 #include "plgMPU6050.h"
+#include "plgServo.h"
 
 /*
- * Датчик веса
  * Адресные ленты. Описать кнопки в хидере и прическать.
+ * Серва с кондером и дописать
  * Шаговик и Серва
  * На закуску Ethernet в режима DHCP?
  * 
@@ -65,6 +66,7 @@ MultiSensPlugin plugins[] = {
   {&plgHTU21D,        "HTU21D",           0},      
   {&plgRC522,         "RC522 (13.56MHz)", 0},      
   {&plgMPU6050,       "MPU6050",          0},
+  {&plgServo,         "Servo",            sizeof(plgServoCfg)},
 }; // 
 
 
