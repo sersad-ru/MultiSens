@@ -5,7 +5,7 @@
 * The Servo plugin rotates servo drive to the selected angle (from 0 to 180°).
 * 
 * Connection:
-* GND - GND - black + 470uF to +5V
+* GND - GND - black
 * VCC - +5V - red
 * PWM - P0 - green
 *
