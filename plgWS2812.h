@@ -2,10 +2,11 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* WS2812 plugin can send commands to WS2812 LEDs. 
+* WS2812 plugin can send commands to the WS2812 LEDs. 
+* 
 * You can specify the number of LEDs using `WS_LED_CNT` in [plgWS2812.h](/plgWS2812.h)
 
-* ATTENTION! To prevent current overload don't use MultiSens on LED Strip. Only a few (2-3) leds can be used.
+* ATTENTION! To prevent the current overload don't use MultiSens on LED Strip. Only a few (2-3) leds can be used.
 * 
 * Connection:
 * 1. VCC(+5V) - red
