@@ -13,9 +13,9 @@ namespace Servo {
 
  void _servo_pulse(const uint16_t pulse){
   cli();
-  bitWrite(PORTD, 2, 1);
+  digitalWrite(PWM_PIN, HIGH);
   delayMicroseconds(pulse);
-  bitWrite(PORTD, 2, 0);
+  digitalWrite(PWM_PIN, LOW);
   sei();
   delay(CYCLE_DELAY_MS - pulse / 1000);  // Ждем остатки до 20 ms 
  }//_servo_pulse

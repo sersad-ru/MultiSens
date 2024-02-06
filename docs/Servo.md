@@ -9,9 +9,9 @@ Results are displayed on the device screen and sends to the serial in human-read
 
 * Use the `SELECT` button to start rotation.
 
-* **ATTENTION!** To prevent overload of the device, connect only one servo drive without any load.
-
 * Press and hold the the `SELECT` button to store current delay in the the `EEPROM`.
+
+* **ATTENTION!** To prevent overload of the device, connect only one servo drive without any load.
 
 * Hold the `DOWN` button and press `RESET` to clear stored value and return to defaults. 
   (**ATTENTION!** All stored data will be cleared. **FOR ALL** plugins!)

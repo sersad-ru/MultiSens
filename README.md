@@ -47,6 +47,7 @@ Currently MuliSens supports following list of devices:
 |[RDM6300](docs/RDM6300.md)|RFID 125 kHz Card reader|
 |[ADXL345](docs/ADXL345.md)|3-axes accelerometer|
 |[MPU6050](docs/MPU6050.md)|3-axes accelerometer and gyroscope|
+|[WS2812](docs/WS2812.md)|WS2812b RGB LED|
 |[Servo](docs/Servo.md)|Servo drive|
 
 
