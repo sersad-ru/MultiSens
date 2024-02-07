@@ -7,7 +7,7 @@
 #define MIN_PULSE_US 500
 #define MAX_PULSE_US 2400
 #define CYCLE_DELAY_MS 20
-#define PULSE_COUNT 10 // Сколько раз повторять импульсы, чтобы точно хватило развернуться на 180 радусов
+#define FULL_PATH_MS 300 // 0.3 c на поворот от 0 до 180 
 
 namespace Servo {
 
@@ -23,7 +23,8 @@ namespace Servo {
  
  void _set_angle(const uint8_t ang){
   int us = map(ang, 0, 180, MIN_PULSE_US, MAX_PULSE_US); // Считаем длительность импульса
-  for(uint8_t i = 0; i < PULSE_COUNT; i++) _servo_pulse(us);
+  uint32_t start_time = millis();
+  while((millis() - start_time) < FULL_PATH_MS) _servo_pulse(us); // Отдаем импульсы пока не совершится полные полоборота
  }//_set_angle
 
 } //namespace
