@@ -6,6 +6,8 @@
 #define IN3_PIN P2 // P2
 #define IN4_PIN P3 // P3
 
+#define DEFAULT_ANGLE 0
+
 #define STEPS 2048 // Steps per full revolution
 #define STEPS_PER_SECOND 500 // 500 steps per second 
 
@@ -39,14 +41,14 @@ namespace Stepper {
       break;     
       default: break;
     }//switch
-    delayMicroseconds(2000);  // 90 градусов в секунду. Тут затеять пересчет и изменение скорости (замедление)
+    delayMicroseconds(2000);  // 90 градусов в секунду (15 оборотов в минуту). Тут можно затеять пересчет и изменение скорости (замедление)
   }//_do_step
 
   
   void _go(int16_t deg){
     uint16_t start = 0; // С какого шага начинать. Прямое направление. По часовой.
     uint16_t stop = abs(map(deg, 0, 360, 0, STEPS)); // На каком шаге заканчивать (с переводм из градусов в шаги)
-    int8_t d = 1; // направление
+    int8_t d = 1; // Направление
     
     if(deg < 0){ // Обратное направление (против часовой)
       d = -1;
@@ -61,11 +63,6 @@ namespace Stepper {
 
 using namespace Stepper;
 
-/*
-* Скорость в градусах в секунду
-* Ну и пользовательский интерфейс
-* И доку написать (картинки готовы)
-*/
 
 // == Main plugin function ==
 void plgStepper(){
@@ -74,13 +71,51 @@ void plgStepper(){
   pinMode(P1, OUTPUT);
   pinMode(P2, OUTPUT);
   pinMode(P3, OUTPUT);
+  
+  // Load settings from EEPROM 
+  if(!core.loadSettings((uint8_t*)&plgStepperCfg)){
+    plgStepperCfg.angle = DEFAULT_ANGLE;// Settings was reseted. Use default values
+    core.saveSettings((uint8_t*)&plgStepperCfg);// Save default value  
+  }//if  
     
   // Display Init
-   
-  _go(360);
+  core.moveCursor(0, 1);
+  core.print(F("Angle:    "));
+  core.print(MS_SYM_DEGREE_CODE);
+  core.print(" ");
+  core.print(MS_SYM_SELECT_CODE);
+  core.println(F("-Go"));
+
+  // Rotate motor to angle from EEPROM
+  _go(plgStepperCfg.angle);   
   
   // Main loop
   while(1){
+    // Display current angle
+    core.moveCursor(6, 1);
+    core.print(core.rAlign(plgStepperCfg.angle, 4));            
     
+    // Process user input    
+    switch (core.wait4Button()) {
+      case UP:
+      case UP_LONG: // Increase angle of servo
+        plgStepperCfg.angle += 5;
+      break;
+      
+      case DOWN:
+      case DOWN_LONG:  // Decrease angle of servo
+        plgStepperCfg.angle -= 5;
+      break;
+      
+      case SELECT: // Rotate the servo drive
+        _go(plgStepperCfg.angle);      
+        Serial.print(plgStepperCfg.angle);
+        Serial.println("°");
+      break;  
+      
+      case SELECT_LONG: core.saveSettings((uint8_t*)&plgStepperCfg); break;   // Save settings to EEPROM
+      
+      default: break;
+    }//switch          
   }//while
 }//plgStepper

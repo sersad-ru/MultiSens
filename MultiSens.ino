@@ -37,7 +37,6 @@
 #include "plgStepper.h"
 
 /*
- * Шаговик. Доделать интерфейс
  * HX711
  * На закуску Ethernet в режима DHCP?
  * 
@@ -67,7 +66,7 @@ MultiSensPlugin plugins[] = {
   {&plgRC522,         "RC522 (13.56MHz)", 0},      
   {&plgMPU6050,       "MPU6050",          0},
   {&plgServo,         "Servo",            sizeof(plgServoCfg)},
-  {&plgStepper,       "Stepper",          0},
+  {&plgStepper,       "Stepper",          sizeof(plgStepperCfg)},
 }; // 
 
 

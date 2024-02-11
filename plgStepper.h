@@ -18,10 +18,9 @@
 * Press and hold SELECT button to store current angle in EEPROM.
 * Hold DOWN button and pres RESET to clear stored value and return to defaults. (ATTENTION! All stored data will be cleared. FOR ALL plugins!)
 */
-/*
+
 struct{
-  uint8_t angle;
-  
+  int16_t angle;  
 } plgStepperCfg;
-*/
+
 void plgStepper();
