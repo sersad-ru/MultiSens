@@ -41,8 +41,8 @@ Currently MuliSens supports following list of devices:
 |[HTU21D](docs/HTU21D.md)|Temperature and Humidity sensor|
 |[iButton](docs/IButton.md)|DS19xx Serial Number reader|
 |[MH-Z19b](docs/MH-Z19.md)|CO₂ concentration sensor|
-|[QRE1113](docs/QRE1113.md)|Distance sensor|
-|[HC-SR04](docs/HC-SR04.md)|Distance sensor|
+|[QRE1113](docs/QRE1113.md)|Infrared distance sensor|
+|[HC-SR04](docs/HC-SR04.md)|Ultrasonic distance sensor|
 |[RC522](docs/RC522.md)|RFID 13.56 MHz Card reader|
 |[RDM6300](docs/RDM6300.md)|RFID 125 kHz Card reader|
 |[ADXL345](docs/ADXL345.md)|3-axes accelerometer|
