@@ -85,9 +85,6 @@ void plgStepper(){
   core.print(" ");
   core.print(MS_SYM_SELECT_CODE);
   core.println(F("-Go"));
-
-  // Rotate motor to angle from EEPROM
-  _go(plgStepperCfg.angle);   
   
   // Main loop
   while(1){

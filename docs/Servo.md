@@ -9,7 +9,7 @@ Results are displayed on the device screen and sends to the serial in human-read
 
 * Use the `SELECT` button to start rotation.
 
-* Press and hold the the `SELECT` button to store current delay in the the `EEPROM`.
+* Press and hold the the `SELECT` button to store current angle in the the `EEPROM`.
 
 * **ATTENTION!** To prevent overload of the device, connect only one servo drive without any load.
 
