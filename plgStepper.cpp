@@ -56,7 +56,7 @@ namespace Stepper {
       stop = 0;
     }//if
     
-    for(int16_t i = start; i != stop; i+= d ) _do_step(i % 4);
+    for(uint16_t i = start; i != stop; i+= d ) _do_step(i % 4);
   }//_step
 } //namespace
 
