@@ -33,6 +33,9 @@
 #define SOCK_CMD_REG         0x0001 // Регистр(смещение в блоке регистров) команды сокета
 #define SOCK_INTERRUPT_REG   0x0002 // Регистр(смещение в блоке регистров) прерывания сокета
 #define SOCK_STATUS_REG      0x0003 // Регистр(смещение в блоке регистров) состояния сокета
+#define SOCK_SRC_PORT_REG    0x0004 // Регистр(смещение в блоке регистров) исходного порта
+#define SOCK_DST_IP_REG      0x000C // Регистр(смещение в блоке регистров) целевого IP-адреса
+#define SOCK_DST_PORT_REG    0x0010 // Регистр(смещение в блоке регистров) целевого порта
 #define SOCK_RX_BUF_SIZE_REG 0x001E // Регистр(смещение в блоке регистров) размера буфера на прием 
 #define SOCK_TX_BUF_SIZE_REG 0x001F // Регистр(смещение в блоке регистров) размера буфера на передачу
 
@@ -99,7 +102,8 @@
 #define SOCK_STAT_MACRAW       0x42
 #define SOCK_STAT_PPPOE        0x5F
   
-#define SOCK_2_ADDR(n, offs) (SOCK_BASE + n * SOCK_REG_SIZE + offs) // Получает полный адрес по номер сокета (n - номер сокета)
+#define SOCK_2_ADDR(n, offs) (SOCK_BASE + n * SOCK_REG_SIZE + offs) // Получает полный адрес по номеру сокета (n - номер сокета)
+
 
 // ---- DHCP ----
 #define DHCP_SERVER_PORT  67
@@ -107,7 +111,7 @@
 #define DHCP_TIMEOUT      6000 // (6 сек) Таймаут DHCP в мс
 #define DHCP_RESP_TIMEOUT 4000 // (4 сек) Таймаут ожидания отсета в мс
 
-// Типы ответов DHCP
+// Типы DHCP сообщений
 #define DHCP_MSG_DISCOVER 1
 #define DHCP_MSG_OFFER    2
 #define DHCP_MSG_REQUEST  3
@@ -132,8 +136,13 @@
 
 
 namespace W5500Lite {
- // ---- Hardware ---- 
- uint8_t mac[]= {0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x00}; 
+ 
+ uint8_t mac[]    = {0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x00}; 
+ uint32_t localIP = 0;           // Полученный от сервера IP
+ uint32_t netMask = 0;           // Маска подсети
+ uint32_t gwIP    = 0;           // Адрес шлюза
+ uint32_t dhcpIP  = 0xFFFFFFFF;  // Адрес сервера (в начале броадкаст 255.255.255.255)
+
 
  // Вывести IP-адрес. 
 /*
@@ -149,7 +158,9 @@ namespace W5500Lite {
   p.print(".");
   p.print((ip  >> 24) & 0xFF);  
  }//_print_ip
+
  
+// ---- Hardware ---- 
 
  // Прочесть данные по адресу
  uint16_t _read(const uint16_t addr, uint8_t* buf, uint16_t size){
@@ -281,12 +292,44 @@ namespace W5500Lite {
  }//_is_link_on
 
 
+ // ---- Сокеты ----
+
  // Отправить сокету команду 
  void _sock_cmd(const uint8_t sock_num, const uint8_t sock_cmd){
   _write_reg(SOCK_2_ADDR(sock_num, SOCK_CMD_REG), sock_cmd);
   while(_read_reg(SOCK_2_ADDR(sock_num, SOCK_CMD_REG)));
  }//_sock_cmd
 
+
+ // Открыть сокет (вернет номер или -1 если не нашел свободного. Сам закрывать не пыается)
+ int8_t _sock_open(const uint8_t proto, const uint16_t port){
+  SPI.beginTransaction(SPI_CONFIG);
+  for(int8_t sock = 0; sock < SOCK_NUM; sock++){ // Ищем свободнй сокет
+    if(_read_reg(SOCK_2_ADDR(sock, SOCK_STATUS_REG)) == SOCK_STAT_CLOSED){ // Читаем статус. Свободен ли
+      // Свободен
+      _write_reg(SOCK_2_ADDR(sock, SOCK_MODE_REG), proto); // В регистр режима пишем протокол
+      _write_reg(SOCK_2_ADDR(sock, SOCK_INTERRUPT_REG), 0xFF); // В регистр прерываний пишем 0xFF
+      _write_reg(SOCK_2_ADDR(sock, SOCK_SRC_PORT_REG), port, 2); // В регистр исходного порта - порт (2 байта)
+      _sock_cmd(sock, SOCK_CMD_OPEN); // Даем команду на открытие сокета
+      SPI.endTransaction();
+      return sock;
+    }//if
+  }//for
+  SPI.endTransaction();
+  return -1; // Свободный сокет не нашли
+ }//_sock_open 
+ 
+
+ // Закрыть сокет
+ void _sock_close(const int8_t sock){
+  SPI.beginTransaction(SPI_CONFIG);
+  _sock_cmd(sock, SOCK_CMD_CLOSE);
+  SPI.endTransaction();
+ }//_sock_close
+
+
+ // Запись и чтение из сокета надо?
+ 
 
  // ---- DHCP ----
  // Фазы обмена с DHCP сервером
@@ -300,8 +343,15 @@ namespace W5500Lite {
  } DHCPState; 
 
 
+ // Данные для общения с DHCP-сервером
+ typedef struct {
+  int8_t sock;       // Номер сокета
+  uint32_t trans_id; // Идентификатор транзакции
+  uint32_t t_start;  // Момент начала общения с сервером (в millis())
+ } DHCPData;
+
  // Разобрать ответ DHCP-сервера. Возвращает тип сообщения. Если таймаут: 255. Если все плохо: 0. Применяет полученные настройки
- uint8_t _dhcp_parse(const uint32_t ){
+ uint8_t _dhcp_parse(){
   uint32_t t_start = millis();
   /*
   while(ждем пакета){ // Ждем ответа до таймаута
@@ -324,24 +374,57 @@ namespace W5500Lite {
 
 
  // Отправить запрос DHCP-серверу. Вернет 0, если все плохо
- //?? Секунды от начала процессе получения адреса нужны или ну их? 
- uint8_t _dhcp_send(const uint8_t msg_type){
+ // Принимает тип сообщения и параметры обмена в структура data)
+ // Время, прошедшее с начала обмена считает сам 
+ uint8_t _dhcp_send(const uint8_t msg_type, const DHCPData data){
+
+  // -------------- Тут подумать!!!!!!!!!!!
+  // для DISCOVER броадкаст на 255.255.255.255
+  // для REQUEST нужен ip-сервера и наш локальный IP
+    
+  // Начинаем формировать UDP-пакет
+  SPI.beginTransaction(SPI_CONFIG);
+  _write_reg(SOCK_2_ADDR(data.sock, SOCK_DST_IP_REG), 0xFFFFFFFF, 4); // В регистр целевого IP - 255.255.255.255 (4 байта)
+  _write_reg(SOCK_2_ADDR(data.sock, SOCK_DST_PORT_REG), DHCP_SERVER_PORT, 2); // В регистр целевого порта - порт (2 байта)
+
+
+  // -------------- с записью разобраться!!!!!!!!!!! Там всякие смещения, маски и т.д.
+  SPI.endTransaction();
   return 0;
  }//_dhcp_send
 
  
  // Получить (и установить) настройки через dhcp. Вернуть 0 если облом.
+ // Результаты пишем в глобальные 
+ // uint8_t mac[]   
+ // uint32_t localIP
+ // uint32_t netMask
+ // uint32_t gwIP  
+ // uint32_t dhcpIP
+ 
  uint8_t _dhcp_request(){
   uint8_t res = 0; 
   DHCPState state = START;
+  DHCPData data; 
 
   // Открываем сокет
+  data.sock = _sock_open(PROTO_UDP, DHCP_CLIENT_PORT);
+  Serial.print("Socket: ");
+  Serial.println(data.sock);
+
+  if(data.sock < 0) return res; // Нет свободных сокетов
+
+  // Формируем идентификатор транзакции
+  data.trans_id = analogRead(P5); // Покатит?
+  Serial.print("ID: ");
+  Serial.println(data.trans_id);
   
-  uint32_t t_start = millis(); // Время начала запросов
-  while((state != LEASED) && ((millis() - t_start) < DHCP_TIMEOUT)){ // Крутимся пока не получим настрйоки или не выйдет таймаут
+  data.t_start = millis(); // Время начала запросов
+  while((state != LEASED) && ((millis() - data.t_start) < DHCP_TIMEOUT)){ // Крутимся пока не получим настройки или не выйдет таймаут
     switch(state){
       case START: 
         //Отправляем запрос DISCOVER
+        _dhcp_send(DHCP_MSG_DISCOVER, data);
         state = DISCOVER;
       break;
 
@@ -370,6 +453,7 @@ namespace W5500Lite {
   }//while
 
   // Закрываем сокет
+  _sock_close(data.sock);
   return res;
  }//_dhcp_request
  
@@ -383,6 +467,69 @@ namespace W5500Lite {
 * Открываем на прослушивание udp сокет на клиентский порт
 * В цикле пока не таймаут исходя из текущего состояния отправляем запросы, либо парсим ответы
 * 
+*/
+/*
+ * DHCP call stack: 
+ * 1. beginWithDHCP | dhcp.cpp
+ *   1. request_DHCP_lease | dhcp.cpp  
+ *      1. udpSocket.stop | EthernetUDP.cpp
+ *         1. socketClose | socket.cpp
+ *            1. execCmd | *
+ *      2. udpSocket.begin(client_port) | EthernetUDP.cpp      
+ *         1. Ethernet.socketClose | socket.cpp
+ *            1. execCmd | *
+ *         2. Ethernet.socketBegin(UDP, client_port) | socket.cpp
+ *            1. execCmd и всякое вокруг | 
+ *      3. send_DHCP_MESSAGE | Dhcp.cpp     
+ *         1. udpSocket.beginPacket(broadcast_addr, server_port) | EthernetUDP
+ *            1. Ethernet.socketStartUDP(ip, port) | socket.cpp
+ *               1. writeSnDIPR | ?
+ *               2. writeDPORT  | ?
+ *         2. Формирование пакета      
+ *            1. udpSocket.write | EthernetUDP.cpp
+ *               1. Ethernet.socketBufferData | socket.cpp
+ *                  1. write_data | socket.cpp
+ *                     1. write | *
+ *         3. dhcpSocket.endPacket | EthernetUDP.cpp
+ *            1. Ethernet.socketSendUDP | socket.cpp
+ *               1. execCmd | *
+ *               2. readSnIR | ?
+ *               3. writeSnIR | ?
+ *      4. parseDHCPRESPONSE | Dhcp.cpp
+ *         1. udpSocket.parsePacket | EthernetUDP.cpp
+ *            1. read | EthernetUDP.cpp
+ *               1. Ethernet.socketRecv | socket.cpp
+ *                  1. readSnSR | ?
+ *                  2. writeSnRX_RD | ?
+ *                  3. execCmd | *
+ *            2. Ethernet.socketRecvAvailable | socket.cpp
+ *               1. getSnRX_RSR | ?
+ *            3. Ethernet.socketRecv | socket.cpp
+ *                  1. readSnSR | ?
+ *                  2. writeSnRX_RD | ?
+ *                  3. execCmd | *
+ *         2. udpSocket.read | EthernetUDP.cpp         
+ *            1. Ethernet.socketRecv | socket.cpp
+ *               1. readSnSR | ?
+ *               2. writeSnRX_RD | ?
+ *               3. execCmd | *
+ *         3. udpSocket.remodePort() | EthernetClient.cpp  
+ *            1. readSnDPORT(sockindex) | ?
+ *         4. udpSocket.flush | EthernetUDP.cpp
+ *         5. udpSocket.read | EthernetUDP.cpp         
+ *            1. Ethernet.socketRecv | socket.cpp
+ *               1. readSnSR | ?
+ *               2. writeSnRX_RD | ?
+ *               3. execCmd | *
+ *         6. Ethernet.socketRecvAvailable | socket.cpp
+ *            1. getSnRX_RSR | ?
+ *         7. udpSocket.read | EthernetUDP.cpp         
+ *         8. udpSocket.flush | EthernetUDP.cpp         
+ *      5. udpSocket.stop | EthernetUDP.cpp
+ *         1. socketClose | socket.cpp
+ *            1. execCmd | *
+ *      
+ *      
 */
 using namespace W5500Lite;
 
@@ -398,14 +545,14 @@ void plgW5500Lite(){
   // Init
   SPI.begin();
 
-/*
+
   Serial.print("Init: ");
   Serial.println(_init());
   Serial.print("DHCP: ");
   Serial.println(_dhcp_request());
-*/  
 
 
+/*
   Ethernet.init(CS_PIN); //только ставит CS и все
   Ethernet.begin(mac, 6000); // инитит чип, прописывает мак и 0 IP, и запускает dhcp и прписывает полученные от него данные  
 
@@ -414,7 +561,7 @@ void plgW5500Lite(){
   Serial.println(Ethernet.localIP());
   core.moveCursor(0, 1);
   core.println(Ethernet.localIP());
-
+*/
 
   SPI.beginTransaction(SPI_CONFIG);
   
