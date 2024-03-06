@@ -29,21 +29,27 @@
 
 
 // ---- Socket ----
-#define SOCK_MODE_REG        0x0000 // Регистр(смещение в блоке регистров) режима сокета
-#define SOCK_CMD_REG         0x0001 // Регистр(смещение в блоке регистров) команды сокета
-#define SOCK_INTERRUPT_REG   0x0002 // Регистр(смещение в блоке регистров) прерывания сокета
-#define SOCK_STATUS_REG      0x0003 // Регистр(смещение в блоке регистров) состояния сокета
-#define SOCK_SRC_PORT_REG    0x0004 // Регистр(смещение в блоке регистров) исходного порта
-#define SOCK_DST_IP_REG      0x000C // Регистр(смещение в блоке регистров) целевого IP-адреса
-#define SOCK_DST_PORT_REG    0x0010 // Регистр(смещение в блоке регистров) целевого порта
-#define SOCK_RX_BUF_SIZE_REG 0x001E // Регистр(смещение в блоке регистров) размера буфера на прием 
-#define SOCK_TX_BUF_SIZE_REG 0x001F // Регистр(смещение в блоке регистров) размера буфера на передачу
+#define SOCK_MODE_REG         0x0000 // Регистр(смещение в блоке регистров) режима сокета
+#define SOCK_CMD_REG          0x0001 // Регистр(смещение в блоке регистров) команды сокета
+#define SOCK_INTERRUPT_REG    0x0002 // Регистр(смещение в блоке регистров) прерывания сокета
+#define SOCK_STATUS_REG       0x0003 // Регистр(смещение в блоке регистров) состояния сокета
+#define SOCK_SRC_PORT_REG     0x0004 // Регистр(смещение в блоке регистров) исходного порта
+#define SOCK_DST_IP_REG       0x000C // Регистр(смещение в блоке регистров) целевого IP-адреса
+#define SOCK_DST_PORT_REG     0x0010 // Регистр(смещение в блоке регистров) целевого порта
+#define SOCK_RX_BUF_SIZE_REG  0x001E // Регистр(смещение в блоке регистров) размера буфера на прием 
+#define SOCK_TX_BUF_SIZE_REG  0x001F // Регистр(смещение в блоке регистров) размера буфера на передачу
+#define SOCK_TX_FREE_REG      0x0020 // Регистр(смещение в блоке регистров) свободного места в буфере отправки сокета 
+#define SOCK_TX_READ_PTR_REG  0x0022 // Регистр(смещение в блоке регистров) указателя чтения в буфере отправки сокета 
+#define SOCK_TX_WRITE_PTR_REG 0x0024 // Регистр(смещение в блоке регистров) указателя чтения в буфере отправки сокета
 
 #define VERSION_VAL   0x04   // Версия чипа (для W5500 должна быть = 4)
 #define SOCK_NUM      0x08   // Количество сокетов
 #define SOCK_SIZE     2048   // Размер буфера сокета 
 #define SOCK_BASE     0x1000 // Базовое смещение для блоков регистров сокетов
 #define SOCK_REG_SIZE 0x0100 // Размер блока регистров сокета
+//CH_BASE_MSB = 0x10
+//SMASK = 2048 - 1
+
 
 // Протоколы
 #define PROTO_IP            0x00
@@ -122,7 +128,14 @@
 #define DHCP_MSG_INFORM   8
 #define DHCP_MSG_TIMEOUT  255 // Это сам добавил
  
-
+// Значения полей DHCP-пакета
+#define DHCP_PKT_OP           1                 // Тип операции
+#define DHCP_PKT_HTYPE        1                 // Тип адреса
+#define DHCP_PKT_HLEN         6                 // Длина mac-адреса
+#define DHCP_PKT_HOPS         0                 // Число промежуточных маршрутизаторов
+#define DHCP_PKT_FLAGS        htons(0x8000)     // Флаг широковещательой операции. Если установлен, то ответ тоже будет широковещательным
+#define DHCP_PKT_MAGIC_COOKIE htonl(0x63825363) // Волшебная кука
+  
 // Первый байт в 16-битном слове будет старшим
 #define htons(x) (((x & 0xFF00) >> 8) | (x & 0xFF) << 8)
 // Первый байт в 16-битном слове будет младшим
@@ -170,7 +183,7 @@ namespace W5500Lite {
    // регистры сокетов (от 0x100 до 0x8000)
    case 0x0100 ... 0x7FFF: ctrl = ((addr >> 3) & 0xE0) | 0x08; break; 
 
-   // буферы передачи (от 0x8000 до 0xC00). размер буферов 2048
+   // буферы передачи (от 0x8000 до 0xC000). размер буферов 2048
    case 0x8000 ... 0xBFFF: ctrl = ((addr >> 6) & 0xE0) | 0x10; break;
     
    // буферы приема (от 0xC000 до 0xFFFF). размер буферов 2048
@@ -328,6 +341,26 @@ namespace W5500Lite {
  }//_sock_close
 
 
+ // Записать в буфер передачи сокета
+ uint16_t _sock_write(const int8_t sock, uint16_t offset, uint8_t * buf, uint16_t size){
+  // Базовый адрес для буфера передачи сокета 0x8000 + sock * SSIZE. Размер буфера SSIZE 2048 (0x800) байт. SMASK = 0x07ff
+
+  // Поджимаем размер, чтобы не пытаться отправить больше, чем есть свободного места в буфере TX_FSR -> SOCK_TX_FREE_REG
+  
+  // Читаем текущий указатель TX_WR -> SOCK_TX_WRITE_PTR_REG
+  // Добавляем к нему смещение offset. получаем ptr
+  // Сбрасываем старшие биты по SMASK и получаем окончательное смещение в буфере
+  // Полный адрес: полное смещение +  базовый адрес буфера 0x8000 + sock * 2048
+  // Если размер данных + полное смешение <= размер буйера (2048), то просто отправляем
+  // Если нет, то вычисляем перебор overfl: 2048 - полное смещение
+  // Затем отправляем по полному адресу данные в объеме перебора overfl
+  // А потом отправляем по базовому адресу (0x8000 + sock * 2048), buf + overfl, size - overfl 
+  // Увеличиваем ptr на размер переданных данных size
+  // Пишем ptr в TX_WR
+  // Возвращаем сколько записали??
+ }//_sock_write
+
+ 
  // Запись и чтение из сокета надо?
  
 
@@ -342,13 +375,34 @@ namespace W5500Lite {
   RELEASE
  } DHCPState; 
 
-
+ 
  // Данные для общения с DHCP-сервером
  typedef struct {
   int8_t sock;       // Номер сокета
   uint32_t trans_id; // Идентификатор транзакции
   uint32_t t_start;  // Момент начала общения с сервером (в millis())
  } DHCPData;
+
+
+ // Начало DHCP-пакета
+ typedef struct {
+  uint8_t op;     // Тип операции
+  uint8_t hType;  // Тип адреса
+  uint8_t hLen;   // Длина mac-адреса
+  uint8_t hops;   // Число промежуточных маршрутизаторов
+  uint32_t id;    // Идентификатор транзакции
+  uint16_t secs;  // Время в секундах с момента начала процесса получения адреса
+  uint16_t flags; // Флаги
+ } dhcpPktBegin;
+
+
+// Опции DHCP-пакета
+typedef struct {
+  uint8_t code; // Код опции
+  uint8_t len;  // Длина облачти даных опции
+  byte data[];  // Данные опции
+ } dhcpPktOption;
+ 
 
  // Разобрать ответ DHCP-сервера. Возвращает тип сообщения. Если таймаут: 255. Если все плохо: 0. Применяет полученные настройки
  uint8_t _dhcp_parse(){
@@ -377,6 +431,12 @@ namespace W5500Lite {
  // Принимает тип сообщения и параметры обмена в структура data)
  // Время, прошедшее с начала обмена считает сам 
  uint8_t _dhcp_send(const uint8_t msg_type, const DHCPData data){
+  uint8_t buf[16]; // Рабочий буфер
+  memset(buf, 0, sizeof(buf)); // Обнуляем
+  uint16_t offset = 0; // Смещение в буфере сокета
+    
+  dhcpPktBegin *pkt = (dhcpPktBegin*)buf; // совмещаем структуру с буфером
+
 
   // -------------- Тут подумать!!!!!!!!!!!
   // для DISCOVER броадкаст на 255.255.255.255
@@ -388,7 +448,48 @@ namespace W5500Lite {
   _write_reg(SOCK_2_ADDR(data.sock, SOCK_DST_PORT_REG), DHCP_SERVER_PORT, 2); // В регистр целевого порта - порт (2 байта)
 
 
+  // Заполняем поля
+  pkt -> op = DHCP_PKT_OP;
+  pkt -> hType = DHCP_PKT_HTYPE;
+  pkt -> hLen = DHCP_PKT_HLEN;
+  //pkt -> hops; не надо. и так = 0
+  pkt -> secs = data.t_start; // Секунды с начала обмена
+  pkt -> id = data.trans_id; // id транзакции
+  pkt -> flags = DHCP_PKT_FLAGS; 
+
   // -------------- с записью разобраться!!!!!!!!!!! Там всякие смещения, маски и т.д.
+  // Отпрвляем в буфер сокета
+  // _sock_write(data.sock, offset, buf, sizeof(dhcpPktBegin)); // Реализовать записть в сокет
+  offset += sizeof(dhcpPktBegin);
+
+  // Пишем ip-шники  
+  memset(buf, 0, sizeof(buf)); // Обнуляем
+  // _sock_write(data.sock, offset, buf, sizeof(buf)); // 16-байт: curIP, newIP, srvIP, giIP
+  offset += sizeof(buf);
+
+  // Пишем mac-адрес с расширением
+  memset(buf, 0, sizeof(buf)); // Обнуляем
+  memcpy(buf, mac, sizeof(mac)); // Копируем MAC
+  // _sock_write(data.sock, offset, buf, sizeof(buf)); // 16-байт: curIP, newIP, srvIP, giIP
+  offset += sizeof(buf);
+
+  // Пишем имя сервера и файла на сервере (BOOTP. У нас все нулевое). 192 байта. 12 циклов 16-байтного буфера 
+  memset(buf, 0, sizeof(buf)); // Обнуляем
+  for(uint8_t i = 0; i < 12; i++, offset += sizeof(buf)){} //_sock_write(data.sock, offset, buf, sizeof(buf)); 
+// 236
+
+  // Магическая кука
+  memset(buf, 0, sizeof(buf)); // Обнуляем
+  *(uint32_t*)buf = DHCP_PKT_MAGIC_COOKIE;
+  // _sock_write(data.sock, offset, buf, sizeof(DHCP_PKT_MAGIC_COOKIE)); // 4-байта
+  offset += sizeof(DHCP_PKT_MAGIC_COOKIE);
+   
+  // Опции. На discover надо опцию поиска сервера. (53 со значением 1) !!!!!!!!!!!!!!!
+   
+  
+  Serial.print("offset: ");
+  Serial.println(offset);
+  
   SPI.endTransaction();
   return 0;
  }//_dhcp_send
@@ -550,7 +651,6 @@ void plgW5500Lite(){
   Serial.println(_init());
   Serial.print("DHCP: ");
   Serial.println(_dhcp_request());
-
 
 /*
   Ethernet.init(CS_PIN); //только ставит CS и все
