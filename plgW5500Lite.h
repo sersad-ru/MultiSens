@@ -5,12 +5,12 @@
 * The W5500Lite plugin ...
 * 
 * Connection:
-* GND  - GND - black
-* VCC  - +5V - red
-* CS   - P0  - green 
-* MOSI - P2  - yellow
-* MISO - P3  - violet
-* SCK  - P4  - brown
+* GND  - GND   - black
+* VCC  - +3.3V - white
+* CS   - P0    - green 
+* MOSI - P2    - yellow
+* MISO - P3    - violet
+* SCK  - P4    - brown
 *
 */
 /*
