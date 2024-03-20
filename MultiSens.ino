@@ -1,4 +1,4 @@
-/*
+  /*
 * Arduino Multi Senstor Tester
 * 
 * v.1.0
@@ -47,7 +47,7 @@
 MultiSensPlugin plugins[] = {
 /*  
   {&plgFindPin,       "FindPin",          0},
-  {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)},
+  {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)}, 
   {&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
   {&plgAnalogRead,    "AnalogRead",       sizeof(plgAnalogReadCfg)},
   {&plgPWM,           "PWM",              sizeof(plgPWMCfg)},
@@ -70,7 +70,7 @@ MultiSensPlugin plugins[] = {
   {&plgServo,         "Servo",            sizeof(plgServoCfg)},
   {&plgStepper,       "Stepper",          sizeof(plgStepperCfg)},
 */  
-  {&plgW5500Lite,     "W5500 Lite",       0},
+  {&plgW5500Lite,     "W5500 Lite",       0},  
 }; // 
 
 

@@ -10,10 +10,14 @@
 
 #define SPI_CONFIG SPISettings(14000000, MSBFIRST, SPI_MODE0)
 
+//#define DBG_PRINT_WRITE
+//#define DBG_PRINT_READ
 /*
- * IP 172.16.0.1 в uint32_t хранится как AС 10 00 01, т.е. 172 - младший октет и 
- * выводиться будет как  01 00 10 AC т.е. 172 - младший значащий байт
-*/
+ * В устройстве хранение big-endian. Т.е. IP 172.16.0.1 хранится как AC 10 00 01
+ * В микроконтроллере little-endian, т.е. 172.16.0.1 в uint32_t должно быть 0x01 00 10 AC
+ * Тоже самое и для 16-битных значений, которые передаются побайтово, например, номера портов (htons в помощь).
+ * Исключение - адреса, которые передаются отдельной командой и их конвертацией занимается SPI.
+ */
 
 // ---- Hardware ----
 #define MR_REG          0x0000 // Регистр режима (8)
@@ -45,8 +49,10 @@
 #define VERSION_VAL   0x04   // Версия чипа (для W5500 должна быть = 4)
 #define SOCK_NUM      0x08   // Количество сокетов
 #define SOCK_SIZE     2048   // Размер буфера сокета 
-#define SOCK_BASE     0x1000 // Базовое смещение для блоков регистров сокетов
 #define SOCK_REG_SIZE 0x0100 // Размер блока регистров сокета
+#define SOCK_BASE     0x1000 // Базовое смещение для блоков регистров сокетов
+#define SOCK_TX_BASE  0x8000 // Базовое смещение для области данных сокета для отправки
+
 //CH_BASE_MSB = 0x10
 //SMASK = 2048 - 1
 
@@ -112,8 +118,8 @@
 
 
 // ---- DHCP ----
-#define DHCP_SERVER_PORT  67
-#define DHCP_CLIENT_PORT  68
+#define DHCP_SERVER_PORT  htons(0x43) //67
+#define DHCP_CLIENT_PORT  htons(0x44) //68
 #define DHCP_TIMEOUT      6000 // (6 сек) Таймаут DHCP в мс
 #define DHCP_RESP_TIMEOUT 4000 // (4 сек) Таймаут ожидания отсета в мс
 
@@ -135,14 +141,18 @@
 #define DHCP_PKT_HOPS         0                 // Число промежуточных маршрутизаторов
 #define DHCP_PKT_FLAGS        htons(0x8000)     // Флаг широковещательой операции. Если установлен, то ответ тоже будет широковещательным
 #define DHCP_PKT_MAGIC_COOKIE htonl(0x63825363) // Волшебная кука
+
+// Коды опций DHCP-пакета
+#define DHCP_PKT_OPTION_MSG_TYPE 0x35 // 53  - Тип сообщения DHCP
+#define DHCP_PKT_OPTION_END      0xFF // 255 - Признак конца опций
   
 // Первый байт в 16-битном слове будет старшим
-#define htons(x) (((x & 0xFF00) >> 8) | (x & 0xFF) << 8)
+#define htons(x) ((((uint16_t)x & 0xFF00) >> 8) | ((uint16_t)x & 0xFF) << 8)
 // Первый байт в 16-битном слове будет младшим
 #define ntohs(x) htons(x)
 
 // Первый байт в 32-битном слове будет старшим
-#define htonl(x) (((x & 0xFF000000) >> 24) | ((x & 0x00FF0000) >> 8) | ((x & 0x0000FF00) << 8) | ((x&0x000000FF) << 24))
+#define htonl(x) ((((uint32_t)x & 0xFF000000) >> 24) | (((uint32_t)x & 0x00FF0000) >> 8) | (((uint32_t)x & 0x0000FF00) << 8) | (((uint32_t)x & 0x000000FF) << 24))
 // Первый байт в 32-битном слове будет младшим
 #define ntohl(x) htonl(x)
 
@@ -159,8 +169,8 @@ namespace W5500Lite {
 
  // Вывести IP-адрес. 
 /*
- * IP 172.16.0.1 в uint32_t хранится как AС 10 00 01, т.е. 172 - младший октет и 
- * выводиться будет как  01 00 10 AC т.е. 172 - младший значащий байт
+ * IP 172.16.0.1 в устройстве хранится как AС 10 00 01, big-endian т.е. 172(0xAC) - старший октет.
+ * В uint32_t little-endian, т.е. значение будет 01 00 10 AC (0x010010AC).
 */ 
  void _print_ip(Print &p, const uint32_t ip){
   p.print(ip & 0xFF);
@@ -199,21 +209,36 @@ namespace W5500Lite {
   memset(buf, 0, size); // Забиваем буфер нулями, т.к. у нас тут прием, а не отправка
   SPI.transfer(buf, size) ; // Отправляем буфер  
   digitalWrite(CS_PIN, HIGH); // Отпускаем CS 
+
+#ifdef DBG_PRINT_READ
+  if(size > 1){
+   Serial.print("\nREAD Addr: 0x"); 
+   Serial.println(addr, HEX);
+   for(uint8_t i = 0; i < size; i++){
+     Serial.print(i);
+     Serial.print(" -> 0x");
+     Serial.println(buf[i], HEX);
+   }
+   Serial.println("------\n");
+  }
+#endif
+  
   return size;
  }//read
 
 
- // Прочесть регистр (от 1 до 4 байт)
+ // Прочесть регистр (от 1 до 4 байт). 
+ // Байты возвращаются в порядке их хранения, т.е. little-endian. Так при чтении 0x78, 0x56, 0x34 и 0x12, значение res будет 0x12345678
  uint32_t _read_reg(const uint16_t addr, uint8_t bytes = 1) {
   uint32_t res = 0;
   bytes = constrain(bytes, 1, 4);
-  _read(addr, (uint8_t*)&res, bytes);
+  _read(addr, (uint8_t*)&res, bytes); 
   return res;
  }//_read_reg
 
 
  // Отправить данные по адресу 
- uint16_t _write(const uint16_t addr, uint8_t* buf, uint16_t size){
+ uint16_t _write(const uint16_t addr, const uint8_t* buf, uint16_t size){
   uint8_t ctrl = 0x04; // по умолчанию управляющие биты = 0x04 (выбор блока = 0, режим чтения (1 = запись), режим работы - переменная длина (0))  
   switch (addr){
    
@@ -230,18 +255,32 @@ namespace W5500Lite {
    default: break; // Для младших адресов  так и оставляем 0x04
   }//switch
   
-//  for(uint8_t i = 0; i < size; i++) Serial.println(buf[i], HEX);
-
+#ifdef DBG_PRINT_WRITE 
+  if(size > 1){
+   Serial.print("\nWRITE Addr: 0x"); 
+   Serial.println(addr, HEX);   
+   for(uint8_t i = 0; i < size; i++){
+     Serial.print(i);
+     Serial.print(" -> 0x");
+     Serial.println(buf[i], HEX);
+   }
+   Serial.println("------\n");
+  }
+#endif
+  
   digitalWrite(CS_PIN, LOW); // Прижимаем CS 
   SPI.transfer16(addr); // Адрес отдаем старшим байтом вперед (transfer16 делает это сам)
   SPI.transfer(ctrl); // Байт управления
-  SPI.transfer(buf, size) ; // Отправляем буфер  
+  // Т.к. SPI затрет данные буфера при передаче, то будем передавать побайтно
+  // SPI.transfer(buf, size) ;
+  for(uint16_t i = 0; i < size; i++) SPI.transfer(buf[i]);
   digitalWrite(CS_PIN, HIGH); // Отпускаем CS 
   return size; 
  }//_write
 
 
- // Записать значение (от 1 до 4 байт) в регистр 
+ // Записать значение (от 1 до 4 байт) в регистр. 
+ // Байты пишутся в порядке их хранения, т.е. little-endian. Так при data = 0x12345678, будут передаваться 0x78, 0x56, 0x34 и 0x12 
  void _write_reg(const uint16_t addr, const uint32_t data, uint8_t bytes = 1){
   bytes = constrain(bytes, 1, 4);
   _write(addr, (uint8_t*)&data, bytes);
@@ -315,14 +354,14 @@ namespace W5500Lite {
 
 
  // Открыть сокет (вернет номер или -1 если не нашел свободного. Сам закрывать не пыается)
- int8_t _sock_open(const uint8_t proto, const uint16_t port){
+ int8_t _sock_open(const uint8_t mode, const uint16_t port){
   SPI.beginTransaction(SPI_CONFIG);
   for(int8_t sock = 0; sock < SOCK_NUM; sock++){ // Ищем свободнй сокет
     if(_read_reg(SOCK_2_ADDR(sock, SOCK_STATUS_REG)) == SOCK_STAT_CLOSED){ // Читаем статус. Свободен ли
       // Свободен
-      _write_reg(SOCK_2_ADDR(sock, SOCK_MODE_REG), proto); // В регистр режима пишем протокол
+      _write_reg(SOCK_2_ADDR(sock, SOCK_MODE_REG), mode); // В регистр режима пишем режим работы сокета
       _write_reg(SOCK_2_ADDR(sock, SOCK_INTERRUPT_REG), 0xFF); // В регистр прерываний пишем 0xFF
-      _write_reg(SOCK_2_ADDR(sock, SOCK_SRC_PORT_REG), port, 2); // В регистр исходного порта - порт (2 байта)
+      _write_reg(SOCK_2_ADDR(sock, SOCK_SRC_PORT_REG), port, 2); // В регистр исходного порта - порт (2 байта). Помним про htons в константе.
       _sock_cmd(sock, SOCK_CMD_OPEN); // Даем команду на открытие сокета
       SPI.endTransaction();
       return sock;
@@ -341,27 +380,78 @@ namespace W5500Lite {
  }//_sock_close
 
 
- // Записать в буфер передачи сокета
- uint16_t _sock_write(const int8_t sock, uint16_t offset, uint8_t * buf, uint16_t size){
-  // Базовый адрес для буфера передачи сокета 0x8000 + sock * SSIZE. Размер буфера SSIZE 2048 (0x800) байт. SMASK = 0x07ff
+ // Отправить данные // socket.cpp socketSendUDP
+ uint8_t _sock_send(const uint8_t sock){
+  SPI.beginTransaction(SPI_CONFIG);
+  // Даем команду отправить данные
+  _sock_cmd(sock, SOCK_CMD_SEND);
 
+  // Ждем, пока не отправится
+  uint8_t res;
+  do {
+    res = _read_reg(SOCK_2_ADDR(sock, SOCK_INTERRUPT_REG)); // Читаем регистр прерываний сокета
+    if(res & SOCK_INT_TIMEOUT){ // Таймаут
+      _write_reg(SOCK_2_ADDR(sock, SOCK_INTERRUPT_REG), SOCK_INT_SEND_OK | SOCK_INT_TIMEOUT);
+      SPI.endTransaction();
+      return false; 
+    }//if
+    SPI.endTransaction();
+    Serial.println(res, HEX);
+    yield();
+    SPI.beginTransaction(SPI_CONFIG);    
+  } while((res & SOCK_INT_SEND_OK) != SOCK_INT_SEND_OK);
+
+  // Все прошло нормально
+  _write_reg(SOCK_2_ADDR(sock, SOCK_INTERRUPT_REG), SOCK_INT_SEND_OK); 
+  SPI.endTransaction();
+  return true;  
+ }//_sock_send
+
+
+ // Записать в буфер передачи сокета. SPI должен быть уже настроен (beginTranscation)
+ uint16_t _sock_write(const int8_t sock, uint16_t offset, uint8_t * buf, uint16_t size){
   // Поджимаем размер, чтобы не пытаться отправить больше, чем есть свободного места в буфере TX_FSR -> SOCK_TX_FREE_REG
+  uint16_t free_size; // Читаем подряд, пока значения не устаканятся
+  do{
+    free_size = _read_reg(SOCK_2_ADDR(sock, SOCK_TX_FREE_REG), 2);
+  } while(free_size != _read_reg(SOCK_2_ADDR(sock, SOCK_TX_FREE_REG), 2));
+  size = min(size, htons(free_size)); // big-endian! htons!
+
+#ifdef DBG_PRINT_WRITE    
+  Serial.print("Size: ");
+  Serial.println(size);
+#endif  
   
   // Читаем текущий указатель TX_WR -> SOCK_TX_WRITE_PTR_REG
-  // Добавляем к нему смещение offset. получаем ptr
-  // Сбрасываем старшие биты по SMASK и получаем окончательное смещение в буфере
+  uint16_t ptr = _read_reg(SOCK_2_ADDR(sock, SOCK_TX_WRITE_PTR_REG), 2); 
+  
+  // Добавляем к нему смещение offset. получаем ptr. Убираем старшие биты, что б не было больше 2048 (0x800)
+  ptr = (offset + htons(ptr)) & (SOCK_SIZE - 1); // big-endian htons!
+
+#ifdef DBG_PRINT_WRITE  
+  Serial.print("Ptr: 0x");
+  Serial.println(ptr, HEX);
+#endif
   // Полный адрес: полное смещение +  базовый адрес буфера 0x8000 + sock * 2048
-  // Если размер данных + полное смешение <= размер буйера (2048), то просто отправляем
-  // Если нет, то вычисляем перебор overfl: 2048 - полное смещение
-  // Затем отправляем по полному адресу данные в объеме перебора overfl
-  // А потом отправляем по базовому адресу (0x8000 + sock * 2048), buf + overfl, size - overfl 
-  // Увеличиваем ptr на размер переданных данных size
-  // Пишем ptr в TX_WR
-  // Возвращаем сколько записали??
+    
+  // Если размер данных + полное смещение больше размера сокета, то отправляем частями
+  if((ptr + size) > SOCK_SIZE) {
+    uint16_t part = SOCK_SIZE - ptr; // Сколько влезет до концк сокета
+    _write(SOCK_TX_BASE + (SOCK_SIZE * sock) + ptr, buf, part); // Пишем сколько влезет от текущего места
+    _write(SOCK_TX_BASE + (SOCK_SIZE * sock), buf + part, size - part); // Пишем оставшееся с самого начала буфера
+  }//if
+  else 
+    _write(SOCK_TX_BASE + (SOCK_SIZE * sock) + ptr, buf, size); // Пишем целиком
+
+  // Пишем в TX_WR (SOCK_TX_WRITE_PTR_REG) новый указатель (старый + сколько записали). big-endian htons!
+  _write_reg(SOCK_2_ADDR(sock, SOCK_TX_WRITE_PTR_REG), htons(ptr + size), 2); 
+
+  // Возвращаем сколько записали
+  return size;
  }//_sock_write
 
  
- // Запись и чтение из сокета надо?
+ // Еще чтение из сокета надо!!!!!!!!!!!!!!!!!!
  
 
  // ---- DHCP ----
@@ -399,8 +489,8 @@ namespace W5500Lite {
 // Опции DHCP-пакета
 typedef struct {
   uint8_t code; // Код опции
-  uint8_t len;  // Длина облачти даных опции
-  byte data[];  // Данные опции
+  uint8_t len;  // Длина области даных опции
+  uint8_t data[];  // Данные опции
  } dhcpPktOption;
  
 
@@ -427,6 +517,10 @@ typedef struct {
  }//_dhcp_parse
 
 
+/*
+* DISCOVER работает. Теперь надо сделать чтение из сокета, разбор пришедшего и отправку Request
+*/
+
  // Отправить запрос DHCP-серверу. Вернет 0, если все плохо
  // Принимает тип сообщения и параметры обмена в структура data)
  // Время, прошедшее с начала обмена считает сам 
@@ -445,53 +539,61 @@ typedef struct {
   // Начинаем формировать UDP-пакет
   SPI.beginTransaction(SPI_CONFIG);
   _write_reg(SOCK_2_ADDR(data.sock, SOCK_DST_IP_REG), 0xFFFFFFFF, 4); // В регистр целевого IP - 255.255.255.255 (4 байта)
-  _write_reg(SOCK_2_ADDR(data.sock, SOCK_DST_PORT_REG), DHCP_SERVER_PORT, 2); // В регистр целевого порта - порт (2 байта)
-
+  _write_reg(SOCK_2_ADDR(data.sock, SOCK_DST_PORT_REG), DHCP_SERVER_PORT, 2); // В регистр целевого порта - порт (2 байта). big-endian htons! 
 
   // Заполняем поля
   pkt -> op = DHCP_PKT_OP;
   pkt -> hType = DHCP_PKT_HTYPE;
   pkt -> hLen = DHCP_PKT_HLEN;
   //pkt -> hops; не надо. и так = 0
-  pkt -> secs = data.t_start; // Секунды с начала обмена
+  pkt -> secs = (millis() - data.t_start) / 1000; // Секунды с начала обмена
   pkt -> id = data.trans_id; // id транзакции
-  pkt -> flags = DHCP_PKT_FLAGS; 
+  pkt -> flags = DHCP_PKT_FLAGS; // broadcast
 
-  // -------------- с записью разобраться!!!!!!!!!!! Там всякие смещения, маски и т.д.
   // Отпрвляем в буфер сокета
-  // _sock_write(data.sock, offset, buf, sizeof(dhcpPktBegin)); // Реализовать записть в сокет
-  offset += sizeof(dhcpPktBegin);
+  _sock_write(data.sock, offset, buf, sizeof(dhcpPktBegin)); 
+  offset += sizeof(dhcpPktBegin); 
 
   // Пишем ip-шники  
   memset(buf, 0, sizeof(buf)); // Обнуляем
-  // _sock_write(data.sock, offset, buf, sizeof(buf)); // 16-байт: curIP, newIP, srvIP, giIP
+  _sock_write(data.sock, offset, buf, sizeof(buf)); // 16-байт: curIP, newIP, srvIP, giIP
   offset += sizeof(buf);
 
   // Пишем mac-адрес с расширением
   memset(buf, 0, sizeof(buf)); // Обнуляем
   memcpy(buf, mac, sizeof(mac)); // Копируем MAC
-  // _sock_write(data.sock, offset, buf, sizeof(buf)); // 16-байт: curIP, newIP, srvIP, giIP
+  _sock_write(data.sock, offset, buf, sizeof(buf)); // Мак + добивание до 16 байт
   offset += sizeof(buf);
-
+  
   // Пишем имя сервера и файла на сервере (BOOTP. У нас все нулевое). 192 байта. 12 циклов 16-байтного буфера 
   memset(buf, 0, sizeof(buf)); // Обнуляем
-  for(uint8_t i = 0; i < 12; i++, offset += sizeof(buf)){} //_sock_write(data.sock, offset, buf, sizeof(buf)); 
-// 236
+  for(uint8_t i = 0; i < 12; i++, offset += sizeof(buf)) _sock_write(data.sock, offset, buf, sizeof(buf)); 
 
   // Магическая кука
   memset(buf, 0, sizeof(buf)); // Обнуляем
   *(uint32_t*)buf = DHCP_PKT_MAGIC_COOKIE;
-  // _sock_write(data.sock, offset, buf, sizeof(DHCP_PKT_MAGIC_COOKIE)); // 4-байта
+  _sock_write(data.sock, offset, buf, sizeof(DHCP_PKT_MAGIC_COOKIE)); // 4-байта
   offset += sizeof(DHCP_PKT_MAGIC_COOKIE);
-   
+  //240
+     
   // Опции. На discover надо опцию поиска сервера. (53 со значением 1) !!!!!!!!!!!!!!!
-   
-  
+  memset(buf, 0, sizeof(buf)); // Обнуляем
+  dhcpPktOption *opt = (dhcpPktOption*)buf; // совмещаем структуру опции с буфером
+  opt -> code = DHCP_PKT_OPTION_MSG_TYPE; // Опция типа сообщения 
+  opt -> len = 0x01; // Длина опции
+  opt -> data[0] = DHCP_MSG_DISCOVER; // DHCP DISCOVER // <-  Это только сейчас. В реальности там еще request может быть!!!
+  //opt -> data[1] = 0; // Выравнивание тут и так ноль
+  opt -> data[2] = DHCP_PKT_OPTION_END; // Ставим признак конца опций
+  _sock_write(data.sock, offset, buf, 5); // 5 байт 
+  offset += 5;
+ 
   Serial.print("offset: ");
   Serial.println(offset);
   
   SPI.endTransaction();
-  return 0;
+
+  // Отправляем
+  return _sock_send(data.sock);    
  }//_dhcp_send
 
  
@@ -509,7 +611,7 @@ typedef struct {
   DHCPData data; 
 
   // Открываем сокет
-  data.sock = _sock_open(PROTO_UDP, DHCP_CLIENT_PORT);
+  data.sock = _sock_open(SOCK_MODE_UDP, DHCP_CLIENT_PORT);
   Serial.print("Socket: ");
   Serial.println(data.sock);
 
@@ -525,7 +627,9 @@ typedef struct {
     switch(state){
       case START: 
         //Отправляем запрос DISCOVER
-        _dhcp_send(DHCP_MSG_DISCOVER, data);
+        res = _dhcp_send(DHCP_MSG_DISCOVER, data);
+        Serial.println("_dhcp_send: ");
+        Serial.println(res);
         state = DISCOVER;
       break;
 
@@ -645,7 +749,6 @@ using namespace W5500Lite;
 void plgW5500Lite(){
   // Init
   SPI.begin();
-
 
   Serial.print("Init: ");
   Serial.println(_init());
