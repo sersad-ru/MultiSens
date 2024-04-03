@@ -12,6 +12,7 @@
 
 //#define DBG_PRINT_WRITE
 //#define DBG_PRINT_READ
+#define DBG_PRINT_READ_SOCK
 /*
  * В устройстве хранение big-endian. Т.е. IP 172.16.0.1 хранится как AC 10 00 01
  * В микроконтроллере little-endian, т.е. 172.16.0.1 в uint32_t должно быть 0x01 00 10 AC
@@ -45,6 +46,8 @@
 #define SOCK_TX_FREE_REG      0x0020 // Регистр(смещение в блоке регистров) свободного места в буфере отправки сокета 
 #define SOCK_TX_READ_PTR_REG  0x0022 // Регистр(смещение в блоке регистров) указателя чтения в буфере отправки сокета 
 #define SOCK_TX_WRITE_PTR_REG 0x0024 // Регистр(смещение в блоке регистров) указателя чтения в буфере отправки сокета
+#define SOCK_RX_READ_SIZE_REG 0x0026 // Регистр(смещение в блоке регистров) количества принятых байт в буфере приема сокета
+#define SOCK_RX_READ_PTR_REG  0x0028 // Регистр(смещение в блоке регистров) указателя чтения в буфере приема сокета
 
 #define VERSION_VAL   0x04   // Версия чипа (для W5500 должна быть = 4)
 #define SOCK_NUM      0x08   // Количество сокетов
@@ -52,6 +55,7 @@
 #define SOCK_REG_SIZE 0x0100 // Размер блока регистров сокета
 #define SOCK_BASE     0x1000 // Базовое смещение для блоков регистров сокетов
 #define SOCK_TX_BASE  0x8000 // Базовое смещение для области данных сокета для отправки
+#define SOCK_RX_BASE  0xC000 // Базовое смещение для области данных сокета для приема
 
 //CH_BASE_MSB = 0x10
 //SMASK = 2048 - 1
@@ -118,10 +122,10 @@
 
 
 // ---- DHCP ----
-#define DHCP_SERVER_PORT  htons(0x43) //67
-#define DHCP_CLIENT_PORT  htons(0x44) //68
-#define DHCP_TIMEOUT      6000 // (6 сек) Таймаут DHCP в мс
-#define DHCP_RESP_TIMEOUT 4000 // (4 сек) Таймаут ожидания отсета в мс
+#define DHCP_SERVER_PORT     htons(0x43) //67
+#define DHCP_CLIENT_PORT     htons(0x44) //68
+#define DHCP_TIMEOUT_MS      6000 // (6 сек) Таймаут DHCP в мс
+#define DHCP_RESP_TIMEOUT_MS 4000 // (4 сек) Таймаут ожидания ответа в мс
 
 // Типы DHCP сообщений
 #define DHCP_MSG_DISCOVER 1
@@ -135,15 +139,20 @@
 #define DHCP_MSG_TIMEOUT  255 // Это сам добавил
  
 // Значения полей DHCP-пакета
-#define DHCP_PKT_OP           1                 // Тип операции
-#define DHCP_PKT_HTYPE        1                 // Тип адреса
-#define DHCP_PKT_HLEN         6                 // Длина mac-адреса
-#define DHCP_PKT_HOPS         0                 // Число промежуточных маршрутизаторов
-#define DHCP_PKT_FLAGS        htons(0x8000)     // Флаг широковещательой операции. Если установлен, то ответ тоже будет широковещательным
-#define DHCP_PKT_MAGIC_COOKIE htonl(0x63825363) // Волшебная кука
+#define DHCP_PKT_OP_BOOTREQUEST 1                 // Тип операции - запрос
+#define DHCP_PKT_OP_BOOTREPLY   2                 // Тип операции - ответ
+#define DHCP_PKT_HTYPE          1                 // Тип адреса
+#define DHCP_PKT_HLEN           6                 // Длина mac-адреса
+#define DHCP_PKT_HOPS           0                 // Число промежуточных маршрутизаторов
+#define DHCP_PKT_FLAGS          htons(0x8000)     // Флаг широковещательой операции. Если установлен, то ответ тоже будет широковещательным
+#define DHCP_PKT_MAGIC_COOKIE   htonl(0x63825363) // Волшебная кука
 
 // Коды опций DHCP-пакета
+#define DHCP_PKT_OPTION_SUBNET   0x01 // 01  - Маска подсети
+#define DHCP_PKT_OPTION_GATEWAY  0x03 // 03  - Адрес шлюза
+//...............................................................
 #define DHCP_PKT_OPTION_MSG_TYPE 0x35 // 53  - Тип сообщения DHCP
+#define DHCP_PKT_OPTION_DHCP_IP  0x36 // 54  - Адрес сервера DHCP
 #define DHCP_PKT_OPTION_END      0xFF // 255 - Признак конца опций
   
 // Первый байт в 16-битном слове будет старшим
@@ -380,7 +389,7 @@ namespace W5500Lite {
  }//_sock_close
 
 
- // Отправить данные // socket.cpp socketSendUDP
+ // Отправить данные 
  uint8_t _sock_send(const uint8_t sock){
   SPI.beginTransaction(SPI_CONFIG);
   // Даем команду отправить данные
@@ -436,7 +445,7 @@ namespace W5500Lite {
     
   // Если размер данных + полное смещение больше размера сокета, то отправляем частями
   if((ptr + size) > SOCK_SIZE) {
-    uint16_t part = SOCK_SIZE - ptr; // Сколько влезет до концк сокета
+    uint16_t part = SOCK_SIZE - ptr; // Сколько влезет до конца сокета
     _write(SOCK_TX_BASE + (SOCK_SIZE * sock) + ptr, buf, part); // Пишем сколько влезет от текущего места
     _write(SOCK_TX_BASE + (SOCK_SIZE * sock), buf + part, size - part); // Пишем оставшееся с самого начала буфера
   }//if
@@ -450,8 +459,76 @@ namespace W5500Lite {
   return size;
  }//_sock_write
 
+
+ // Возвращает количество принятых байт в буфере сокета
+ uint16_t _sock_available(const int8_t sock){
+  uint16_t data_size; // Читаем подряд, пока значения не устаканятся
+  SPI.beginTransaction(SPI_CONFIG);
+  do{
+    data_size = _read_reg(SOCK_2_ADDR(sock, SOCK_RX_READ_SIZE_REG), 2);
+  } while(data_size != _read_reg(SOCK_2_ADDR(sock, SOCK_RX_READ_SIZE_REG), 2));
+  SPI.endTransaction();
+  return htons(data_size); // big-endian! htons! 
+ }// _sock_available
+
+
+// Еще чтение из сокета надо!!!!!!!!!!!!!!!!!!
+ // Прочесть из буфера приема сокета. SPI должен быть уже настроен (beginTranscation)
+ uint16_t _sock_read(const int8_t sock, uint8_t * buf, uint16_t size){
+  
+ // Читаем текущий указатель RX_RD -> SOCK_RX_READ_PTR_REG
+  uint16_t ptr = _read_reg(SOCK_2_ADDR(sock, SOCK_RX_READ_PTR_REG), 2); 
+  
+  // Добавляем к нему смещение offset. получаем ptr. Убираем старшие биты, что б не было больше 2048 (0x800)
+  ptr = htons(ptr) & (SOCK_SIZE - 1); // big-endian htons!
+  
+#ifdef DBG_PRINT_READ_SOCK  
+  Serial.print("Ptr: 0x");
+  Serial.println(ptr, HEX); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#endif
+
+  // Полный адрес: полное смещение +  базовый адрес буфера 0xC000 + sock * 2048
+
+  // Читаем в буфер данные, начиная с указателя
+  if(buf){ // Если читаем в NULL, то само чтение не выполняем
+    if((ptr + size) > SOCK_SIZE) { // Если размер данных + полное смещение больше размера сокета, то читаем частями
+      uint16_t part = SOCK_SIZE - ptr; // Сколько есть до конца сокета
+      _read(SOCK_RX_BASE + (SOCK_SIZE * sock) + ptr, buf, part); // Читаем сколько есть от текущего места
+      _read(SOCK_RX_BASE + (SOCK_SIZE * sock), buf + part, size - part); // Читаем оставшееся с самого начала буфера
+    }//if
+    else 
+      _read(SOCK_RX_BASE + (SOCK_SIZE * sock) + ptr, buf, size); // Читаем целиком
+  }//if buf    
+  
+  // Обновить указатель RX_RD
+  // Пишем в RX_RD (SOCK_RX_READ_PTR_REG) новый указатель (старый + сколько прочли). big-endian htons!
+  _write_reg(SOCK_2_ADDR(sock, SOCK_RX_READ_PTR_REG), htons(ptr + size), 2); 
+
+  // Отправить команду RECV
+  _sock_cmd(sock, SOCK_CMD_RECEIVE);
+  return size;
+ }// _sock_read
+
+  
+// Побыстрому читаем 1 байт из буфера приема сокета. SPI должен быть уже настроен (beginTranscation)
+ uint8_t _sock_read(const int8_t sock){
+  uint8_t res;
+  _sock_read(sock, &res, 1);
+  return res;
+ }//_sock_read
+  
+  
+
  
- // Еще чтение из сокета надо!!!!!!!!!!!!!!!!!!
+ // Очистить буфер приема сокета. SPI должен быть уже настроен (beginTranscation)
+ void _sock_flush(const int8_t sock){
+  uint16_t size = _sock_available(sock);
+  if(!size) return; // Пусто. Ничего чистить не надо
+  SPI.beginTransaction(SPI_CONFIG);
+  _sock_read(sock, (uint8_t*)NULL, size);
+  SPI.endTransaction();
+ }// _sock_flush
+
  
 
  // ---- DHCP ----
@@ -486,6 +563,15 @@ namespace W5500Lite {
  } dhcpPktBegin;
 
 
+// Блок IP-адресов в dhcp-пакете
+typedef struct {
+  uint32_t ciaddr; // Адрес клиента (при обновлении адреса)
+  uint32_t yiaddr; // Предложенный сервером новый адрес клиента
+  uint32_t siaddr; // Адрес следующего сервера в цепочке сереров
+  uint32_t giaddr; // Адрес агента ретрансляции
+ } dhcpPktIP;
+
+
 // Опции DHCP-пакета
 typedef struct {
   uint8_t code; // Код опции
@@ -494,26 +580,184 @@ typedef struct {
  } dhcpPktOption;
  
 
+// Заголовок UDP 
+typedef struct {
+  uint32_t remoteIP; // IP адрес источника
+  uint16_t remotePort; // Порт источника
+  uint16_t dataSize; // Размер полезной нагрузки пакета
+ } dhcpUdpHdr;
+
+
+
  // Разобрать ответ DHCP-сервера. Возвращает тип сообщения. Если таймаут: 255. Если все плохо: 0. Применяет полученные настройки
- uint8_t _dhcp_parse(){
+ // Принимает параметры обмена в структура data)
+ uint8_t _dhcp_parse(const DHCPData data){
+  uint8_t buf[16]; // Рабочий буфер
+  memset(buf, 0, sizeof(buf)); // Обнуляем
+  uint8_t msg_type = 0; // Тип пришедшего от DHCP-сервера сообщения 
+  uint16_t r_size; // Количество полученных байт в буфере сокета
+
+  // Ждем ответа до таймаута
   uint32_t t_start = millis();
-  /*
-  while(ждем пакета){ // Ждем ответа до таймаута
-    if((millis() - t_start) > DHCP_RESP_TIMEOUT) return DHCP_MSG_TIMEOUT;
+  while(!(r_size = _sock_available(data.sock))){ 
+    if((millis() - t_start) > DHCP_RESP_TIMEOUT_MS) return DHCP_MSG_TIMEOUT;
     delay(50);
   }//while
-  */
-  // Читаем DHCP заголоок
-  // Проверяем id транзакции и всякие BOOTREPLY
-  // получаем минимальные данные
-  // Разгребаем опции
+
+#ifdef DBG_PRINT_READ_SOCK  
+  Serial.print("RSR: ");
+  Serial.println(r_size); 
+#endif  
+  SPI.beginTransaction(SPI_CONFIG);
+
+  // Читаем udp-заголовок
+  dhcpUdpHdr *hdr = (dhcpUdpHdr*)buf; // совмещаем структуру заголовка с буфером
+  _sock_read(data.sock, buf, sizeof(dhcpUdpHdr)); 
+  
+#ifdef DBG_PRINT_READ_SOCK  
+  Serial.print("Remote IP: ");
+  _print_ip(Serial, hdr->remoteIP);
+  Serial.println(); 
+  Serial.print("Remote Port: ");
+  Serial.println(htons(hdr->remotePort)); // big-endian htons! В реальной работе, константа уже сконвертирована. htons не надо
+  Serial.print("Data Size: ");
+  Serial.println(htons(hdr->dataSize)); // big-endian htons! 
+  Serial.println("--------------");  
+#endif
+
+  // Проверяем порт сервера
+  if(hdr->remotePort != DHCP_SERVER_PORT){
+    _sock_flush(data.sock);
+    return 0;
+  }//if
+
+#ifdef DBG_PRINT_READ_SOCK  
+  Serial.println("Remote port is ok.");
+#endif  
+
+  // Читаем DHCP заголовок
+  dhcpPktBegin *pkt = (dhcpPktBegin*)buf; // совмещаем структуру с буфером
+  _sock_read(data.sock, buf, sizeof(dhcpPktBegin)); 
+
+
+#ifdef DBG_PRINT_READ_SOCK  
+  Serial.print("Op: ");
+  Serial.println(pkt->op); 
+  Serial.print("hType: ");
+  Serial.println(pkt->hType);
+  Serial.print("hLen: ");
+  Serial.println(pkt->hLen);
+  Serial.print("hops: ");
+  Serial.println(pkt->hops);
+  Serial.print("trID: 0x");
+  Serial.println(htonl(pkt->id), HEX); //big-endian htonl!  В реальной работе, константа уже сконвертирована. htons не надо
+  Serial.print("Seconds: ");
+  Serial.println(htons(pkt->secs)); //big-endian htons! В реальной работе, константа уже сконвертирована. htons не надо
+  Serial.print("Flags: 0x");
+  Serial.println(htons(pkt->flags), HEX); //big-endian htons! В реальной работе, константа уже сконвертирована. htons не надо
+  Serial.println("--------------");
+#endif
+
+/*  
+#ifdef DBG_PRINT_READ_SOCK
+  for(uint8_t i = 0; i < sizeof(dhcpPktBegin); i++){
+     Serial.print(i);
+     Serial.print(" -> 0x");
+     //Serial.print(" 0x");
+     Serial.println(buf[i], HEX);
+     //Serial.print(buf[i], HEX);
+   }
+   Serial.println("------\n");
+#endif
+*/
+  // Проверяем id транзакции и BOOTREPLY
+  if((pkt->op != DHCP_PKT_OP_BOOTREPLY) || (pkt->id != data.trans_id)){
+     _sock_flush(data.sock);
+     return 0;
+  }//if
+  
+#ifdef DBG_PRINT_READ_SOCK  
+  Serial.println("op and id is ok.");
+#endif  
+
+  // Получаем предложенный сервером IP
+  dhcpPktIP *ip = (dhcpPktIP*)buf; // совмещаем структуру заголовка с буфером
+  _sock_read(data.sock, buf, sizeof(dhcpPktIP)); 
+  localIP = ip->yiaddr;
+  
+  
+#ifdef DBG_PRINT_READ_SOCK  
+  Serial.print("Local IP: ");
+  _print_ip(Serial, localIP);
+  Serial.println(); 
+  Serial.print("ciaddr: ");
+  _print_ip(Serial, ip->ciaddr);
+  Serial.println(); 
+  Serial.print("yiaddr: ");
+  _print_ip(Serial, ip->yiaddr);
+  Serial.println(); 
+  Serial.print("siaddr: ");
+  _print_ip(Serial, ip->siaddr);
+  Serial.println(); 
+  Serial.print("giaddr: ");
+  _print_ip(Serial, ip->giaddr);
+  Serial.println(); 
+  Serial.println("--------------");  
+#endif
+
+  // Проматываем до магической куки. 16 байт mac + 64 байта sname + 128 байт BOOTP = 208 байт 
+  _sock_read(data.sock, (uint8_t*)NULL, 208); 
+
+  // Читаем Магическую куку
+  _sock_read(data.sock, buf, 4); 
+  if(*(uint32_t*)buf != DHCP_PKT_MAGIC_COOKIE){
+    _sock_flush(data.sock);
+   return 0;
+  }//if
+
+#ifdef DBG_PRINT_READ_SOCK  
+  Serial.println("Magic cookie is ok.");
+#endif  
+
+  // Вынуть подсеть, gateway, IP-DHCP сервера !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //uint32_t netMask = 0;           // Маска подсети
+  //uint32_t gwIP    = 0;           // Адрес шлюза
+  // uint32_t dhcpIP  = 0xFFFFFFFF;  // Адрес сервера (в начале броадкаст 255.255.255.255)
+
+  // Разгребаем опции 
+  uint8_t opt_size = 0; // Длина опции
+  while(_sock_available(data.sock)){
+    switch(_sock_read(data.sock)){ // Читаем тип опции и смотрим, что делать дальше
+      case DHCP_PKT_OPTION_END: // Конец опций
+        _sock_flush(data.sock); // Очищаем буфер
+        Serial.println("Option end");
+      break;      
+
+      case DHCP_PKT_OPTION_MSG_TYPE: // Тип сообщения DHCP (DHCP_MSG_)
+        _sock_read(data.sock); // Читаем и выкидываем длину. Она тут всегда = 1
+        msg_type = _sock_read(data.sock);
+        Serial.print("MSG Type: 0x");
+        Serial.println(msg_type);
+      break;
+      
+      default:  // Необслуживаемая опция
+        opt_size = _sock_read(data.sock); // Длина опции
+        _sock_read(data.sock, (uint8_t*)NULL, opt_size); // Просто проматываем
+      break;
+    }//switch
+  }//while
+
+  // Очищаем, что осталось в буфере
+  _sock_flush(data.sock);
   /*
    * Скип - это примерно так
    *  opt_len = _dhcpUdpSocket.read();
    *  _dhcpUdpSocket.read((uint8_t *)NULL, opt_len);
    *
   */
-  return 0;
+  SPI.endTransaction();
+  //return 0;
+  return msg_type; //!!!!!!!!!!!!!!!!!!!!!!!!!!
  }//_dhcp_parse
 
 
@@ -542,7 +786,7 @@ typedef struct {
   _write_reg(SOCK_2_ADDR(data.sock, SOCK_DST_PORT_REG), DHCP_SERVER_PORT, 2); // В регистр целевого порта - порт (2 байта). big-endian htons! 
 
   // Заполняем поля
-  pkt -> op = DHCP_PKT_OP;
+  pkt -> op = DHCP_PKT_OP_BOOTREQUEST;
   pkt -> hType = DHCP_PKT_HTYPE;
   pkt -> hLen = DHCP_PKT_HLEN;
   //pkt -> hops; не надо. и так = 0
@@ -623,7 +867,7 @@ typedef struct {
   Serial.println(data.trans_id);
   
   data.t_start = millis(); // Время начала запросов
-  while((state != LEASED) && ((millis() - data.t_start) < DHCP_TIMEOUT)){ // Крутимся пока не получим настройки или не выйдет таймаут
+  while((state != LEASED) && ((millis() - data.t_start) < DHCP_TIMEOUT_MS)){ // Крутимся пока не получим настройки или не выйдет таймаут
     switch(state){
       case START: 
         //Отправляем запрос DISCOVER
@@ -641,7 +885,11 @@ typedef struct {
       case DISCOVER: 
         // Разбираем ответ
         // Если mesType OFFER, то опять отправляем запрос REQUEST
-        state = REQUEST;
+        res = _dhcp_parse(data);
+        Serial.println("_dhcp_parse: ");
+        Serial.println(res);
+        if(res) state = REQUEST;//!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //state = REQUEST;
       break;
 
       case REQUEST: 
