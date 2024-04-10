@@ -17,6 +17,8 @@
   Исключение - адреса, которые передаются отдельной командой и их конвертацией занимается SPI.
 */ 
 
+// DHCP - около 4Kb
+
 // ---- Hardware ----
 #define MR_REG          0x0000 // Регистр режима (8)
 #define GW_REG          0x0001 // Регистр адреса шлюза (4)
@@ -29,8 +31,16 @@
 #define PHYCFG_REG      0x002E // Регистр конфигурации среды бит 0: 1 подключено, 0 выключено, бит 1: 1 - 100м/б, 0 - 10м/б, бит 3: 1-дуплекс, 0 - полудуплекс
 #define VERSION_REG     0x0039 // Регистр версии чипа (для W5500 должен быть = 4)
 
+#define VERSION_VAL     0x04   // Версия чипа (для W5500 должна быть = 4)
 
 // ---- Socket ----
+#define SOCK_NUM      0x08   // Количество сокетов
+#define SOCK_SIZE     2048   // Размер буфера сокета 
+#define SOCK_REG_SIZE 0x0100 // Размер блока регистров сокета
+#define SOCK_BASE     0x1000 // Базовое смещение для блоков регистров сокетов
+#define SOCK_TX_BASE  0x8000 // Базовое смещение для области данных сокета для отправки
+#define SOCK_RX_BASE  0xC000 // Базовое смещение для области данных сокета для приема
+
 #define SOCK_MODE_REG         0x0000 // Регистр(смещение в блоке регистров) режима сокета
 #define SOCK_CMD_REG          0x0001 // Регистр(смещение в блоке регистров) команды сокета
 #define SOCK_INTERRUPT_REG    0x0002 // Регистр(смещение в блоке регистров) прерывания сокета
@@ -38,6 +48,8 @@
 #define SOCK_SRC_PORT_REG     0x0004 // Регистр(смещение в блоке регистров) исходного порта
 #define SOCK_DST_IP_REG       0x000C // Регистр(смещение в блоке регистров) целевого IP-адреса
 #define SOCK_DST_PORT_REG     0x0010 // Регистр(смещение в блоке регистров) целевого порта
+#define SOCK_PROTO_REG        0x0014 // Регистр(смещение в блоке регистров) протокола (используется в режиме IP_RAW)
+#define SOCK_TTL_REG          0x0016 // Регистр(смещение в блоке регистров) TTL
 #define SOCK_RX_BUF_SIZE_REG  0x001E // Регистр(смещение в блоке регистров) размера буфера на прием 
 #define SOCK_TX_BUF_SIZE_REG  0x001F // Регистр(смещение в блоке регистров) размера буфера на передачу
 #define SOCK_TX_FREE_REG      0x0020 // Регистр(смещение в блоке регистров) свободного места в буфере отправки сокета 
@@ -46,16 +58,7 @@
 #define SOCK_RX_READ_SIZE_REG 0x0026 // Регистр(смещение в блоке регистров) количества принятых байт в буфере приема сокета
 #define SOCK_RX_READ_PTR_REG  0x0028 // Регистр(смещение в блоке регистров) указателя чтения в буфере приема сокета
 
-#define VERSION_VAL   0x04   // Версия чипа (для W5500 должна быть = 4)
-#define SOCK_NUM      0x08   // Количество сокетов
-#define SOCK_SIZE     2048   // Размер буфера сокета 
-#define SOCK_REG_SIZE 0x0100 // Размер блока регистров сокета
-#define SOCK_BASE     0x1000 // Базовое смещение для блоков регистров сокетов
-#define SOCK_TX_BASE  0x8000 // Базовое смещение для области данных сокета для отправки
-#define SOCK_RX_BASE  0xC000 // Базовое смещение для области данных сокета для приема
-
-
-// Протоколы
+// Протоколы 
 #define PROTO_IP            0x00
 #define PROTO_ICMP          0x01
 #define PROTO_IGMP          0x02
@@ -112,7 +115,7 @@
 #define SOCK_STAT_MACRAW       0x42
 #define SOCK_STAT_PPPOE        0x5F
   
-#define SOCK_2_ADDR(n, offs) (SOCK_BASE + n * SOCK_REG_SIZE + offs) // Получает полный адрес по номеру сокета (n - номер сокета)
+#define SOCK_2_ADDR(n, offs) (SOCK_BASE + (n) * SOCK_REG_SIZE + (offs)) // Получает полный адрес по номеру сокета (n - номер сокета)
 
 
 // ---- DHCP ----
@@ -144,24 +147,30 @@
 // Коды опций DHCP-пакета
 #define DHCP_PKT_OPTION_SUBNET   0x01 // 01  - Маска подсети
 #define DHCP_PKT_OPTION_GATEWAY  0x03 // 03  - Адрес шлюза
-//...............................................................
 #define DHCP_PKT_OPTION_REQ_IP   0x32 // 50  - Запрашиваемый IP адрес
 #define DHCP_PKT_OPTION_MSG_TYPE 0x35 // 53  - Тип сообщения DHCP
 #define DHCP_PKT_OPTION_DHCP_IP  0x36 // 54  - Адрес сервера DHCP
 #define DHCP_PKT_OPTION_END      0xFF // 255 - Признак конца опций
+
+
+// ---- ICMP ----
+#define PING_TIMEOUT_MS 1000 // Таймаут для пинга (1с)
+
+// Типы ICMP пакетов
+#define ICMP_TYPE_REPLY   0 // Ответ
+#define ICMP_TYPE_REQUEST 8 // Запрос 
   
 // Первый байт в 16-битном слове будет старшим
-#define htons(x) ((((uint16_t)x & 0xFF00) >> 8) | ((uint16_t)x & 0xFF) << 8)
+#define htons(x) ((((uint16_t)(x) & 0xFF00) >> 8) | ((uint16_t)(x) & 0xFF) << 8)
 
 // Первый байт в 16-битном слове будет младшим
 #define ntohs(x) htons(x)
 
 // Первый байт в 32-битном слове будет старшим
-#define htonl(x) ((((uint32_t)x & 0xFF000000) >> 24) | (((uint32_t)x & 0x00FF0000) >> 8) | (((uint32_t)x & 0x0000FF00) << 8) | (((uint32_t)x & 0x000000FF) << 24))
+#define htonl(x) ((((uint32_t)(x) & 0xFF000000) >> 24) | (((uint32_t)(x) & 0x00FF0000) >> 8) | (((uint32_t)(x) & 0x0000FF00) << 8) | (((uint32_t)(x) & 0x000000FF) << 24))
 
 // Первый байт в 32-битном слове будет младшим
 #define ntohl(x) htonl(x)
-
 
 
 namespace W5500Lite {
@@ -252,8 +261,7 @@ namespace W5500Lite {
   SPI.transfer16(addr); // Адрес отдаем старшим байтом вперед (transfer16 делает это сам)
   SPI.transfer(ctrl); // Байт управления
   // Т.к. SPI затрет данные буфера при передаче, то будем передавать побайтно
-  // SPI.transfer(buf, size) ;
-  for(uint16_t i = 0; i < size; i++) SPI.transfer(buf[i]);
+  for(uint16_t i = 0; i < size; i++) SPI.transfer(buf[i]); //SPI.transfer(buf, size) ;
   digitalWrite(CS_PIN, HIGH); // Отпускаем CS 
   return size; 
  }//_write
@@ -324,17 +332,16 @@ namespace W5500Lite {
  }//_is_link_on
 
 
- // ---- Сокеты ----
 
+ // ---- Сокеты ----
  // Отправить сокету команду 
  void _sock_cmd(const uint8_t sock_num, const uint8_t sock_cmd){
   _write_reg(SOCK_2_ADDR(sock_num, SOCK_CMD_REG), sock_cmd);
   while(_read_reg(SOCK_2_ADDR(sock_num, SOCK_CMD_REG)));
  }//_sock_cmd
 
-
- // Открыть сокет (вернет номер или -1 если не нашел свободного. Сам закрывать не пыается)
- int8_t _sock_open(const uint8_t mode, const uint16_t port){
+ // Открыть сокет (вернет номер или -1 если не нашел свободного. Сам закрывать не пыается)  
+ int8_t _sock_open(const uint8_t mode, const uint16_t port, const uint8_t proto = 0){
   SPI.beginTransaction(SPI_CONFIG);
   for(int8_t sock = 0; sock < SOCK_NUM; sock++){ // Ищем свободнй сокет
     if(_read_reg(SOCK_2_ADDR(sock, SOCK_STATUS_REG)) == SOCK_STAT_CLOSED){ // Читаем статус. Свободен ли
@@ -342,6 +349,7 @@ namespace W5500Lite {
       _write_reg(SOCK_2_ADDR(sock, SOCK_MODE_REG), mode); // В регистр режима пишем режим работы сокета
       _write_reg(SOCK_2_ADDR(sock, SOCK_INTERRUPT_REG), 0xFF); // В регистр прерываний пишем 0xFF
       _write_reg(SOCK_2_ADDR(sock, SOCK_SRC_PORT_REG), port, 2); // В регистр исходного порта - порт (2 байта). Помним про htons в константе.
+      if(mode == SOCK_MODE_IPRAW) _write_reg(SOCK_2_ADDR(sock, SOCK_PROTO_REG), proto); // В регистр протокола пишем только если IP_RAW
       _sock_cmd(sock, SOCK_CMD_OPEN); // Даем команду на открытие сокета
       SPI.endTransaction();
       return sock;
@@ -529,8 +537,9 @@ typedef struct {
 typedef struct {
   uint8_t code; // Код опции
   uint8_t len;  // Длина области даных опции
-  uint8_t data[];  // Данные опции
- } dhcpPktOption;
+  uint8_t data; // Данные опции
+  uint8_t align;
+ } dhcpPktOptionByte;
 
 // Опциия DHCP-пакета содержащая IP-адрес
 typedef struct {
@@ -546,7 +555,6 @@ typedef struct {
   uint16_t remotePort; // Порт источника
   uint16_t dataSize; // Размер полезной нагрузки пакета
  } dhcpUdpHdr;
-
 
 
  // Разобрать ответ DHCP-сервера. Возвращает тип сообщения. Если таймаут: 255. Если все плохо: 0. Применяет полученные настройки
@@ -619,8 +627,9 @@ typedef struct {
       break;      
 
       case DHCP_PKT_OPTION_MSG_TYPE: // Тип сообщения DHCP (DHCP_MSG_)
-        _sock_read(data.sock); // Читаем и выкидываем длину. Она тут всегда = 1
+        opt_size = _sock_read(data.sock); // Читаем и выкидываем длину. Она тут всегда = 1
         msg_type = _sock_read(data.sock);
+        _sock_read(data.sock, (uint8_t*)NULL, opt_size - 1); // Подчищаем
       break;
 
       case DHCP_PKT_OPTION_DHCP_IP: // DHCP-сервер
@@ -701,12 +710,12 @@ typedef struct {
   // Опции. На discover надо опцию поиска сервера. (53 со значением 1), а на REQUEST 53 со значением 3 
   memset(buf, 0, sizeof(buf)); // Обнуляем
   uint8_t opt_offs = 0; // Смещение в буфере для опций
-  dhcpPktOption *opt = (dhcpPktOption*)&(buf[opt_offs]); // совмещаем структуру опции с началом буфера
+  dhcpPktOptionByte *opt = (dhcpPktOptionByte*)&(buf[opt_offs]); // совмещаем структуру опции с началом буфера
   opt -> code = DHCP_PKT_OPTION_MSG_TYPE; // Опция типа сообщения 
   opt -> len = 0x01; // Длина опции
-  opt -> data[0] = msg_type; // DHCP_MSG_DISCOVER или DHCP_MSG_REQUEST
-  //opt -> data[1] = 0; // Выравнивание тут и так ноль  
-  opt_offs += 4; // 4 байта на эту опцию
+  opt -> data = msg_type; // DHCP_MSG_DISCOVER или DHCP_MSG_REQUEST
+  //opt -> align = 0; // Выравнивание тут и так ноль  
+  opt_offs += sizeof(dhcpPktOptionByte); // 4 байта на эту опцию
 
   // Для REQUEST-а надо еще добавить опции нашего ip и ip сервера
   if(msg_type == DHCP_MSG_REQUEST){
@@ -715,13 +724,13 @@ typedef struct {
     addr_opt -> code = DHCP_PKT_OPTION_REQ_IP; // Запрашиваемый IP
     addr_opt -> len = 0x04; // 4 байта
     addr_opt -> ip = localIP; // Наш адрес
-    opt_offs += sizeof(dhcpPktOptionIP); // Длина опции 
+    opt_offs += sizeof(dhcpPktOptionIP); // Длина опции 6
 
     addr_opt = (dhcpPktOptionIP*)&(buf[opt_offs]); // совмещаем структуру опции с началом буфера  
     addr_opt -> code = DHCP_PKT_OPTION_DHCP_IP; // Адрес DHCP-сервера
     addr_opt -> len = 0x04; // 4 байта
     addr_opt -> ip = dhcpIP; // Адрес DHCP сервера
-    opt_offs += sizeof(dhcpPktOptionIP); // Длина опции    
+    opt_offs += sizeof(dhcpPktOptionIP); // Длина опции 6    
   }//if
   
   buf[opt_offs] = DHCP_PKT_OPTION_END; // Ставим признак конца опций
@@ -729,7 +738,7 @@ typedef struct {
   _sock_write(data.sock, offset, buf, opt_offs); 
     
   SPI.endTransaction();
-
+  
   // Отправляем
   return _sock_send(data.sock);    
  }//_dhcp_send
@@ -737,6 +746,7 @@ typedef struct {
  
  // Получить (и установить) настройки через dhcp. Вернуть 0 если облом.
  // Получение однократное. Без продления и использования времени аренды.
+ // Пишет в SRC_IP_REG полученный IP в случае удачи
 /* 
   Результаты пишем в глобальные 
   uint32_t localIP
@@ -784,8 +794,172 @@ typedef struct {
 
   // Закрываем сокет
   _sock_close(data.sock);
+
+  // Прописываем полученный IP
+  if(res == DHCP_MSG_ACK) _write_reg(SRC_IP_REG, localIP, 4); // Прописываем полученный IP
+  
   return res; // Возвращаем результат
  }//_dhcp_request
+
+
+
+// ---- ICMP ----
+ // ICMP-пакет
+ typedef struct {
+  uint8_t  type; // Тип пакета (8 - запрос, 0 - ответ)
+  uint8_t  code; // Код пакета (0 для запроса и ответа)
+  uint16_t cSum; // Контрольная сумма пакета
+  uint16_t id;   // Идентификатор пакета
+  uint16_t seq;  // Порядковый номер пакета
+ } icmpPkt;
+
+
+ // Считаем контрольную сумму для ICMP
+ uint16_t _icmp_cSum(uint8_t * data, uint16_t size){
+  uint32_t sum = 0;
+  // Считаем арифметическую сумму по словам
+  while(size >= 2){
+    sum += ((uint16_t)*data << 8) | *(data + 1);
+    data += 2;
+    size -= 2;
+  }//while
+
+  // Если длина буфера нечетная (после цикла осталось > 0), дополняем нулем
+  if(size) sum += (uint16_t)*data << 8;
+
+  // Пока сумма не влезет в 2 байта, складываем старшее слово с младшим
+  while(sum >> 16) sum = (sum & 0xFFFF) + (sum >> 16);
+
+  // Конвертируем в big-endian и берем дополнение
+  return ~htons((uint16_t)sum);
+ } //_icmp_cSum
+
+ 
+ // Отправляет пинг на заданный адрес и ждет ответа до PING_TIMEOUT_MS. Возвращает -1, если ошибки. Иначе возаращает время в ms.
+ // Если был таймаут, то возвращает PING_TIMEOUT_MS
+ // Свой IP и MAC уже прописаны в устройство. mac - init-ом, а ip - dhcp_request-ом
+ // * dst_ip - адрес, на который отправляем запросы
+ // * seq - номер последовательности
+ // * ttl - возвращает TTL
+ int16_t _ping(const uint32_t dst_ip, const uint16_t seq, uint16_t &ttl){
+  int8_t sock = _sock_open(SOCK_MODE_IPRAW, 0, PROTO_ICMP);
+  if(sock < 0) return -1; // Нет свободных сокетов
+
+  // Готовим ICMP запрос
+  SPI.beginTransaction(SPI_CONFIG);
+  _write_reg(SOCK_2_ADDR(sock, SOCK_DST_IP_REG), dst_ip, 4); // Регистр целевого IP
+  _write_reg(SOCK_2_ADDR(sock, SOCK_DST_PORT_REG), 0, 2); // Регистр целевого порта - 0
+  _write_reg(SOCK_2_ADDR(sock, SOCK_TTL_REG), 128); // Регистр TTL
+
+  icmpPkt pkt;
+  pkt.type = ICMP_TYPE_REQUEST; // Тип пакета
+  pkt.code = 0; // Код для запроса и ответа = 0
+  pkt.cSum = 0; // Контольная сумма должна быть сброшена перед рассчетом
+  pkt.id = 1;
+  pkt.seq = htons(seq); //big-endian htons!
+  pkt.cSum = _icmp_cSum((uint8_t*)&pkt, sizeof(pkt)); 
+  _sock_write(sock, 0, (uint8_t*)&pkt, sizeof(pkt)); 
+  SPI.endTransaction();
+
+  // Отправляем
+  if(! _sock_send(sock)) return -1;
+
+  // Ждем ответа до таймаута
+  uint16_t r_size; // Количество полученных байт в буфере сокета
+  uint32_t t_start = millis();
+  while(!(r_size = _sock_available(sock))){ 
+    if((millis() - t_start) > PING_TIMEOUT_MS) return PING_TIMEOUT_MS;
+  }//while
+  
+  Serial.print("r_size: ");
+  Serial.println(r_size);
+  
+  // Разбираем пришедший пакет
+  uint32_t remoteIP;
+  SPI.beginTransaction(SPI_CONFIG);
+
+  // Проверяем адрес, с которого пришел ответ
+  _sock_read(sock, (uint8_t*)&remoteIP, 4); 
+  Serial.print("remoteIP: ");
+  _print_ip(Serial, remoteIP);
+  Serial.println();
+  if(remoteIP != dst_ip){ // Не с того IP пришел пакет
+    _sock_flush(sock);
+    return -1;
+  }//if
+
+  // Проматываем лишнее (2 байта)
+  _sock_read(sock, (uint8_t*)NULL, 2);
+
+  // Читаем ICMP-пакет
+  _sock_read(sock, (uint8_t*)&pkt, sizeof(pkt));
+
+  Serial.print("Type: ");
+  Serial.println(pkt.type);
+  
+  Serial.print("Code: ");
+  Serial.println(pkt.code);
+  
+  Serial.print("ChkSum: ");
+  Serial.println(pkt.cSum, HEX);
+
+  Serial.print("id: ");
+  Serial.println(pkt.id);
+
+  Serial.print("seq: ");
+  Serial.println(pkt.seq);
+
+  uint16_t sum = pkt.cSum;
+  pkt.cSum = 0;
+  if(sum != _icmp_cSum((uint8_t*)&pkt, sizeof(pkt))){ // Не та контрольная сумма
+    Serial.print("Wrong sum: 0x");
+    Serial.print(_icmp_cSum((uint8_t*)&pkt, sizeof(pkt)), HEX);
+    Serial.print(" need: 0x");
+    Serial.println(sum, HEX);
+    _sock_flush(sock);
+    return -1;
+  }//if
+
+  if(pkt.type != ICMP_TYPE_REPLY){ // Не тот тип
+    _sock_flush(sock);
+    return -1;
+  }//if
+
+  if(pkt.code){ // код должен быть == 0
+    _sock_flush(sock);
+    return -1;
+  }//if
+
+  if(pkt.seq != seq){ // Не тот номер последовательности
+    _sock_flush(sock);
+    return -1;
+  }//if
+
+  /*
+   *  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
+   *  Закрывать сокет при всех выходах
+   *  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
+  * Тут еще закончить разбор. В том числе получить TTL
+  * Проверить пинг вне своей подсети
+  * Не забыть изменять seq снаружи
+  * 
+  * 
+  */
+/*
+  Serial.println("-------------");
+  for(uint8_t i = 0; i < sizeof(buf); i++){
+    Serial.print(" 0x");
+    Serial.print(buf[i], HEX);
+  }   
+  Serial.println("\n-------------");
+*/  
+  SPI.endTransaction();
+  
+  // Закрываем сокет
+  _sock_close(sock);
+
+  return (int16_t)(millis() - t_start);
+ }// _ping
  
 } //namespace
 
@@ -806,8 +980,36 @@ void plgW5500Lite(){
 
   Serial.print("Init: ");
   Serial.println(_init());
+  
   Serial.print("DHCP: ");
   Serial.println(_dhcp_request());
+  Serial.print("IP: ");
+  _print_ip(Serial, localIP);
+  Serial.print("\nMask: ");
+  _print_ip(Serial, netMask);
+  Serial.print("\nGateway: ");
+  _print_ip(Serial, gwIP);
+  Serial.print("\nDHCP: ");
+  _print_ip(Serial, dhcpIP);
+  Serial.println();
+
+
+  uint32_t pingIP = 0x150010AC;
+  //uint32_t pingIP = 0xF2FFFF05; // 5.255.255.242
+   _print_ip(Serial, pingIP);
+  Serial.println();
+  uint16_t seq = 0;
+  uint16_t ttl = 0;
+  //int16_t time_ms = _ping(gwIP, seq, ttl); //0x150010AC
+  int16_t time_ms = _ping(pingIP, seq, ttl); //0x150010AC - 172.16.0.21
+
+  Serial.print("Ping seq: ");
+  Serial.println(seq);
+  Serial.print("Ping ttl: ");
+  Serial.println(ttl);
+  Serial.print("Ping time: ");
+  Serial.println(time_ms);
+  
 
 /*
   Ethernet.init(CS_PIN); //только ставит CS и все
