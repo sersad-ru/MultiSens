@@ -340,6 +340,7 @@ namespace W5500Lite {
   while(_read_reg(SOCK_2_ADDR(sock_num, SOCK_CMD_REG)));
  }//_sock_cmd
 
+
  // Открыть сокет (вернет номер или -1 если не нашел свободного. Сам закрывать не пыается)  
  int8_t _sock_open(const uint8_t mode, const uint16_t port, const uint8_t proto = 0){
   SPI.beginTransaction(SPI_CONFIG);
@@ -557,8 +558,9 @@ typedef struct {
  } dhcpUdpHdr;
 
 
- // Разобрать ответ DHCP-сервера. Возвращает тип сообщения. Если таймаут: 255. Если все плохо: 0. Применяет полученные настройки
- // Принимает параметры обмена в структура data)
+ // Разобрать ответ DHCP-сервера. Возвращает тип сообщения. Если таймаут: 255. Если все плохо: 0. 
+ // Устанавливает глобальные netMask, gwIP, dhcpIP и localIP в случае удачи.
+ // Принимает параметры обмена в структура data
  uint8_t _dhcp_parse(const DHCPData data){
   uint8_t buf[16]; // Рабочий буфер
   memset(buf, 0, sizeof(buf)); // Обнуляем
@@ -746,7 +748,8 @@ typedef struct {
  
  // Получить (и установить) настройки через dhcp. Вернуть 0 если облом.
  // Получение однократное. Без продления и использования времени аренды.
- // Пишет в SRC_IP_REG полученный IP в случае удачи
+ // Пишет в SRC_IP_REG полученный IP в случае удачи, а так же маску и шлюз MSK_REG и GW_REG
+
 /* 
   Результаты пишем в глобальные 
   uint32_t localIP
@@ -795,8 +798,12 @@ typedef struct {
   // Закрываем сокет
   _sock_close(data.sock);
 
-  // Прописываем полученный IP
-  if(res == DHCP_MSG_ACK) _write_reg(SRC_IP_REG, localIP, 4); // Прописываем полученный IP
+  // Прописываем полученный IP, маску и шлюз
+  if(res == DHCP_MSG_ACK){
+    _write_reg(SRC_IP_REG, localIP, 4); // Прописываем полученный IP
+    _write_reg(GW_REG, gwIP, 4); // Прописываем полученный шлюз
+    _write_reg(MSK_REG, netMask, 4); // Прописываем полученную маску
+  }//if
   
   return res; // Возвращаем результат
  }//_dhcp_request
@@ -835,13 +842,13 @@ typedef struct {
  } //_icmp_cSum
 
  
- // Отправляет пинг на заданный адрес и ждет ответа до PING_TIMEOUT_MS. Возвращает -1, если ошибки. Иначе возаращает время в ms.
- // Если был таймаут, то возвращает PING_TIMEOUT_MS
+ // Отправляет пинг на заданный адрес и ждет ответа до PING_TIMEOUT_MS. Возвращает -1, если ошибки. Иначе возаращает время в us!.
+ // Если был таймаут, то возвращает PING_TIMEOUT_MS * 1000
  // Свой IP и MAC уже прописаны в устройство. mac - init-ом, а ip - dhcp_request-ом
  // * dst_ip - адрес, на который отправляем запросы
  // * seq - номер последовательности
  // * ttl - возвращает TTL
- int16_t _ping(const uint32_t dst_ip, const uint16_t seq, uint16_t &ttl){
+ int32_t _ping(const uint32_t dst_ip, const uint16_t seq, uint8_t &ttl){
   int8_t sock = _sock_open(SOCK_MODE_IPRAW, 0, PROTO_ICMP);
   if(sock < 0) return -1; // Нет свободных сокетов
 
@@ -862,17 +869,28 @@ typedef struct {
   SPI.endTransaction();
 
   // Отправляем
-  if(! _sock_send(sock)) return -1;
+  if(! _sock_send(sock)){ 
+    _sock_close(sock);
+    return -1;
+  }//if
 
   // Ждем ответа до таймаута
   uint16_t r_size; // Количество полученных байт в буфере сокета
-  uint32_t t_start = millis();
+  //uint32_t t_start = millis();
+  uint32_t t_start = micros();
   while(!(r_size = _sock_available(sock))){ 
-    if((millis() - t_start) > PING_TIMEOUT_MS) return PING_TIMEOUT_MS;
+/*    
+    if((millis() - t_start) > PING_TIMEOUT_MS){ 
+      _sock_close(sock);
+      return PING_TIMEOUT_MS;
+    }//if   
+*/    
+    if((micros() - t_start) > ((uint32_t)PING_TIMEOUT_MS) * 1000){ 
+      _sock_close(sock);
+      return ((int32_t)PING_TIMEOUT_MS) * 1000;
+    }//if
+
   }//while
-  
-  Serial.print("r_size: ");
-  Serial.println(r_size);
   
   // Разбираем пришедший пакет
   uint32_t remoteIP;
@@ -880,11 +898,9 @@ typedef struct {
 
   // Проверяем адрес, с которого пришел ответ
   _sock_read(sock, (uint8_t*)&remoteIP, 4); 
-  Serial.print("remoteIP: ");
-  _print_ip(Serial, remoteIP);
-  Serial.println();
   if(remoteIP != dst_ip){ // Не с того IP пришел пакет
     _sock_flush(sock);
+    _sock_close(sock);
     return -1;
   }//if
 
@@ -894,71 +910,40 @@ typedef struct {
   // Читаем ICMP-пакет
   _sock_read(sock, (uint8_t*)&pkt, sizeof(pkt));
 
-  Serial.print("Type: ");
-  Serial.println(pkt.type);
-  
-  Serial.print("Code: ");
-  Serial.println(pkt.code);
-  
-  Serial.print("ChkSum: ");
-  Serial.println(pkt.cSum, HEX);
-
-  Serial.print("id: ");
-  Serial.println(pkt.id);
-
-  Serial.print("seq: ");
-  Serial.println(pkt.seq);
-
   uint16_t sum = pkt.cSum;
   pkt.cSum = 0;
   if(sum != _icmp_cSum((uint8_t*)&pkt, sizeof(pkt))){ // Не та контрольная сумма
-    Serial.print("Wrong sum: 0x");
-    Serial.print(_icmp_cSum((uint8_t*)&pkt, sizeof(pkt)), HEX);
-    Serial.print(" need: 0x");
-    Serial.println(sum, HEX);
     _sock_flush(sock);
+    _sock_close(sock);
     return -1;
   }//if
 
   if(pkt.type != ICMP_TYPE_REPLY){ // Не тот тип
     _sock_flush(sock);
+    _sock_close(sock);
     return -1;
   }//if
 
   if(pkt.code){ // код должен быть == 0
     _sock_flush(sock);
+    _sock_close(sock);
     return -1;
   }//if
 
-  if(pkt.seq != seq){ // Не тот номер последовательности
+  if(pkt.seq != htons(seq)){ // Не тот номер последовательности //big-endian htons!
     _sock_flush(sock);
+    _sock_close(sock);
     return -1;
   }//if
 
-  /*
-   *  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
-   *  Закрывать сокет при всех выходах
-   *  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
-  * Тут еще закончить разбор. В том числе получить TTL
-  * Проверить пинг вне своей подсети
-  * Не забыть изменять seq снаружи
-  * 
-  * 
-  */
-/*
-  Serial.println("-------------");
-  for(uint8_t i = 0; i < sizeof(buf); i++){
-    Serial.print(" 0x");
-    Serial.print(buf[i], HEX);
-  }   
-  Serial.println("\n-------------");
-*/  
-  SPI.endTransaction();
+  // Читаем TTL
+  ttl = _read_reg(SOCK_2_ADDR(sock, SOCK_TTL_REG));
   
-  // Закрываем сокет
-  _sock_close(sock);
+  SPI.endTransaction();  
+  _sock_close(sock);// Закрываем сокет
 
-  return (int16_t)(millis() - t_start);
+  //return (int16_t)(millis() - t_start);
+  return (int32_t)(micros() - t_start);
  }// _ping
  
 } //namespace
@@ -968,7 +953,7 @@ using namespace W5500Lite;
 
 
 /*
- * Ну и может быть пингование гейтвея
+ * Подчистить по пингам и сделать юзерскую интерфейсную часть!!!!!!!!!!!!!!!!!!!!!!!!!
 */
 
 
@@ -994,21 +979,34 @@ void plgW5500Lite(){
   Serial.println();
 
 
-  uint32_t pingIP = 0x150010AC;
+  //uint32_t pingIP = 0x150010AC;
+  uint32_t pingIP = 0x0100A8C0; // 192.168.0.1
   //uint32_t pingIP = 0xF2FFFF05; // 5.255.255.242
    _print_ip(Serial, pingIP);
   Serial.println();
-  uint16_t seq = 0;
-  uint16_t ttl = 0;
+  
+  uint8_t ttl = 0;
+  uint32_t time_us;
   //int16_t time_ms = _ping(gwIP, seq, ttl); //0x150010AC
-  int16_t time_ms = _ping(pingIP, seq, ttl); //0x150010AC - 172.16.0.21
-
+/*  
+  time_ms = _ping(pingIP, 0, ttl); //0x150010AC - 172.16.0.21
   Serial.print("Ping seq: ");
   Serial.println(seq);
   Serial.print("Ping ttl: ");
   Serial.println(ttl);
   Serial.print("Ping time: ");
   Serial.println(time_ms);
+*/  
+  for(uint8_t seq = 1; seq <= 4; seq ++){
+    time_us = _ping(pingIP, seq, ttl);
+    Serial.print(seq);
+    Serial.print(" ");
+    Serial.print(ttl);
+    Serial.print(" ");
+    Serial.println(time_us);
+    delay(500);
+  }//for
+
   
 
 /*
