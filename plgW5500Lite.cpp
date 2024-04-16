@@ -17,7 +17,7 @@
   Исключение - адреса, которые передаются отдельной командой и их конвертацией занимается SPI.
 */ 
 
-// DHCP - около 4Kb
+// DHCP - около 4Kb, DHCP + Ping ~ 5Kb
 
 // ---- Hardware ----
 #define MR_REG          0x0000 // Регистр режима (8)
@@ -334,7 +334,7 @@ namespace W5500Lite {
 
 
  // ---- Сокеты ----
- // Отправить сокету команду 
+ // Отправить сокету команду. SPI должен быть уже настроен (beginTranscation)
  void _sock_cmd(const uint8_t sock_num, const uint8_t sock_cmd){
   _write_reg(SOCK_2_ADDR(sock_num, SOCK_CMD_REG), sock_cmd);
   while(_read_reg(SOCK_2_ADDR(sock_num, SOCK_CMD_REG)));
@@ -482,7 +482,7 @@ namespace W5500Lite {
  }//_sock_read
   
    
- // Очистить буфер приема сокета. SPI должен быть уже настроен (beginTranscation)
+ // Очистить буфер приема сокета.
  void _sock_flush(const int8_t sock){
   uint16_t size = _sock_available(sock);
   if(!size) return; // Пусто. Ничего чистить не надо
@@ -748,15 +748,8 @@ typedef struct {
  
  // Получить (и установить) настройки через dhcp. Вернуть 0 если облом.
  // Получение однократное. Без продления и использования времени аренды.
- // Пишет в SRC_IP_REG полученный IP в случае удачи, а так же маску и шлюз MSK_REG и GW_REG
-
-/* 
-  Результаты пишем в глобальные 
-  uint32_t localIP
-  uint32_t netMask
-  uint32_t gwIP  
-  uint32_t dhcpIP
-*/  
+ // Пишет в SRC_IP_REG полученный IP в случае удачи, а так же маску и шлюз в MSK_REG и GW_REG 
+ // и глобальные localIP, netMask, gwIP, dhcpIP
  uint8_t _dhcp_request(){
   uint8_t res = 0; 
   DHCPState state = START;
@@ -876,20 +869,12 @@ typedef struct {
 
   // Ждем ответа до таймаута
   uint16_t r_size; // Количество полученных байт в буфере сокета
-  //uint32_t t_start = millis();
   uint32_t t_start = micros();
   while(!(r_size = _sock_available(sock))){ 
-/*    
-    if((millis() - t_start) > PING_TIMEOUT_MS){ 
-      _sock_close(sock);
-      return PING_TIMEOUT_MS;
-    }//if   
-*/    
     if((micros() - t_start) > ((uint32_t)PING_TIMEOUT_MS) * 1000){ 
       _sock_close(sock);
       return ((int32_t)PING_TIMEOUT_MS) * 1000;
     }//if
-
   }//while
   
   // Разбираем пришедший пакет
@@ -942,10 +927,15 @@ typedef struct {
   SPI.endTransaction();  
   _sock_close(sock);// Закрываем сокет
 
-  //return (int16_t)(millis() - t_start);
   return (int32_t)(micros() - t_start);
  }// _ping
- 
+
+ const char MSG_INIT_ERROR[]   PROGMEM = "** Init error **";
+ const char MSG_NO_LINK[]      PROGMEM = "** No link **";
+ const char MSG_DHCP_ERROR[]   PROGMEM = "** DHCP error **";
+ const char MSG_PING_ERROR[]   PROGMEM = "** Ping error **";
+ const char MSG_PING_TIMEOUT[] PROGMEM = "** Ping timeout **";
+
 } //namespace
 
 
@@ -953,7 +943,15 @@ using namespace W5500Lite;
 
 
 /*
- * Подчистить по пингам и сделать юзерскую интерфейсную часть!!!!!!!!!!!!!!!!!!!!!!!!!
+ * Сделать юзерскую интерфейсную часть!!!!!!!!!!!!!!!!!!!!!!!!!
+ * Инитимся
+ * Проверяем наличие линка. Если линка нету - пишем, что нету
+ * Если линк появлился - запускаем DHCP
+ * Если DHCP не отработал - пишем и ждем пока не пропадет и вновь не появится линк
+ * Если DHCP отработал - выводим IP и позволяем скроллить кнопками вверх и вниз на маску, шлюз и dhcp-сервер
+ * По нажатию select - запускаем пинг на шлюз до ресета или пропадания линка
+ * Выводим ошибку пинга (если не идет), таймаут или задержку до сотых ms. 
+ * Пауза между пингами 1 секунда
 */
 
 
@@ -961,11 +959,25 @@ using namespace W5500Lite;
 void plgW5500Lite(){
   // Init
   SPI.begin();
+  core.moveCursor(0, 1);
+
+  // Init harwdare
+  if(!_init()){
+    Serial.println(FF(MSG_INIT_ERROR));
+    core.println(FF(MSG_INIT_ERROR));
+    while(1); // wait for reset
+  }//if
 
 
-  Serial.print("Init: ");
-  Serial.println(_init());
+  // Load settings from EEPROM  
+  // Display Init  
+  // Main loop
   
+  while(1){
+    delay(500);
+  }//while
+
+/*  
   Serial.print("DHCP: ");
   Serial.println(_dhcp_request());
   Serial.print("IP: ");
@@ -978,16 +990,18 @@ void plgW5500Lite(){
   _print_ip(Serial, dhcpIP);
   Serial.println();
 
-
+*/
   //uint32_t pingIP = 0x150010AC;
-  uint32_t pingIP = 0x0100A8C0; // 192.168.0.1
-  //uint32_t pingIP = 0xF2FFFF05; // 5.255.255.242
+  //uint32_t pingIP = 0x0100A8C0; // 192.168.0.1
+/*  
+  uint32_t pingIP = 0xF2FFFF05; // 5.255.255.242
    _print_ip(Serial, pingIP);
   Serial.println();
   
   uint8_t ttl = 0;
   uint32_t time_us;
   //int16_t time_ms = _ping(gwIP, seq, ttl); //0x150010AC
+*/  
 /*  
   time_ms = _ping(pingIP, 0, ttl); //0x150010AC - 172.16.0.21
   Serial.print("Ping seq: ");
@@ -997,6 +1011,7 @@ void plgW5500Lite(){
   Serial.print("Ping time: ");
   Serial.println(time_ms);
 */  
+/*
   for(uint8_t seq = 1; seq <= 4; seq ++){
     time_us = _ping(pingIP, seq, ttl);
     Serial.print(seq);
@@ -1006,7 +1021,7 @@ void plgW5500Lite(){
     Serial.println(time_us);
     delay(500);
   }//for
-
+*/
   
 
 /*
@@ -1020,7 +1035,7 @@ void plgW5500Lite(){
   core.println(Ethernet.localIP());
 */
 
-  SPI.beginTransaction(SPI_CONFIG);
+  //SPI.beginTransaction(SPI_CONFIG);
   
   //_write_reg(0x0000, 0xAABBCCDD, 4);01 00 10 AC
   //_write_reg(0x0000, 0x010010AC, 4);
@@ -1040,10 +1055,8 @@ void plgW5500Lite(){
   //_print_ip(Serial, 0x010010AC);
   Serial.println();
 */  
-  SPI.endTransaction();
+  //SPI.endTransaction();
   
-
-
 
   // Load settings from EEPROM 
     
