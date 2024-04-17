@@ -25,32 +25,32 @@ if the sensor works properly or not.
 ## Supported Devices
 Currently MuliSens supports following list of devices:
 
-|Plugin|Description|
-|---|---|
-|[FindPin](docs/FindPin.md)|Displays the `msPin` number of selected wire|
-|[I²CScan](docs/I2CScan.md)|Searches for I²C devices|
-|[DigitalAnalog](docs/DigitalAnalog.md)|Reads one digital and one analog pin|
-|[DigitalRead](docs/DigitalRead.md)|Reads digital pins|
-|[AnalogRead](docs/AnalogRead.md)|Reads analog pins|
-|[PWM](docs/PWM.md)|Creates the PWM signal on pins|
-|[DS18B20](docs/DS18B20.md)|Temperature sensor|
-|[AM2320/DHT22](docs/AM2302.md)|Temperature and Humidity sensor|
-|[AHT20](docs/AHT20.md)|Temperature and Humidity sensor|
-|[BME280](docs/BME280.md)|Temperature, Humidity and Pressure sensor|
-|[BMP280+AHT20](docs/BMP280AHT20.md)|Temperature, Humidity and Pressure module| 
-|[HTU21D](docs/HTU21D.md)|Temperature and Humidity sensor|
-|[iButton](docs/IButton.md)|DS19xx Serial Number reader|
-|[MH-Z19b](docs/MH-Z19.md)|CO₂ concentration sensor|
-|[QRE1113](docs/QRE1113.md)|Infrared distance sensor|
-|[HC-SR04](docs/HC-SR04.md)|Ultrasonic distance sensor|
-|[RC522](docs/RC522.md)|RFID 13.56 MHz Card reader|
-|[RDM6300](docs/RDM6300.md)|RFID 125 kHz Card reader|
-|[ADXL345](docs/ADXL345.md)|3-axes accelerometer|
-|[MPU6050](docs/MPU6050.md)|3-axes accelerometer and gyroscope|
-|[WS2812](docs/WS2812.md)|WS2812b RGB LED|
-|[Servo](docs/Servo.md)|Servo drive|
-|[Stepper](docs/Stepper.md)|Stepper motor|
-|[W5500Lite](docs/W5500Lite.md)|W5500 Lite Ethernet module|
+|Plugin|Description|Activated|
+|---|---|---|
+|[FindPin](docs/FindPin.md)|Displays the `msPin` number of selected wire|Yes|
+|[I²CScan](docs/I2CScan.md)|Searches for I²C devices|Yes|
+|[DigitalAnalog](docs/DigitalAnalog.md)|Reads one digital and one analog pin|Yes|
+|[DigitalRead](docs/DigitalRead.md)|Reads digital pins|Yes|
+|[AnalogRead](docs/AnalogRead.md)|Reads analog pins|Yes|
+|[PWM](docs/PWM.md)|Creates the PWM signal on pins|Yes|
+|[DS18B20](docs/DS18B20.md)|Temperature sensor|Yes|
+|[AM2320/DHT22](docs/AM2302.md)|Temperature and Humidity sensor|Yes|
+|[AHT20](docs/AHT20.md)|Temperature and Humidity sensor|Yes|
+|[BME280](docs/BME280.md)|Temperature, Humidity and Pressure sensor|Yes|
+|[BMP280+AHT20](docs/BMP280AHT20.md)|Temperature, Humidity and Pressure module|Yes|
+|[HTU21D](docs/HTU21D.md)|Temperature and Humidity sensor|Yes|
+|[iButton](docs/IButton.md)|DS19xx Serial Number reader|Yes|
+|[MH-Z19b](docs/MH-Z19.md)|CO₂ concentration sensor|Yes|
+|[QRE1113](docs/QRE1113.md)|Infrared distance sensor|Yes|
+|[HC-SR04](docs/HC-SR04.md)|Ultrasonic distance sensor|Yes|
+|[RC522](docs/RC522.md)|RFID 13.56 MHz Card reader|Yes|
+|[RDM6300](docs/RDM6300.md)|RFID 125 kHz Card reader|Yes|
+|[ADXL345](docs/ADXL345.md)|3-axes accelerometer|Yes|
+|[MPU6050](docs/MPU6050.md)|3-axes accelerometer and gyroscope|Yes|
+|[WS2812](docs/WS2812.md)|WS2812b RGB LED|Yes|
+|[Servo](docs/Servo.md)|Servo drive|Yes|
+|[Stepper](docs/Stepper.md)|Stepper motor|Yes|
+|[W5500Lite](docs/W5500Lite.md)|W5500 Lite Ethernet module|No|
 
 
 ## Hardware
