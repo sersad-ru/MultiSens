@@ -52,6 +52,9 @@ Currently MuliSens supports following list of devices:
 |[Stepper](docs/Stepper.md)|Stepper motor|Yes|
 |[W5500Lite](docs/W5500Lite.md)|W5500 Lite Ethernet module|No|
 
+Due to the memory limit of the hardware you may you can not use all plugins simuatinely. 
+For example, the [W5500Lite](docs/W5500Lite.md) plugin is deactivated by default. 
+See [Plugin activation](#plugin-activation) section to activate/deactivate plugins.
 
 ## Hardware
 <p align="center"><img src="docs/Minimal.jpg"/></p>
