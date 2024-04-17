@@ -26,7 +26,7 @@ if the sensor works properly or not.
 Currently MuliSens supports following list of devices:
 
 |Plugin|Description|Activated|
-|---|---|---|
+|---|---|:---:|
 |[FindPin](docs/FindPin.md)|Displays the `msPin` number of selected wire|Yes|
 |[I²CScan](docs/I2CScan.md)|Searches for I²C devices|Yes|
 |[DigitalAnalog](docs/DigitalAnalog.md)|Reads one digital and one analog pin|Yes|
