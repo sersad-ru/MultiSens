@@ -1,5 +1,5 @@
 # W5500Lite Plugin
-<p align="center"><img src="W5500.png"/></p>
+<p align="center"><img src="W5500Lite.png"/></p>
 
 The W5500Lite plugin requests the network settings (IP, Netmask and Gateway) from a DHCP server.
 
@@ -12,7 +12,7 @@ Results are printed on screen and sends to serial in human readable format.
 
 
 ### Connection
-![WS2812Connection](WS2812-CONN.png)
+![W550LiteConnection](W5500Lite-CONN.png)
 |Sensor Pin|MultiSens Pin|Color|
 |:---:|:---:|:---|
 |GND|GND|Black|
