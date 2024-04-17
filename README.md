@@ -50,6 +50,7 @@ Currently MuliSens supports following list of devices:
 |[WS2812](docs/WS2812.md)|WS2812b RGB LED|
 |[Servo](docs/Servo.md)|Servo drive|
 |[Stepper](docs/Stepper.md)|Stepper motor|
+|[W5500Lite](docs/W5500Lite.md)|W5500 Lite Ethernet module|
 
 
 ## Hardware

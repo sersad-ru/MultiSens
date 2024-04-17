@@ -17,7 +17,7 @@
   Исключение - адреса, которые передаются отдельной командой и их конвертацией занимается SPI.
 */ 
 
-// DHCP - около 4Kb, DHCP + Ping ~ 5Kb
+// DHCP - около 4Kb, DHCP + Ping ~ 6Kb
 
 // ---- Hardware ----
 #define MR_REG          0x0000 // Регистр режима (8)
@@ -930,29 +930,124 @@ typedef struct {
   return (int32_t)(micros() - t_start);
  }// _ping
 
+
+// ---- PLUGIN ----
+
  const char MSG_INIT_ERROR[]   PROGMEM = "** Init error **";
  const char MSG_NO_LINK[]      PROGMEM = "** No link **";
  const char MSG_DHCP_ERROR[]   PROGMEM = "** DHCP error **";
  const char MSG_PING_ERROR[]   PROGMEM = "** Ping error **";
  const char MSG_PING_TIMEOUT[] PROGMEM = "** Ping timeout **";
 
+ // Получаем настройки по DHCP и отображаем их по мере надобности
+ uint8_t _do_dhcp(){
+  if(!_dhcp_request()) return 0; // DHCP не отработал
+  
+  // Сработало. Выводим полученные настройки
+  Serial.print(F("IP: "));
+  _print_ip(Serial, localIP);
+  Serial.print(F("\nMask: "));
+  _print_ip(Serial, netMask);
+  Serial.print(F("\nGateway: "));
+  _print_ip(Serial, gwIP);
+  Serial.print(F("\nDHCP: "));
+  _print_ip(Serial, dhcpIP);
+  Serial.println();
+  
+  int8_t item = 0;
+  while(1){
+    // Выводим текущий показатеть
+    core.moveCursor(0, 1);
+    switch(item){
+      case 0: // IP
+        core.print(F("IP:"));
+        _print_ip(core, localIP);      
+      break;
+
+      case 1: // Mask
+        core.print(F("NM:"));
+        _print_ip(core, netMask);      
+      break;
+
+      case 2: // Gateway
+        core.print(F("GW:"));
+        _print_ip(core, gwIP);      
+      break;
+
+      case 3: // Gateway
+        core.print(F("DH:"));
+        _print_ip(core, dhcpIP);      
+      break;
+      
+      default: break;
+    }//switch
+    core.println(); 
+    
+    switch(core.wait4Button()){
+      case SELECT: 
+      case SELECT_LONG: return _is_link_on()? 1 : 0; // Выходим отсюда и идем пинговать или снова ищем линк
+      
+      case UP:
+      case UP_LONG: item--; break; 
+      
+      case DOWN:
+      case DOWN_LONG: item++; break; 
+      
+      default: break;
+    }//switch        
+    if(item < 0) item = 3;
+    if(item > 3) item = 0;
+  }//while
+ }//_do_dhcp
+
+
+ // Пингуем шлюз до упора
+ void _do_ping(){
+  uint16_t seq = 0;
+  uint8_t ttl = 0;
+  uint32_t time_us;
+  while(1){
+    if(!_is_link_on()) return; // Кабель отвалился
+    core.moveCursor(0, 1);
+    time_us = _ping(gwIP, seq++, ttl); // Пингуем
+    switch(time_us){ 
+      case -1: // Ошибка пинга
+        Serial.println(FF(MSG_PING_ERROR));
+        core.println(FF(MSG_PING_ERROR));
+      break; 
+
+      case (int32_t)PING_TIMEOUT_MS * 1000: // Таймаут
+        Serial.println(FF(MSG_PING_TIMEOUT));
+        core.println(FF(MSG_PING_TIMEOUT));
+      break; 
+
+      default: // Выводим значения
+        _print_ip(Serial, gwIP);
+        Serial.print(F(": seq="));
+        Serial.print(seq);
+        Serial.print(F(" ttl="));
+        Serial.print(ttl);
+        Serial.print(F(" time="));
+        core.printValScale(Serial, time_us, 1000); // 3 знака после запятой
+        Serial.println(F(" ms"));
+
+        core.printValScale(core, time_us / 10, 100); // 2 знака после запятой
+        core.print(F("ms, s="));
+        core.print(seq);
+        core.print(F(" t="));
+        core.println(ttl);
+      break;     
+    }//switch  
+
+    // Пауза по нажатию select
+    if(core.getButton() == SELECT) while(core.wait4Button() != SELECT);
+    delay(1000); 
+  }//while
+ }//_do_ping
 } //namespace
 
 
 using namespace W5500Lite;
-
-
-/*
- * Сделать юзерскую интерфейсную часть!!!!!!!!!!!!!!!!!!!!!!!!!
- * Инитимся
- * Проверяем наличие линка. Если линка нету - пишем, что нету
- * Если линк появлился - запускаем DHCP
- * Если DHCP не отработал - пишем и ждем пока не пропадет и вновь не появится линк
- * Если DHCP отработал - выводим IP и позволяем скроллить кнопками вверх и вниз на маску, шлюз и dhcp-сервер
- * По нажатию select - запускаем пинг на шлюз до ресета или пропадания линка
- * Выводим ошибку пинга (если не идет), таймаут или задержку до сотых ms. 
- * Пауза между пингами 1 секунда
-*/
 
 
 // == Main plugin function ==
@@ -972,98 +1067,28 @@ void plgW5500Lite(){
   // Load settings from EEPROM  
   // Display Init  
   // Main loop
-  
-  while(1){
+  uint8_t no_link_printed = 0; // Флаг того, что сообщение об отсутствии кабеля уже было выведено
+  while(1){  
     delay(500);
-  }//while
+   
+    // Ждем подключения кабеля
+    if(!_is_link_on()){
+      if(!no_link_printed){ // Выводим на экран
+        core.moveCursor(0, 1);
+        Serial.println(FF(MSG_NO_LINK));
+        core.println(FF(MSG_NO_LINK));
+        no_link_printed = 1; // Больше выводить не надо
+      }//if
+      continue; // Идем ждать дальше 
+    }//if
 
-/*  
-  Serial.print("DHCP: ");
-  Serial.println(_dhcp_request());
-  Serial.print("IP: ");
-  _print_ip(Serial, localIP);
-  Serial.print("\nMask: ");
-  _print_ip(Serial, netMask);
-  Serial.print("\nGateway: ");
-  _print_ip(Serial, gwIP);
-  Serial.print("\nDHCP: ");
-  _print_ip(Serial, dhcpIP);
-  Serial.println();
-
-*/
-  //uint32_t pingIP = 0x150010AC;
-  //uint32_t pingIP = 0x0100A8C0; // 192.168.0.1
-/*  
-  uint32_t pingIP = 0xF2FFFF05; // 5.255.255.242
-   _print_ip(Serial, pingIP);
-  Serial.println();
-  
-  uint8_t ttl = 0;
-  uint32_t time_us;
-  //int16_t time_ms = _ping(gwIP, seq, ttl); //0x150010AC
-*/  
-/*  
-  time_ms = _ping(pingIP, 0, ttl); //0x150010AC - 172.16.0.21
-  Serial.print("Ping seq: ");
-  Serial.println(seq);
-  Serial.print("Ping ttl: ");
-  Serial.println(ttl);
-  Serial.print("Ping time: ");
-  Serial.println(time_ms);
-*/  
-/*
-  for(uint8_t seq = 1; seq <= 4; seq ++){
-    time_us = _ping(pingIP, seq, ttl);
-    Serial.print(seq);
-    Serial.print(" ");
-    Serial.print(ttl);
-    Serial.print(" ");
-    Serial.println(time_us);
-    delay(500);
-  }//for
-*/
-  
-
-/*
-  Ethernet.init(CS_PIN); //только ставит CS и все
-  Ethernet.begin(mac, 6000); // инитит чип, прописывает мак и 0 IP, и запускает dhcp и прписывает полученные от него данные  
-
-  if(Ethernet.hardwareStatus() == EthernetNoHardware) Serial.println("No hardware");
-  if(Ethernet.linkStatus() == LinkOFF) Serial.println("No Link");
-  Serial.println(Ethernet.localIP());
-  core.moveCursor(0, 1);
-  core.println(Ethernet.localIP());
-*/
-
-  //SPI.beginTransaction(SPI_CONFIG);
-  
-  //_write_reg(0x0000, 0xAABBCCDD, 4);01 00 10 AC
-  //_write_reg(0x0000, 0x010010AC, 4);
-  //_write_reg(0x0000, 0xAABB, 2);
-  //Serial.println(_read_reg(VERSION_REG), HEX);
-  //Serial.println(_read_reg(PHYCFG_REG), HEX);
-  //Serial.println(_read_reg(0x0001, 4), HEX); // Gateway
-/*
-  uint8_t macc[6];
-  _read(SRC_MAC_REG, macc, 6);
-  core.printHexArray(Serial, macc, 6);
-  Serial.println();
-  
-  uint32_t ip = _read_reg(SRC_IP_REG, 4);
-  Serial.println(ip, HEX);
-  _print_ip(Serial, ip);
-  //_print_ip(Serial, 0x010010AC);
-  Serial.println();
-*/  
-  //SPI.endTransaction();
-  
-
-  // Load settings from EEPROM 
+    // Кабель есть
+    no_link_printed = 0;
     
-  // Display Init
-  
-  // Main loop
-  while(1){
-    delay(500);
+    // Запускаем DHCP клиента и опказываем полученные настройки
+    if(!_do_dhcp()) continue; // DHCP не прошел, опять проверяем соединение 
+
+    // Запускаем пинг на шлюз и пингуем от обрыва связи ли сбороса
+    _do_ping();
   }//while
 }//plgW5500Lite
