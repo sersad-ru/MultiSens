@@ -6,7 +6,7 @@
 * 
 * Connection:
 * GND - GND - black
-* VCC - +5V - red
+* Vs  - +5V - red
 * OUT - P0 - green
 *
 */
