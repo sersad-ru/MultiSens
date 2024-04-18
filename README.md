@@ -153,13 +153,16 @@ section. After that recompile the code and upload it to the board.
 ```c++
 // Registered plugins
 MultiSensPlugin plugins[] = {
-  {&plgFindPin,       "FindPin",          0},  // Active plugin
+
+  // Active plugin
+  {&plgFindPin,       "FindPin",          0},  
   // Active plugin
   {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)}, 
+
   // Inactive plugin
-//  {&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
+  // {&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
   // Inactive plugin 
-//  {&plgAnalogRead,    "AnalogRead",       sizeof(plgAnalogReadCfg)}, 
+  // {&plgAnalogRead,    "AnalogRead",       sizeof(plgAnalogReadCfg)}, 
 
 ...
 

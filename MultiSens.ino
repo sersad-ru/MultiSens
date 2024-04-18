@@ -36,11 +36,13 @@
 #include "plgMPU6050.h"
 #include "plgServo.h"
 #include "plgStepper.h"
+#include "plgTSOP312.h"
 #include "plgW5500Lite.h"
 
 /*
+ * IR-приемник TSOP31236
+ * Энкодер
  * HX711
- * IR-приемник
  * 
 */
 
@@ -70,6 +72,7 @@ MultiSensPlugin plugins[] = {
   {&plgMPU6050,       "MPU6050",          0},
   {&plgServo,         "Servo",            sizeof(plgServoCfg)},
   {&plgStepper,       "Stepper",          sizeof(plgStepperCfg)},
+  {&plgTSOP312,       "TSOP312",          sizeof(plgTSOP312Cfg)},
   
   //{&plgW5500Lite,     "W5500 Lite",       0},  
 }; // 
