@@ -48,7 +48,7 @@
 
 // Registred plugins
 MultiSensPlugin plugins[] = {
-  
+/*  
   {&plgFindPin,       "FindPin",          0},
   {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)}, 
   {&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
@@ -72,6 +72,7 @@ MultiSensPlugin plugins[] = {
   {&plgMPU6050,       "MPU6050",          0},
   {&plgServo,         "Servo",            sizeof(plgServoCfg)},
   {&plgStepper,       "Stepper",          sizeof(plgStepperCfg)},
+*/  
   {&plgTSOP312,       "TSOP312",          sizeof(plgTSOP312Cfg)},
   
   //{&plgW5500Lite,     "W5500 Lite",       0},  
