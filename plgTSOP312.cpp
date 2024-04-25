@@ -22,10 +22,20 @@ namespace TSOP312 {
 
     /*
     * Тут сделать нормальное распознование протокола !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * 
     */
-    
-    if((time > (NEC_ZERO_US - NEC_TIME_DELTA_US)) && (time < (NEC_ZERO_US + NEC_TIME_DELTA_US))) cur_bit = 0;
-    if((time > (NEC_ONE_US - NEC_TIME_DELTA_US)) && (time < (NEC_ONE_US + NEC_TIME_DELTA_US))) cur_bit = 1;
+    switch(time) {
+      case (NEC_ZERO_US - NEC_TIME_DELTA_US) ... (NEC_ZERO_US + NEC_TIME_DELTA_US): // Это 0
+        cur_bit = 0;
+      break; 
+      
+      case (NEC_ONE_US - NEC_TIME_DELTA_US) ... (NEC_ONE_US + NEC_TIME_DELTA_US): // Это 1
+        cur_bit = 1;
+      break; 
+
+      default:
+      break;
+    }//switch
     
     if(cur_bit > 1) return; // Пока тут просто выход
    
