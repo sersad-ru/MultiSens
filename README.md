@@ -102,6 +102,8 @@ Link to the thingverse.
 * Clone this repository.
 * Run Arduino environment, compile the code and upload it to the board.
 
+*Be careful!* This project was developed and tested for `Arduino Uno` board only.
+
 ```bash
 mkdir MultiSens
 cd MultiSens
