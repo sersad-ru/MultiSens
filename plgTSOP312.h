@@ -10,9 +10,9 @@
 * OUT - P0 - green
 *
 */
-
+/*
 struct{
     
 } plgTSOP312Cfg;
-
+*/
 void plgTSOP312();
