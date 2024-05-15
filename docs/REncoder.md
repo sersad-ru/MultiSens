@@ -1,10 +1,10 @@
-# REnc Plugin
-<p align="center"><img src="REnc.png"/></p>
+# REncoder Plugin
+<p align="center"><img src="REncoder.png"/></p>
 
-The REnc plugin...
+The REncoder plugin...
 
 ### Connection
-![REncConnection](REnc-CONN.png)
+![REncoderConnection](REncoder-CONN.png)
 |Sensor Pin|MultiSens Pin|Color|
 |:---:|:---:|:---|
 |GND|GND|Black|

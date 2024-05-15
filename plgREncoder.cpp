@@ -1,18 +1,18 @@
-#include "plgREnc.h"
+#include "plgREncoder.h"
 
 
 #define INPUT_PIN P0
 
 
-namespace REnc {
+namespace REncoder {
 
 } //namespace
 
 
-using namespace REnc;
+using namespace REncoder;
 
 // == Main plugin function ==
-void plgREnc(){
+void plgREncoder(){
   // Init
 
   
@@ -23,4 +23,4 @@ void plgREnc(){
   // Main loop
   while(1){
   }//while
-}//plgREnc
+}//plgREncoder

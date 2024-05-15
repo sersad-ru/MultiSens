@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* The REnc plugin ...
+* The REncoder plugin ...
 *
 * 
 * 
@@ -17,6 +17,6 @@
 /*
 struct{
     
-} plgREncCfg;
+} plgREncoderCfg;
 */
-void plgREnc();
+void plgREncoder();
