@@ -8,7 +8,7 @@ The REnc plugin...
 |Sensor Pin|MultiSens Pin|Color|
 |:---:|:---:|:---|
 |GND|GND|Black|
-|Vs|+5V|Red|
+|5v|+5V|Red|
 |S1|P0|Green|
 |S2|P1|Blue|
 |Key|P2|Yellow|
