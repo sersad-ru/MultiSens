@@ -95,7 +95,7 @@ void plgDigitalRead(){
         core.println(F("INT"));
         Serial.println(F("P0, P1 (Interrup mode.)"));        
         attachInterrupt(digitalPinToInterrupt(INPUT_PIN), _p0_isr, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(INPUT_PULLUP_PIN), _p0_isr, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(INPUT_PULLUP_PIN), _p1_isr, CHANGE);
         continue;
       }//if     
       // delay mode

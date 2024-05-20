@@ -9,10 +9,11 @@
 * Connection:
 * GND - GND - black
 * VCC - +5V - red
-* S1  - P0  - green
-* S2  - P1  - blue
-* Key - P2  - yellow
-
+* Key - P0  - green 
+* S1  - P1  - blue
+* S2  - P2  - yellow 
+*
+*
 */
 /*
 struct{

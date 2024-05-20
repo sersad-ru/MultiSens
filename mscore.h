@@ -106,7 +106,7 @@ public:
   //** Save current cursor position
   void storeCursor();
 
-  //** Restore previously srored cursor position
+  //** Restore previously stored cursor position
   void restoreCursor();
   
   //** Create new symbol from array. Symbols with code from 0 to 2 are available

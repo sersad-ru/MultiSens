@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 /*
-* Micro ФЕР20 Library
+* Micro AHT20 Library
 * 
 * (c)2024 by sersad.ru
 * 
