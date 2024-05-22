@@ -7,7 +7,7 @@
 * In other direction (CCW) the counter decrease. 
 * If the button is pressed, the counter will be resetted to zero.
 *
-* Don't forget to add pull-up resistors if you are using standalone encoder (not the preassembled module). 
+* Don't forget to add pull-up resistors if you are using a standalone encoder (not the preassembled module). 
 * 
 * Results are displayed on the device screen and sends to the serial in human readable format. 
 * 
