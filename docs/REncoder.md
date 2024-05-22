@@ -10,7 +10,7 @@ Results are displayed on the device screen and sends to the serial in human read
 * In other direction (`CCW`) the counter decrease. 
 * If the button is pressed, the counter will be resetted to zero.
 
-**ATTENTION!**  Don't forget to add pull-up resistors if you are using standalone 
+**ATTENTION!**  Don't forget to add pull-up resistors if you are using a standalone 
 encoder (not the preassembled module). 
 
 <p align="center"><img src="REncoder-SCHM.png"/></p>
