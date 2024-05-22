@@ -50,22 +50,31 @@ void plgREncoder(){
   // Load settings from EEPROM 
     
   // Display Init
+  core.moveCursor(0, 1);
+  core.println(F("<NONE> Val: 0"));
 
-/*
-* Сделать нормальный интерфейс. Вывод счетчика и направления вращения. Сброс счетчика в 0 по нажатию кнопки. 
-* Вывод на экран и в порт.
-*/
   // Main loop
   while(1){
     if(btn){ // Кнопка была нажата
-      btn = 0; // Тут еще вывод обнулившегося счетчика
+      btn = 0; 
       counter = 0;
-      Serial.print("BTN: ");      
+      core.moveCursor(0, 1);
+      core.print(F("<BTN>  Val: "));
+      core.println(counter);
+      
+      Serial.print(F("<BTN>  Val: "));      
       Serial.println(counter);
     }//if
+    
     if(!rot) continue; // Если 0 - вращения не было
     counter += rot; 
-    Serial.print((rot > 0)? "CW:  " : "CCW: ");
+    core.moveCursor(0, 1);
+    core.print((rot > 0)? F("<CW> ") : F("<CCW>"));
+    core.print(F("  Val: "));
+    core.println(counter);
+    
+    Serial.print((rot > 0)? F("<CW> ") : F("<CCW>"));
+    Serial.print(F("  Val: "));
     Serial.println(counter);    
     rot = 0;
   }//while

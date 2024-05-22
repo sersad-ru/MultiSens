@@ -2,8 +2,14 @@
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* The REncoder plugin ...
+* The REncoder plugin receives signals from the rotary encoder and displays the rotating direction and the button status. 
+* When encoder rotated clockwise (CW) it increase the counter. 
+* In other direction (CCW) the counter decrease. 
+* If the button is pressed, the counter will be resetted to zero.
 *
+* Don't forget to add pull-up resistors if you are using standalone encoder (not the preassembled module). 
+* 
+* Results are displayed on the device screen and sends to the serial in human readable format. 
 * 
 * 
 * Connection:
