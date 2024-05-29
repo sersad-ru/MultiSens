@@ -3,7 +3,7 @@
 * Arduino Multi Senstor Tester
 * 
 * v.1.0
-* (c)2023 by sersad
+* (c)2023-2024 by sersad
 * 
 * 01.11.2023
 * 11.12.2023
@@ -38,6 +38,7 @@
 #include "plgStepper.h"
 #include "plgTSOP312.h"
 #include "plgREncoder.h"
+#include "plgHX711.h"
 #include "plgW5500Lite.h"
 
 /*
@@ -47,7 +48,7 @@
 
 // Registred plugins
 MultiSensPlugin plugins[] = {
-
+/*
   {&plgFindPin,       "FindPin",          0},
   {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)}, 
   {&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
@@ -72,9 +73,10 @@ MultiSensPlugin plugins[] = {
   {&plgServo,         "Servo",            sizeof(plgServoCfg)},
   {&plgStepper,       "Stepper",          sizeof(plgStepperCfg)},
   {&plgTSOP312,       "TSOP312",          0},
-
+*/
   //{&plgREncoder,      "Encoder",          0}, 
   //{&plgW5500Lite,     "W5500 Lite",       0},  
+  {&plgHX711,         "HX711",          sizeof(plgHX711Cfg)},   
 }; // 
 
 

@@ -52,6 +52,7 @@ Currently MuliSens supports following list of devices:
 |[Stepper](docs/Stepper.md)|Stepper motor|Yes|
 |[TSOP312](docs/TSOP312.md)|TSOP312xx IR receiver|Yes|
 |[REncoder](docs/REncoder.md)|Rotary Encoder|No|
+|[HX711](docs/HX711.md)|Weighing sensor|No|
 |[W5500Lite](docs/W5500Lite.md)|W5500 Lite Ethernet module|No|
 
 Due to the memory limit of the hardware you can not use all plugins simuatinely. 
