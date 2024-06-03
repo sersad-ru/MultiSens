@@ -61,11 +61,6 @@ namespace HX711 {
 
 using namespace HX711;
 
-/*
-* Сделать документацию.
-* Select - выбор нуля
-* вверх и вниз - изменение коэффициента, которым надо добиться точного показания известного веса в граммах 
-*/
 
 // == Main plugin function ==
 void plgHX711(){
@@ -73,7 +68,7 @@ void plgHX711(){
   pinMode(DT_PIN, INPUT);
   pinMode(SCK_PIN, OUTPUT);
   digitalWrite(SCK_PIN, LOW);  
-
+ 
   int32_t tare = _get_tare(); // Фиксация нулевого уровня
   int32_t weight = _get_gramm(tare); // Начальный вес   
   
