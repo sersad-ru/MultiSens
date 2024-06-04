@@ -36,3 +36,44 @@ This function clears the display. All symbols will be erased including hidden co
 void home();
 ```
 This function moves the cursor and scroll the display to the start position [0,0].
+
+
+### Move cursor
+```
+void moveCursor(uint8_t col, uint8_t row);
+```
+This function moves the cursor to the selected position.
+|Prarm|Type|Description|
+|:---:|:---|:---|
+|col|uint8_t|Colum number from **0** to **39**|
+|row|uint8_t|Row number from **0** to **1**|
+
+```
+ moveCursor(0, 1); // Place the cursor to the first symbol of the second line.
+```
+
+
+### Store cursor
+```
+void storeCursor();
+```
+Saves the current cursor position in the internal buffer. Cursor can be restored later 
+with [`restoreCursor`](restore-cursor) function.
+
+
+### Restore cursor
+```
+void restoreCursor();
+```
+Restore previously stored cursor position. See  [`storeCursor`](store-cursor) function.
+
+```
+moveCursor(0, 1); // Place the cursor to the first symbol of the second line.
+storeCursor(); // Store current cursor position
+print("foo"); // Print some text. Current cursor will be at [3, 1]
+restoreCursor(); // Now cursor is back to [0, 1]
+print("bar"); // This text will replace "foo"
+
+```
+
+### Set cursor type
