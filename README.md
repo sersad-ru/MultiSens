@@ -183,3 +183,4 @@ list or order of plugins in this list. To do this hold down the `DOWN` button th
 
 ## Adding plugins
 How to write your own plugin.
+[MultiSens Core API](docs/Core.md)

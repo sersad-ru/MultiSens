@@ -179,13 +179,13 @@ public:
   //* i2c_addr - address of I2C device
   //* reg - register number
   //* val - register value
-  //* reg_size - register size (SIZE_8, SIZE_16, SIZE_24 or SIZE_32 bits). Bit endian (сначала старший)  
+  //* reg_size - register size (SIZE_8, SIZE_16, SIZE_24 or SIZE_32 bits). Big endian (сначала старший)  
   void i2cWriteReg(const uint8_t i2c_addr, const uint8_t reg, const uint32_t val, const MultiSensI2CRegSize reg_size = SIZE_8);// Big endian (сначала старший)
 
   //** Read I2C register
   //* i2c_addr - address of I2C device
   //* reg - register number
-  //* reg_size - register size (SIZE_8, SIZE_16, SIZE_24 or SIZE_32 bits). Bit endian (сначала старший)
+  //* reg_size - register size (SIZE_8, SIZE_16, SIZE_24 or SIZE_32 bits). Big endian (сначала старший)
   uint32_t i2cReadReg(const uint8_t i2c_addr, const uint8_t reg, const MultiSensI2CRegSize reg_size = SIZE_8);// Big endian (сначала старший)
 
   //** Send I2C register address and waits for reading. Wire.read() should be next call 
