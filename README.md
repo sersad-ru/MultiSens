@@ -155,7 +155,7 @@ Due to the memory limit of the hardware you may need to activate/deactivate some
 To do this, open [MultiSens.ino](/MultiSens.ino) and comment required line in plugin registration
 section. After that recompile the code and upload it to the board. 
 
-```c++
+```cpp
 // Registered plugins
 MultiSensPlugin plugins[] = {
 
