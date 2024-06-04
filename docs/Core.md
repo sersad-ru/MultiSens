@@ -1,5 +1,7 @@
 # MultiSens Core API
 
+All functions are available through static `core` object.
+
 ## Table of contents
 * [MultiSens Pins](#multisens-pins)
 * [Screen Functions](#screen-functions)
