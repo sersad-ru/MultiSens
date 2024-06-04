@@ -1,6 +1,6 @@
 # MultiSens Core API
 
-All functions are available through static `core` object.
+All functions are available through the static `core` object.
 
 ## Table of contents
 * [MultiSens Pins](#multisens-pins)
@@ -79,3 +79,6 @@ print("bar"); // This text will replace "foo"
 ```
 
 ### Set cursor type
+
+
+### Print values
