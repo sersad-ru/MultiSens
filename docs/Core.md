@@ -67,7 +67,7 @@ void restoreCursor();
 ```
 Restore previously stored cursor position. See  [`storeCursor`](store-cursor) function.
 
-```python
+```cpp
 moveCursor(0, 1); // Place the cursor to the first symbol of the second line.
 storeCursor(); // Store current cursor position
 print("foo"); // Print some text. Current cursor will be at [3, 1]
