@@ -10,6 +10,7 @@ core.print("Hello World");
 * [MultiSens Pins](#multisens-pins)
 * [Screen Functions](#screen-functions)
 * [String Functions](#string-functions)
+* [I<sup>2<sup>C Utils](#i2c-utils)
 
 ## MuiltSens Pins
 You can up to 8 pins in your plugins according to the following table.
@@ -101,7 +102,7 @@ typedef enum {
 ```
 
 ```cpp
-setCursorType(UNDERLINE);
+setCursorType(UNDERLINE); // Set cursor to underline type
 ```
 
 
@@ -118,3 +119,91 @@ Returns the pointer to the string in the internal buffer with the name of the se
 print(getPinName(P1)); // Prints: "P1"
 print(getPinName(P3)); // Prints: "P3"
 ```
+
+### Get the string aligned to right
+```cpp
+char * rAlign(uint32_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+char * rAlign(int32_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+char * rAlign(uint16_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+char * rAlign(int16_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+char * rAlign(uint8_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+char * rAlign(int8_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
+```
+
+Returns the pointer to the string representation of the `val` paramert in the internal buffer. 
+
+|Prarm|Type|Description|
+|:---:|:---|:---|
+|val|From uint8_t to uint32_t|Any integer value|
+|width|uint8_t|String width from **1** to **32**|
+|fill|char|Leading fill symbol|
+|base|uint8_t|Number base **DEC**, **HEX**, **OCT** or **BIN**|
+
+```cpp
+print(rAlign(42, 5));           // Prints: "   42"
+print(rAlign(-42, 5));          // Prints: "  -42"
+print(rAlign(4242, 5));         // Prints: " 4242"
+print(rAlign(42, 5, '@'));      // Prints: "@@@42"
+print(rAlign(42, 5, ' ', HEX)); // Prints: "   2A"
+```
+
+
+### Print values with fixed decimal point
+```cpp
+void printValScale(Print &p, int32_t value, int16_t scale = 10);
+```
+
+Prints `value` with fixed decimal point to the selected stream.
+For example, if you need to print -25.7, `value` should be **-257** and `scale` should be **10**.
+
+|Prarm|Type|Description|
+|:---:|:---|:---|
+|p|Print|Stream to print to|
+|value|int32_t|Scaled value|
+|scale|int16_t|Scale factor|
+
+```cpp
+printValScale(core, -257);      // Prints: "-25.7" to the device screen
+printValScale(core, 254);       // Prints: "25.4" to the device screen
+printValScale(Serial, 254);     // Prints: "25.4" to the serial
+printValScale(core, 2545);      // Prints: "254.5" to the device screen
+printValScale(core, 2545, 100); // Prints: "25.45" to the device screen
+printValScale(core, 254, 100);  // Prints: "2.54" to the device screen
+```
+
+
+### Print array of bytes in HEX
+```cpp
+void printHexArray(Print &p, uint8_t* arr, const uint8_t arrSize, const char spacer = ':');   
+```
+
+Prints the array of hexadecimal values to the selected stream with the specified separator.
+
+|Prarm|Type|Description|
+|:---:|:---|:---|
+|p|Print|Stream to print to|
+|arr|pointer to uint8_t|Array of bytes|
+|arrSize|uint8_t|Array size|
+|spacer|char|Item separator|
+
+```cpp
+uint8_t arr[] = {0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x00};
+printHexArray(core, arr, 6);      // Prints: "DE:AD:BE:EF:00:00"
+printHexArray(core, arr, 6, '-'); // Prints: "DE-AD-BE-EF-00-00"
+```
+
+
+### Print long interger as array
+```cpp
+void printLongAsArray(Print &p, const uint32_t val, const char spacer = ':');
+```
+
+Prints `val` as array of four bytes to the selected stream using specified separator.
+
+```cpp
+printLongAsArray(core, 0xAABBCCDD);      // Prints: "AA:BB:CC:DD"
+printLongAsArray(core, 0xAABBCCDD, '-'); // Prints: "AA-BB-CC-DD"
+```
+
+
+##I<sup>2<sup>C Utils
