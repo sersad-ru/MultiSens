@@ -206,5 +206,5 @@ printLongAsArray(core, 0xAABBCCDD, '-'); // Prints: "AA-BB-CC-DD"
 ```
 
 
-## I2C Utils
+## I<sup>2</sup>C Utils
 
