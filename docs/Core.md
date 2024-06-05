@@ -54,8 +54,8 @@ void moveCursor(uint8_t col, uint8_t row);
 This function moves the cursor to the selected position.
 |Prarm|Type|Description|
 |:---:|:---|:---|
-|col|uint8_t|Colum number from **0** to **39**|
-|row|uint8_t|Row number from **0** to **1**|
+|col|`uint8_t`|Colum number from **0** to **39**|
+|row|`uint8_t`|Row number from **0** to **1**|
 
 ```cpp
  moveCursor(0, 1); // Place the cursor to the first symbol of the second line.
@@ -120,7 +120,7 @@ print(getPinName(P1)); // Prints: "P1"
 print(getPinName(P3)); // Prints: "P3"
 ```
 
-### Get the string aligned to right
+### Get the string aligned to the right
 ```cpp
 char * rAlign(uint32_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
 char * rAlign(int32_t val, const uint8_t width, const char fill = ' ', uint8_t base = DEC);
@@ -134,10 +134,10 @@ Returns the pointer to the string representation of the `val` paramert in the in
 
 |Prarm|Type|Description|
 |:---:|:---|:---|
-|val|From uint8_t to uint32_t|Any integer value|
-|width|uint8_t|String width from **1** to **32**|
-|fill|char|Leading fill symbol|
-|base|uint8_t|Number base **DEC**, **HEX**, **OCT** or **BIN**|
+|val|From `uint8_t` to `uint32_t`|Any integer value|
+|width|`uint8_t`|String width from **1** to **32**|
+|fill|`char`|Leading fill symbol|
+|base|`uint8_t`|Number base **DEC**, **HEX**, **OCT** or **BIN**|
 
 ```cpp
 print(rAlign(42, 5));           // Prints: "   42"
@@ -158,9 +158,9 @@ For example, if you need to print -25.7, `value` should be **-257** and `scale` 
 
 |Prarm|Type|Description|
 |:---:|:---|:---|
-|p|Print|Stream to print to|
-|value|int32_t|Scaled value|
-|scale|int16_t|Scale factor|
+|p|`Print`|Stream to print to|
+|value|`int32_t`|Scaled value|
+|scale|`int16_t`|Scale factor|
 
 ```cpp
 printValScale(core, -257);      // Prints: "-25.7" to the device screen
@@ -181,10 +181,10 @@ Prints the array of hexadecimal values to the selected stream with the specified
 
 |Prarm|Type|Description|
 |:---:|:---|:---|
-|p|Print|Stream to print to|
-|arr|pointer to uint8_t|Array of bytes|
-|arrSize|uint8_t|Array size|
-|spacer|char|Item separator|
+|p|`Print`|Stream to print to|
+|arr|pointer to `uint8_t`|Array of bytes|
+|arrSize|`uint8_t`|Array size|
+|spacer|`char`|Item separator|
 
 ```cpp
 uint8_t arr[] = {0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x00};
