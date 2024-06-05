@@ -207,3 +207,5 @@ printLongAsArray(core, 0xAABBCCDD, '-'); // Prints: "AA-BB-CC-DD"
 
 
 ##I2C Utils
+
+dd
