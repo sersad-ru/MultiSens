@@ -113,7 +113,7 @@ setCursorType(UNDERLINE);
 char * getPinName(uint8_t pinNumber);
 ```
 
-Returns the pointer to the string in the internal buffer with the name of the selected [pin](muiltsens-pins). 
+Returns the pointer to the string in the internal buffer with the name of the selected [pin](#muiltsens-pins). 
 ```cpp
 print(getPinName(P1)); // Prints: "P1"
 print(getPinName(P3)); // Prints: "P3"
