@@ -10,7 +10,7 @@ core.print("Hello World");
 * [MultiSens Pins](#multisens-pins)
 * [Screen Functions](#screen-functions)
 * [String Functions](#string-functions)
-* [I<sup>2<sup>C Utils](#i2c-utils)
+* [I<sup>2</sup>C Utils](#i2c-utils)
 
 ## MuiltSens Pins
 You can up to 8 pins in your plugins according to the following table.
@@ -206,4 +206,4 @@ printLongAsArray(core, 0xAABBCCDD, '-'); // Prints: "AA-BB-CC-DD"
 ```
 
 
-##I<sup>2<sup>C Utils
+##I<sup>2</sup>C Utils
