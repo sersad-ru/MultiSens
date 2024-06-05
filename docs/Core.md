@@ -2,9 +2,14 @@
 
 All functions are available through the static `core` object.
 
+```cpp
+core.print("Hello World");
+```
+
 ## Table of contents
 * [MultiSens Pins](#multisens-pins)
 * [Screen Functions](#screen-functions)
+* [String Functions](#string-functions)
 
 ## MuiltSens Pins
 You can up to 8 pins in your plugins according to the following table.
@@ -19,6 +24,7 @@ You can up to 8 pins in your plugins according to the following table.
 |P5|Orange|Analog In|
 |P6|Yellow-Black|Analog In, SDA|
 |P7|Gray-Black|Analog In, SCL|
+
 
 
 ## Screen functions
@@ -79,6 +85,35 @@ print("bar"); // This text will replace "foo"
 ```
 
 ### Set cursor type
+```cpp
+void setCursorType(MultiSensCursor ct);
+```
+This function sets display cursor to the specified type.
+Available cursor types are:
+
+```cpp
+typedef enum {
+  OFF,        // No cursor
+  UNDERLINE,  // Underline cursor
+  BLOCK       // Block cursor
+} MultiSensCursor;
+
+```
+
+```cpp
+setCursorType(UNDERLINE);
+```
 
 
-### Print values
+
+## Screen functions
+
+### Get the name of pin
+```cpp
+char * getPinName(uint8_t pinNumber);
+```
+
+Returns the pointer to the string in the internal buffer with the name of selected pin. 
+```cpp
+print(getPinName(P1)); // Prints: "P1"
+```
