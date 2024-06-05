@@ -106,7 +106,7 @@ setCursorType(UNDERLINE);
 
 
 
-## Screen functions
+## String functions
 
 ### Get the name of pin
 ```cpp
