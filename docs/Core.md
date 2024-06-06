@@ -10,6 +10,7 @@ core.print("Hello World");
 * [MultiSens Pins](#multisens-pins)
 * [Screen Functions](#screen-functions)
 * [String Functions](#string-functions)
+* [EEPROM Functions](#eeprom-functions)
 * [I<sup>2</sup>C Utils](#i2c-utils)
 
 ## MuiltSens Pins
@@ -78,10 +79,10 @@ Restore previously stored cursor position. See  [`storeCursor`](store-cursor) fu
 
 ```cpp
 moveCursor(0, 1); // Place the cursor to the first symbol of the second line.
-storeCursor(); // Store current cursor position
-print("foo"); // Print some text. Current cursor will be at [3, 1]
-restoreCursor(); // Now cursor is back to [0, 1]
-print("bar"); // This text will replace "foo"
+storeCursor();    // Store current cursor position
+print("foo");     // Print some text. Current cursor will be at [3, 1]
+restoreCursor();  // Now cursor is back to [0, 1]
+print("bar");     // This text will replace "foo"
 
 ```
 
@@ -154,7 +155,7 @@ void printValScale(Print &p, int32_t value, int16_t scale = 10);
 ```
 
 Prints `value` with fixed decimal point to the selected stream.
-For example, if you need to print -25.7, `value` should be **-257** and `scale` should be **10**.
+For example, if you need to print **-25.7**, `value` should be **-257** and `scale` should be **10**.
 
 |Prarm|Type|Description|
 |:---:|:---|:---|
@@ -203,6 +204,83 @@ Prints `val` as array of four bytes to the selected stream using specified separ
 ```cpp
 printLongAsArray(core, 0xAABBCCDD);      // Prints: "AA:BB:CC:DD"
 printLongAsArray(core, 0xAABBCCDD, '-'); // Prints: "AA-BB-CC-DD"
+```
+
+
+
+## EEPROM functions
+
+### Save settings
+```cpp
+void saveSettings(uint8_t * data);
+```
+
+Saves plugin settings block in `EEPROM`.  This block can be restored using [`loadSettings`](#loadsettings) function.
+The size of the settings block **MUST** be provided in plugin registration process.
+
+|Prarm|Type|Description|
+|:---:|:---|:---|
+|data|pointer to `uint_8t`|Pointer to the settings block|
+                                                        
+```cpp
+// Define the plugin settings block in the plugin header file
+struct{
+  uint8_t value; // Stored value
+} plgMyPluginSettings;
+
+
+// Register the plugin with size of settings block in MultiSens.ino
+MultiSensPlugin plugins[] = {
+  {&plgMyPlugin,  "MyPlugin",  sizeof(plgMyPluginSettings)},
+  ...
+};
+
+// Update stored value
+plgMyPluginSettings.value = 42;
+
+// Save the plugin settings block
+core.saveSettings((uint8_t*)&plgMyPluginSettings);
+```
+
+
+### Load settings
+```cpp
+bool loadSettings(uint8_t * data);
+```
+Loads the plugin settings block from the `EEPROM` previously saved with [`saveSettings`](#savesettings) function.
+The size of the settings block **MUST** be provided in plugin registration process.
+
+|Prarm|Type|Description|
+|:---:|:---|:---|
+|data|pointer to `uint_8t`|Pointer to the settings block|
+
+Function returns **true** if settings was successfully loaded. Otherwise it returns **false**.
+
+```cpp
+// Define the plugin settings block in the plugin header file
+struct{
+  uint8_t value; // Stored value
+} plgMyPluginSettings;
+
+
+// Register the plugin with size of settings block in MultiSens.ino
+MultiSensPlugin plugins[] = {
+  {&plgMyPlugin,  "MyPlugin",  sizeof(plgMyPluginSettings)},
+  ...
+};
+
+// Update stored value
+plgMyPluginSettings.value = 42;
+
+// Save the plugin settings block
+core.saveSettings((uint8_t*)&plgMyPluginSettings);
+
+// Try to load previously stored settings
+if(!core.loadSettings((uint8_t*)&plgMyPluginSettings)){
+    // Settings was not loaded. Use default values.
+}//if  
+// Settings was loaded successfully
+
 ```
 
 
