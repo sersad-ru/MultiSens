@@ -292,5 +292,96 @@ if(!core.loadSettings((uint8_t*)&plgMyPluginSettings)){
 ```
 
 
+
 ## I<sup>2</sup>C Utils
 
+### Write register
+```cpp
+void i2cWriteReg(const uint8_t i2c_addr, const uint8_t reg, const uint32_t val, const MultiSensI2CRegSize reg_size = SIZE_8);
+```
+Writes data to the register of device using I<sup>2</sup>C bus.
+**ATTENTION!** `Wire.begin()` method should be called by plugin before this function.
+
+|Prarm|Type|Description|
+|:---:|:---|:---|
+|i2c_addr|`uint8_t`|Device address on I<sub>2</sup>C bus|
+|reg|`uint8_t`|Register address|
+|val|`uint32_t`|Value|
+|reg_size|`MultiSensI2CRegSize`|Register size. From **SIZE_8** to **SIZE_32**|
+
+
+```cpp
+typedef enum {
+  SIZE_0  = 0,
+  SIZE_8  = 1,
+  SIZE_16 = 2,
+  SIZE_24 = 3,
+  SIZE_32 = 4
+} MultiSensI2CRegSize;
+
+```
+
+```cpp
+Wire.begin();
+...
+core.i2cWriteReg(0x53, 0x2D, 0x08);  // Writes 0x08 to the register number 0x2D on device with address 0x53 
+core.i2cWriteReg(0x53, 0x2D, 0x08AB, SIZE_16);  // Writes 0x08AB to the register number 0x2D on device with address 0x53 
+
+```
+
+
+### Read register
+```cpp
+uint32_t i2cReadReg(const uint8_t i2c_addr, const uint8_t reg, const MultiSensI2CRegSize reg_size = SIZE_8);
+```
+Reads data from the register of device using I<sup>2</sup>C bus.
+**ATTENTION!** `Wire.begin()` method should be called by plugin before this function.
+
+|Prarm|Type|Description|
+|:---:|:---|:---|
+|i2c_addr|`uint8_t`|Device address on I<sub>2</sup>C bus|
+|reg|`uint8_t`|Register address|
+|reg_size|`MultiSensI2CRegSize`|Register size. From **SIZE_8** to **SIZE_32**|
+
+```cpp
+typedef enum {
+  SIZE_0  = 0,
+  SIZE_8  = 1,
+  SIZE_16 = 2,
+  SIZE_24 = 3,
+  SIZE_32 = 4
+} MultiSensI2CRegSize;
+
+```
+
+Function returns the value of the register.
+
+```cpp
+Wire.begin();
+...
+int32_t val = core.i2cReadReg(0x77, 0xFA, SIZE_24); // Reads 24 bit value from register number 0xFA on device with address 0x77
+```
+
+
+### Request bytes from the register
+```cpp
+void i2cRequestRead(const uint8_t i2c_addr, const uint8_t reg, const uint8_t cnt);
+```
+
+Sends register address and request specified number of bytes to be readed. `Wire.read()` method should to be called next to this function.
+
+|Prarm|Type|Description|
+|:---:|:---|:---|
+|i2c_addr|`uint8_t`|Device address on I<sub>2</sup>C bus|
+|reg|`uint8_t`|Register address|
+|cnt|`uint8_t`|Amount of bytes to be read|
+
+```cpp
+uint16_t x, y, z;
+Wire.begin();
+core.i2cRequestRead(0x53, 0x32, 0x06); // Request 6 bytes from the register number 0x32 from the device with address 0x53
+x = Wire.read() | Wire.read() << 8; // Read first 2 bytes of 6
+y = Wire.read() | Wire.read() << 8; // Read next 2 bytes of 6
+z = Wire.read() | Wire.read() << 8; // Read last 2 bytes of 6
+
+```
