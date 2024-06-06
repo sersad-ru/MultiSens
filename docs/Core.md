@@ -9,6 +9,7 @@ core.print("Hello World");
 ## Table of contents
 * [MultiSens Pins](#multisens-pins)
 * [Screen Functions](#screen-functions)
+* [Buttons Functions](#buttons-functions)
 * [String Functions](#string-functions)
 * [EEPROM Functions](#eeprom-functions)
 * [I<sup>2</sup>C Utils](#i2c-utils)
@@ -106,6 +107,27 @@ typedef enum {
 setCursorType(UNDERLINE); // Set cursor to underline type
 ```
 
+
+## Buttons functions
+Buttons function are usefull to react on users input.
+
+### Button codes
+```cpp
+typedef enum {
+  NONE,   // No button was pressed
+  SELECT, // `Select` button
+  UP,     // `UP` button
+  DOWN,   // `DOWN` button
+  LEFT,   // Used internally for screen scrolling 
+  RIGHT,  // Used internally for screen scrolling 
+  SELECT_LONG = SELECT | MS_BTN_LONG_MASK, // `SELECT` button long pressed
+  UP_LONG     = UP     | MS_BTN_LONG_MASK, // `UP` button long pressed
+  DOWN_LONG   = DOWN   | MS_BTN_LONG_MASK, // `DOWN` button long pressed
+  LEFT_LONG   = LEFT   | MS_BTN_LONG_MASK, // Used internally for screen scrolling 
+  RIGHT_LONG  = RIGHT  | MS_BTN_LONG_MASK  // Used internally for screen scrolling 
+} MultiSensButton;
+
+```
 
 
 ## String functions
