@@ -68,14 +68,14 @@ This function moves the cursor to the selected position.
 void storeCursor();
 ```
 Saves the current cursor position in the internal buffer. Cursor can be restored later 
-with [`restoreCursor`](restore-cursor) function.
+with [`restoreCursor`](#restore-cursor) function.
 
 
 ### Restore cursor
 ```cpp
 void restoreCursor();
 ```
-Restore previously stored cursor position. See  [`storeCursor`](store-cursor) function.
+Restore previously stored cursor position. See  [`storeCursor`](#store-cursor) function.
 
 ```cpp
 moveCursor(0, 1); // Place the cursor to the first symbol of the second line.
@@ -215,12 +215,12 @@ printLongAsArray(core, 0xAABBCCDD, '-'); // Prints: "AA-BB-CC-DD"
 void saveSettings(uint8_t * data);
 ```
 
-Saves plugin settings block in `EEPROM`.  This block can be restored using [`loadSettings`](#loadsettings) function.
+Saves plugin settings block in `EEPROM`.  This block can be restored using [`loadSettings`](#load-settings) function.
 The size of the settings block **MUST** be provided in plugin registration process.
 
-**ATTENTION!** If you register new plugin or change the size of the settings block of any 
+**ATTENTION!** If you register new a plugin or change the size of the settings block of any 
 registered plugin you **MUST** clear all settings stored in `EEPROM`. Otherwise you will get
-a wrong values. To do this Hold the `DOWN` button and press `RESET` to clear stored settings of all plugins. 
+a wrong values. To do this hold the `DOWN` button and press `RESET` to clear stored settings of all plugins. 
 
 |Prarm|Type|Description|
 |:---:|:---|:---|
@@ -251,7 +251,7 @@ core.saveSettings((uint8_t*)&plgMyPluginSettings);
 ```cpp
 bool loadSettings(uint8_t * data);
 ```
-Loads the plugin settings block from the `EEPROM` previously saved with [`saveSettings`](#savesettings) function.
+Loads the plugin settings block from the `EEPROM` previously saved with [`saveSettings`](#save-settings) function.
 The size of the settings block **MUST** be provided in plugin registration process.
 
 |Prarm|Type|Description|
@@ -260,9 +260,9 @@ The size of the settings block **MUST** be provided in plugin registration proce
 
 Function returns **true** if settings was successfully loaded. Otherwise it returns **false**.
 
-**ATTENTION!** If you register new plugin or change the size of the settings block of any 
+**ATTENTION!** If you register a new plugin or change the size of the settings block of any 
 registered plugin you **MUST** clear all settings stored in `EEPROM`. Otherwise you will get
-a wrong values. To do this Hold the `DOWN` button and press `RESET` to clear stored settings of all plugins. 
+a wrong values. To do this hold the `DOWN` button and press `RESET` to clear stored settings of all plugins. 
 
 ```cpp
 // Define the plugin settings block in the plugin header file
