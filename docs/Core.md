@@ -109,25 +109,73 @@ setCursorType(UNDERLINE); // Set cursor to underline type
 
 
 ## Buttons functions
-Buttons function are usefull to react on users input.
+Buttons function are usefull to react on users input. There are 6 buttons in device and 3 of them
+are available for plugins. The `SELECT`, `UP` and `DOWN` buttons can be used by plugin. The `LEFT` and `RIGHT` buttons are internally used for screen scrolling. 
+And the `RESET` button is for device reset.
 
 ### Button codes
 ```cpp
 typedef enum {
   NONE,   // No button was pressed
-  SELECT, // `Select` button
-  UP,     // `UP` button
-  DOWN,   // `DOWN` button
+  SELECT, // [Select] button
+  UP,     // [UP] button
+  DOWN,   // [DOWN] button
   LEFT,   // Used internally for screen scrolling 
   RIGHT,  // Used internally for screen scrolling 
-  SELECT_LONG = SELECT | MS_BTN_LONG_MASK, // `SELECT` button long pressed
-  UP_LONG     = UP     | MS_BTN_LONG_MASK, // `UP` button long pressed
-  DOWN_LONG   = DOWN   | MS_BTN_LONG_MASK, // `DOWN` button long pressed
+  SELECT_LONG = SELECT | MS_BTN_LONG_MASK, // [SELECT] button long pressed
+  UP_LONG     = UP     | MS_BTN_LONG_MASK, // [UP] button long pressed
+  DOWN_LONG   = DOWN   | MS_BTN_LONG_MASK, // [DOWN] button long pressed
   LEFT_LONG   = LEFT   | MS_BTN_LONG_MASK, // Used internally for screen scrolling 
   RIGHT_LONG  = RIGHT  | MS_BTN_LONG_MASK  // Used internally for screen scrolling 
 } MultiSensButton;
 
 ```
+
+### Get the button code
+```cpp
+MultiSensButton getButton();
+```
+This function returns the button [code](#button-codes) if it was pressed before.  If not, it returns `NONE`.
+If the button was pressed and still not released function repeats the button code until it will be released.
+
+```cpp
+switch (core.getButton()) { // Check if some button was pressed
+  case UP: 
+    // React on [UP] button one or multiple times if it is still pressed
+  break;
+      
+  case DOWN:
+    // React on [DOWN] button one or multiple times if it is still pressed
+  break;
+        
+  case SELECT_LONG: 
+    // React on [SELECT] button if it was pressed for a long time
+  break;
+      
+  default: break; // Do nothing if no button was pressed
+}//switch
+```
+
+
+### Wait for pressed button
+```cpp
+MultiSensButton wait4Button();
+```
+Waits for pressed button and returns the button [code](#button-codes).
+This function blocks the plugin execution until some button is pressed for a long time or pressed and released for a short.
+
+```cpp
+switch (core.wait4Button()) { // Stop execution and wait for button
+  case UP: 
+    // React on [UP] button
+  break;
+      
+  case DOWN:
+    // React on [DOWN] button
+  break;
+}//switch
+```
+
 
 
 ## String functions
