@@ -136,7 +136,7 @@ typedef enum {
 MultiSensButton getButton();
 ```
 This function returns the button [code](#button-codes) if it was pressed before.  If not, it returns `NONE`.
-If the button was pressed and still not released function repeats the button code until it will be released.
+If the button was pressed and still not released function repeats the button code (4 times per second) until it will be released.
 
 ```cpp
 switch (core.getButton()) { // Check if some button was pressed
@@ -149,7 +149,7 @@ switch (core.getButton()) { // Check if some button was pressed
   break;
         
   case SELECT_LONG: 
-    // React on [SELECT] button if it was pressed for a long time
+    // React on [SELECT] button if it was pressed for a long time (more then 1 second)
   break;
       
   default: break; // Do nothing if no button was pressed
@@ -162,10 +162,10 @@ switch (core.getButton()) { // Check if some button was pressed
 MultiSensButton wait4Button();
 ```
 Waits for pressed button and returns the button [code](#button-codes).
-This function blocks the plugin execution until some button is pressed for a long time or pressed and released for a short.
+This function blocks the plugin execution until some button is pressed for a long time (more than 1 second) or pressed and released for a short time.
 
 ```cpp
-switch (core.wait4Button()) { // Stop execution and wait for button
+switch (core.wait4Button()) { // Stop execution and wait for some button
   case UP: 
     // React on [UP] button
   break;
@@ -374,7 +374,7 @@ Writes data to the register of device using I<sup>2</sup>C bus.
 
 |Prarm|Type|Description|
 |:---:|:---|:---|
-|i2c_addr|`uint8_t`|Device address on I<sub>2</sup>C bus|
+|i2c_addr|`uint8_t`|Device address on I<sup>2</sup>C bus|
 |reg|`uint8_t`|Register address|
 |val|`uint32_t`|Value|
 |reg_size|`MultiSensI2CRegSize`|Register size. From **SIZE_8** to **SIZE_32**|
@@ -412,7 +412,7 @@ Reads data from the register of device using I<sup>2</sup>C bus.
 
 |Prarm|Type|Description|
 |:---:|:---|:---|
-|i2c_addr|`uint8_t`|Device address on I<sub>2</sup>C bus|
+|i2c_addr|`uint8_t`|Device address on I<sup>2</sup>C bus|
 |reg|`uint8_t`|Register address|
 |reg_size|`MultiSensI2CRegSize`|Register size. From **SIZE_8** to **SIZE_32**|
 
@@ -446,7 +446,7 @@ Sends register address and request specified number of bytes to be readed. `Wire
 
 |Prarm|Type|Description|
 |:---:|:---|:---|
-|i2c_addr|`uint8_t`|Device address on I<sub>2</sup>C bus|
+|i2c_addr|`uint8_t`|Device address on I<sup>2</sup>C bus|
 |reg|`uint8_t`|Register address|
 |cnt|`uint8_t`|Amount of bytes to be read|
 
