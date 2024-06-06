@@ -218,6 +218,10 @@ void saveSettings(uint8_t * data);
 Saves plugin settings block in `EEPROM`.  This block can be restored using [`loadSettings`](#loadsettings) function.
 The size of the settings block **MUST** be provided in plugin registration process.
 
+**ATTENTION!** If you register new plugin or change the size of the settings block of any 
+registered plugin you **MUST** clear all settings stored in `EEPROM`. Otherwise you will get
+a wrong values. To do this Hold the `DOWN` button and press `RESET` to clear stored settings of all plugins. 
+
 |Prarm|Type|Description|
 |:---:|:---|:---|
 |data|pointer to `uint_8t`|Pointer to the settings block|
@@ -255,6 +259,10 @@ The size of the settings block **MUST** be provided in plugin registration proce
 |data|pointer to `uint_8t`|Pointer to the settings block|
 
 Function returns **true** if settings was successfully loaded. Otherwise it returns **false**.
+
+**ATTENTION!** If you register new plugin or change the size of the settings block of any 
+registered plugin you **MUST** clear all settings stored in `EEPROM`. Otherwise you will get
+a wrong values. To do this Hold the `DOWN` button and press `RESET` to clear stored settings of all plugins. 
 
 ```cpp
 // Define the plugin settings block in the plugin header file
