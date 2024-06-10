@@ -188,7 +188,7 @@ Maybe you will need to [deactivate](#plugin-activation) some existent plugins to
 You can create your own plugin in 3 steps.
 
 ### Step 1. The plugin header
-First of all choose the plugin name. Plugin files and main function name should start with "plg".  
+First of all choose the plugins name. Plugin files and main function name should start with "plg".  
 For example, `plgSample.h` for plugin named "Sample".
 Let's look into `plgSample.h`.
 ```cpp
@@ -206,8 +206,86 @@ void plgSample();
 ```
 In this file we include standard arduino header `#include <Arduino.h>` and MuiltSens Core header `#include "mscore.h"`.
 Then we add some plugin description in comment and declare the main plugin function `void plgSample();`. 
-This function should no return or take any params. And must never returns. 
-Switching from one plugin to other always going through device reset.
+This function should no return or accept any params and should never terminate. 
+Switching from one plugin to another always occurs through a device reset.
 
+
+### Step 2. The plugin code
+The plugin code must be placed in the `plgSample.cpp` file.
+```cpp
+#include "plgSample.h"
+
+#define INPUT_PIN P0
+#define READ_DELAY_MS 500 // 0.5 seconds between attempt
+
+// == Main plugin function ==
+void plgSample(){
+
+  // Init    
+  pinMode(INPUT_PIN, INPUT);
+  
+  // Dispaly init
+  core.moveCursor(0, 1); // First symbol of second line
+
+  core.print(MS_SYM_SELECT_CODE); // The SELECT button symbol
+  core.println(F("-to start/stop"));
+
+  uint8_t can_read = false; // Read enable flag
+  uint8_t value;
+
+  // Main loop
+  while(1){
+    // Process user input    
+    switch (core.getButton()) {
+      case SELECT: // React on SELECT button
+        can_read = !can_read; // enable/disable reading
+      break; 
+    
+      default: break;
+    }//switch
+
+    if(!can_read) continue; // reading is disabled
+
+    // Read results
+    value = digitalRead(INPUT_PIN);
+
+    // Display results on the screen
+    core.moveCursor(0, 1); // First symbol of second line
+    core.print(F("Value: "));
+    core.println(value);
+
+    // Send results to the Serial
+    Serial.print(F("Value: "));
+    Serial.println(value);
+
+    delay(READ_DELAY_MS); // Delay between attemps
+  }//while
+}//plgSample
+```
+
+First of all, let's add the plugin header `#include "plgSample.h"`.
+Then declare an input pin and a delay between plugin activities.
+```cpp
+#define INPUT_PIN P0
+#define READ_DELAY_MS 500
+```
+
+Next part is the main plugin function.
+This function should no return or accept any params and should never terminate. 
 How to write your own plugin.
+```cpp
+void plgSample(){
+```
+In the init section of this function we should configure plugin pins. `pinMode(INPUT_PIN, INPUT);`
+Then we need to send the welcome message to the display.
+```cpp
+core.moveCursor(0, 1); // First symbol of second line
+
+core.print(MS_SYM_SELECT_CODE); // The SELECT button symbol
+core.println(F("-to start/stop"));
+```
+[`core.moveCursor`](docs/Core.md#move-cursor) function moves the screen cursor to the fisrt position of the second line.
+The first line of the screen always contains current plugin name and is not available for plugins.
+
+
 [MultiSens Core API](docs/Core.md)

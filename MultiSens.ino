@@ -79,7 +79,7 @@ MultiSensPlugin plugins[] = {
   //{&plgW5500Lite,     "W5500 Lite",       0},  
   //{&plgHX711,         "HX711",          sizeof(plgHX711Cfg)},
 
-  {&plgSample,        "Sample Pluing",  0},   
+  {&plgSample,        "Sample Plugin",  0},   
 }; // 
 
 
