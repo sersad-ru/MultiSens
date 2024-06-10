@@ -324,3 +324,27 @@ To send current value of the pin to the Serial we use `Serial.println(value);` f
 
 The last part of the main loop is the delay between attempts `delay(READ_DELAY_MS);`.
 
+
+### Step 3. The plugin activation
+To activate the plugin open [`MultiSens.ino`](/MultiSens.ino) file.
+Then include the plugin header at the end of plugins header list.
+```cpp
+#include "plgSample.h"
+```
+Find the plugins registration section and append the registration record to the list.
+```cpp
+// Registred plugins
+MultiSensPlugin plugins[] = {
+ ...
+  {&plgSample,        "Sample Plugin",  0},   
+};  
+
+```
+The first param of the registration record is the link to the main plugin function.
+The second one is the plugin title. This title will be displayed in the main menu and on the first line of the screen when the plugin is launched.
+The last param is the size of plugins settings block. The Sample plugin use no settings block, so we sets is to **zero**.
+More about settings block and how to store it to the EEPROM see in [`EEPROM Functions`](docs/Core.md#eeprom-functions) section of the [MultiSens Core API](docs/Core.md).
+
+The last thing we need to do is to save [`MultiSens.ino`](/MultiSens.ino), recompile it and send it to the device. 
+
+And of course, pray that we have no errors in the code and that everything works fine. :)
