@@ -7,4 +7,5 @@
 * Press SELECT button to start/stop reading process.
 */
 
+/* The main plugin function declaration */
 void plgSample();

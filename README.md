@@ -190,7 +190,24 @@ You can create your own plugin in 3 steps.
 ### Step 1. The plugin header
 First of all choose the plugin name. Plugin files and main function name should start with "plg".  
 For example, `plgSample.h` for plugin named "Sample".
+Let's look into `plgSample.h`.
+```cpp
+#pragma once
+#include <Arduino.h>
+#include "mscore.h"  // Include the MultiSens Core
 
+/*
+* The Sample plugin reads the digital pin P0 and prints it current state. 
+* Press SELECT button to start/stop reading process.
+*/
+
+/* The main plugin function declaration */
+void plgSample();
+```
+In this file we include standard arduino header `#include <Arduino.h>` and MuiltSens Core header `#include "mscore.h"`.
+Then we add some plugin description in comment and declare the main plugin function `void plgSample();`. 
+This function should no return or take any params. And must never returns. 
+Switching from one plugin to other always going through device reset.
 
 How to write your own plugin.
 [MultiSens Core API](docs/Core.md)
