@@ -284,8 +284,10 @@ core.moveCursor(0, 1); // First symbol of second line
 core.print(MS_SYM_SELECT_CODE); // The SELECT button symbol
 core.println(F("-to start/stop"));
 ```
-[`core.moveCursor`](docs/Core.md#move-cursor) function moves the screen cursor to the fisrt position of the second line.
+The [`core.moveCursor`](docs/Core.md#move-cursor) function moves the screen cursor to the fisrt position of the second line.
 The first line of the screen always contains current plugin name and is not available for plugins.
 
-
+The `core.print` function prints the data at the current cursor position.
+`MS_SYM_SELECT_CODE` is the predefined symbol to display `SELECT` button. Other predefined symbols 
+are in [mscustomsymbols.h](mscustomsymbols.h).
 [MultiSens Core API](docs/Core.md)
