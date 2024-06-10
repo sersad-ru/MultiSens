@@ -290,4 +290,37 @@ The first line of the screen always contains current plugin name and is not avai
 The `core.print` function prints the data at the current cursor position.
 `MS_SYM_SELECT_CODE` is the predefined symbol to display `SELECT` button. Other predefined symbols 
 are in [mscustomsymbols.h](mscustomsymbols.h).
-[MultiSens Core API](docs/Core.md)
+More information about MuitiSens Core functions are in [MultiSens Core API](docs/Core.md).
+
+Next important part is the main infinity cycle.
+```cpp
+// Main loop
+while(1){
+```
+The main plugin function should never terminate. Switching from one plugin to another always occurs through a device reset. So we use an infinity loop.
+In this loop, we firstly check for the user input.
+```cpp
+switch (core.getButton()) {
+  case SELECT: // React on SELECT button
+    can_read = !can_read; // enable/disable reading
+  break; 
+  
+  default: break;
+}//switch
+```
+The [`core.getButton`](docs/Core.md#get-the-button-code) function returns the [`button code`](docs/Core.md#button-codes) if the button was pressed.
+We react on this event by setting or resetting `can_read` flag.
+Next we finish this iteration of the cycle `if(!can_read) continue;` or read and display current pin state.
+```cpp
+// Read results
+value = digitalRead(INPUT_PIN);
+
+// Display results on the screen
+core.moveCursor(0, 1); // First symbol of second line
+core.print(F("Value: "));
+core.println(value);
+```
+To send current value of the pin to the Serial we use `Serial.println(value);` from the standard arnuino library.
+
+The last part of the main loop is the delay between attempts `delay(READ_DELAY_MS);`.
+
