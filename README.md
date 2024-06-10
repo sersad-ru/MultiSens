@@ -211,7 +211,7 @@ Switching from one plugin to another always occurs through a device reset.
 
 
 ### Step 2. The plugin code
-The plugin code must be placed in the [`plgSample.cpp`](/plgSample.cpp) file.
+The plugin code is placed in the [`plgSample.cpp`](/plgSample.cpp) file.
 ```cpp
 #include "plgSample.h"
 
@@ -272,7 +272,6 @@ Then declare an input pin and a delay between plugin activities.
 
 Next part is the main plugin function.
 This function should no return or accept any params and should never terminate. 
-How to write your own plugin.
 ```cpp
 void plgSample(){
 ```
@@ -310,8 +309,10 @@ switch (core.getButton()) {
 ```
 The [`core.getButton`](docs/Core.md#get-the-button-code) function returns the [`button code`](docs/Core.md#button-codes) if the button was pressed.
 We react on this event by setting or resetting `can_read` flag.
-Next we finish this iteration of the cycle `if(!can_read) continue;` or read and display current pin state.
+Next we finish this iteration of the cycle or read and display current pin state.
 ```cpp
+if(!can_read) continue; // reading is disabled
+
 // Read results
 value = digitalRead(INPUT_PIN);
 
@@ -342,8 +343,8 @@ MultiSensPlugin plugins[] = {
 ```
 * The first param of the registration record is the link to the main plugin function `&plgSample`.
 * The second one is the plugin title `"Sample Plugin"`. This title will be displayed in the main menu and on the first line of the screen when the plugin is launched.
-* The last param is the size of plugins settings block. The Sample plugin use no settings block, so we sets is to **zero**.
-More about settings block and how to store it to the EEPROM see in [`EEPROM Functions`](docs/Core.md#eeprom-functions) section of the [MultiSens Core API](docs/Core.md).
+* The last param is the size of plugins settings block. The Sample plugin use no settings block, so we sets it to **zero**.
+More about settings block and how to store it to the `EEPROM` see in [`EEPROM Functions`](docs/Core.md#eeprom-functions) section of the [MultiSens Core API](docs/Core.md).
 
 The last thing we need to do is to save [`MultiSens.ino`](/MultiSens.ino), recompile it and send it to the device. 
 
