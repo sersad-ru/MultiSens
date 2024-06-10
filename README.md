@@ -152,7 +152,7 @@ actions.
 #### Plugin activation
 
 Due to the memory limit of the hardware you may need to activate/deactivate some plugins.
-To do this, open [MultiSens.ino](/MultiSens.ino) and comment required line in plugin registration
+To do this, open [`MultiSens.ino`](/MultiSens.ino) and comment required line in plugin registration
 section. After that recompile the code and upload it to the board. 
 
 ```cpp
@@ -190,7 +190,7 @@ You can create your own plugin in 3 steps.
 ### Step 1. The plugin header
 First of all choose the plugins name. Plugin files and main function name should start with "plg".  
 For example, `plgSample.h` for plugin named "Sample".
-Let's look into `plgSample.h`.
+Let's look into [`plgSample.h`](/plgSample.h).
 ```cpp
 #pragma once
 #include <Arduino.h>
@@ -211,7 +211,7 @@ Switching from one plugin to another always occurs through a device reset.
 
 
 ### Step 2. The plugin code
-The plugin code must be placed in the `plgSample.cpp` file.
+The plugin code must be placed in the [`plgSample.cpp`](/plgSample.cpp) file.
 ```cpp
 #include "plgSample.h"
 
