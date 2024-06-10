@@ -182,5 +182,15 @@ list or order of plugins in this list. To do this hold down the `DOWN` button th
 
 
 ## Adding plugins
+In there are no plugin for your sensor you can create your own plugin and add it to the MultiSens. 
+Maybe you will need to [deactivate](#plugin-activation) some existent plugins to free device memory.
+
+You can create your own plugin in 3 steps.
+
+### Step 1. The plugin header
+First of all choose the plugin name. Plugin files and main function name should start with "plg".  
+For example, `plgSample.h` for plugin named "Sample".
+
+
 How to write your own plugin.
 [MultiSens Core API](docs/Core.md)
