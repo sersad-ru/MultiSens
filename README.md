@@ -340,8 +340,8 @@ MultiSensPlugin plugins[] = {
 };  
 
 ```
-* The first param of the registration record is the link to the main plugin function.
-* The second one is the plugin title. This title will be displayed in the main menu and on the first line of the screen when the plugin is launched.
+* The first param of the registration record is the link to the main plugin function `&plgSample`.
+* The second one is the plugin title `"Sample Plugin"`. This title will be displayed in the main menu and on the first line of the screen when the plugin is launched.
 * The last param is the size of plugins settings block. The Sample plugin use no settings block, so we sets is to **zero**.
 More about settings block and how to store it to the EEPROM see in [`EEPROM Functions`](docs/Core.md#eeprom-functions) section of the [MultiSens Core API](docs/Core.md).
 
