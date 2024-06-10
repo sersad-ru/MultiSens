@@ -331,7 +331,7 @@ Then include the plugin header at the end of plugins header list.
 ```cpp
 #include "plgSample.h"
 ```
-Find the plugins registration section and append the registration record to the list.
+Find the plugins registration section and append the registration record to the end of the list.
 ```cpp
 // Registred plugins
 MultiSensPlugin plugins[] = {
