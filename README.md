@@ -53,6 +53,7 @@ Currently MuliSens supports following list of devices:
 |[TSOP312](docs/TSOP312.md)|TSOP312xx IR receiver|Yes|
 |[REncoder](docs/REncoder.md)|Rotary Encoder|No<sup>*</sup>|
 |[HX711](docs/HX711.md)|Weighing sensor|No<sup>*</sup>|
+|[HC-05/06](docs/HC-06.md)|Bluetooth module|No<sup>*</sup>|
 |[W5500Lite](docs/W5500Lite.md)|W5500 Lite Ethernet module|No<sup>*</sup>|
 
 <sup>*</sup>Due to the memory limit of the hardware you can not use all plugins simuatinely. 

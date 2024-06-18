@@ -1,5 +1,4 @@
-
-  /*
+/*
 * Arduino Multi Senstor Tester
 * 
 * v.1.0
@@ -40,9 +39,11 @@
 #include "plgREncoder.h"
 #include "plgHX711.h"
 #include "plgW5500Lite.h"
+#include "plgHC06.h"
 #include "plgSample.h"
 
 /*
+ * HC-05
  * GPS
  * 
 */
@@ -78,8 +79,9 @@ MultiSensPlugin plugins[] = {
   //{&plgREncoder,      "Encoder",          0}, 
   //{&plgW5500Lite,     "W5500 Lite",       0},  
   //{&plgHX711,         "HX711",          sizeof(plgHX711Cfg)},
+  {&plgHC06,          "HC-05/06",           0},  
 
-  {&plgSample,        "Sample Plugin",  0},   
+  //{&plgSample,        "Sample Plugin",  0},   
 }; // 
 
 
