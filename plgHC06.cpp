@@ -7,7 +7,10 @@
 #define BUF_SIZE 32
 
 namespace HC06 {
-  const char NO_DEV_MSG[] PROGMEM = "No device found";  
+  /*
+ * Переписать под uSST
+*/
+  const char NO_DEV_MSG[] PROGMEM = "No device found";   // Есть в uSST!
   
   // Буфер для чтения строк
   char _buf[BUF_SIZE];
@@ -95,6 +98,7 @@ namespace HC06 {
 }// namespace
 
 /*
+ * Переписать под uSST
  * Протестировать на HC-05
  * 
  * https://f-droid.org/ru/packages/ru.sash0k.bluetooth_terminal/
@@ -126,18 +130,6 @@ void plgHC06(){
   // Dispaly init
   core.moveCursor(0, 1);
   _check_device(ser);
-/*  
-  core.moveCursor(0, 1); // First symbol of second line
-
-  // Пытаемся определить тип устройства
-  if(_try_command(ser, F("AT+VERSION"))){
-  //if(_try_command(ser, F("AT+ADDR?"), "\r\n")){
-  //if(_try_command(ser, F("AT+PSWD?"))){
-    core.println(_buf);
-    Serial.println(_buf);
-  }//if
-  else Serial.println("Timeout");  
-*/
 
   Serial.println(F("Bluetooth serial log:"));
 
@@ -147,6 +139,7 @@ void plgHC06(){
       core.moveCursor(0, 1);
       core.println(_buf);
       Serial.println(_buf);
+      ser.println(_buf);
     }//if
   }//while
 }//plgHC06

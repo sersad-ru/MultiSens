@@ -40,6 +40,7 @@
 #include "plgHX711.h"
 #include "plgW5500Lite.h"
 #include "plgHC06.h"
+#include "plgNEO6MV2.h"
 #include "plgSample.h"
 
 /*
@@ -79,7 +80,8 @@ MultiSensPlugin plugins[] = {
   //{&plgREncoder,      "Encoder",          0}, 
   //{&plgW5500Lite,     "W5500 Lite",       0},  
   //{&plgHX711,         "HX711",          sizeof(plgHX711Cfg)},
-  {&plgHC06,          "HC-05/06",           0},  
+  //{&plgHC06,          "HC-05/06",         0},  
+  {&plgNEO6MV2,       "GY-NEO6MV2",       0},  
 
   //{&plgSample,        "Sample Plugin",  0},   
 }; // 

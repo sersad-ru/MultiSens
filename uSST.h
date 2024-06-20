@@ -1,0 +1,52 @@
+#pragma once
+#include <Arduino.h>
+#include <SoftwareSerial.h>
+/*
+* Micro SoftwareSerial Tools Library
+* 
+* (c)2024 by sersad.ru
+* 
+* 20.06.2024
+* 
+* Минимальные функции для Обработки строк из COM-порта
+* 
+*/
+/* Сообщения при поиске устройства на порту */
+const char uSST_NO_DEV_MSG[]     PROGMEM = "No device found";  
+const char uSST_CONNECTING_MSG[] PROGMEM = "Connecting...";  
+const char uSST_FOUND_MSG[]      PROGMEM = "Found at ";  
+
+// Прототип функции проверки соединения для поиска скорости ком-порта
+//* Возвращает 0 - если соединение не установилось, 1 - если установилось
+//* ser - Ссылка на Software serial
+//* buf - буфер для приема строки
+//* buf_size - размер буфера
+//* timeout_ms - таймаут в ms
+typedef uint8_t (*uSST_ProbeFunction)(const SoftwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
+
+
+//** Читает строку из Serial в буфер до появления /n, /r или таймаута. Отрезает /n, /r. Ставит ноль в конце. 
+//* Возвращает длину строки (включая завершающий ноль) или  0 - если таймаут
+//* ser - Ссылка на Software serial
+//* buf - буфер для приема строки
+//* buf_size - размер буфера
+//* timeout_ms - таймаут в ms
+uint8_t uSST_ReadString(const SoftwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
+
+
+//** Последовательно открыват порт на разных скоростях (от большей к меньшей) и вызывает функцию проверки. 
+//*  Если проверка прошла - возвращает скорость порта. Если ни одной проверка не прошло - возвращает 0.
+//* ser - Ссылка на Software serial
+//* probe - ссылка на функцию проверки соединения (см. typedef выше)
+//* buf - буфер для приема строки
+//* buf_size - размер буфера
+//* timeout_ms - таймаут в ms
+uint32_t uSST_FindSpeed(const SoftwareSerial &ser, uSST_ProbeFunction probe, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
+
+
+//** Ищет n-ое входжение символа в строку. Возвращает индекс или 0, если нужного входжения не найдено 
+//* (Для первого вхождения символа в нулевой позиции работать не будет!).
+//* str - строка
+//* sym - символ
+//* n - номер входжения 
+uint8_t uSST_strchrn(char* str, const char sym, const uint8_t n);
