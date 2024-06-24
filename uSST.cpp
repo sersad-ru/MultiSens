@@ -36,8 +36,8 @@ uint32_t uSST_FindSpeed(const SoftwareSerial &ser, uSST_ProbeFunction probe, cha
 }//uSST_FindSpeed
 
 
-//** Ищет n-ое входжение символа в строку. Возвращает индекс или 0, если нужного входжения не найдено 
-uint8_t uSST_strchrn(char* str, const char sym, const uint8_t n){
+//** Ищет n-ое входжение символа в строку. Возвращает индекс или -1, если нужного входжения не найдено 
+int8_t uSST_strchrn(char* str, const char sym, const uint8_t n){
   uint8_t i = 0;
   uint8_t cnt = 0;
   while(str[i]){ // До финального нуля
@@ -45,5 +45,5 @@ uint8_t uSST_strchrn(char* str, const char sym, const uint8_t n){
     if(cnt == n) return i;
     i++;
   }//while
-  return 0;
+  return -1;
 }//uSST_strchrn

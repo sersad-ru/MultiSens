@@ -44,9 +44,8 @@ uint8_t uSST_ReadString(const SoftwareSerial &ser, char* buf, const uint8_t buf_
 uint32_t uSST_FindSpeed(const SoftwareSerial &ser, uSST_ProbeFunction probe, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
 
 
-//** Ищет n-ое входжение символа в строку. Возвращает индекс или 0, если нужного входжения не найдено 
-//* (Для первого вхождения символа в нулевой позиции работать не будет!).
+//** Ищет n-ое входжение символа в строку. Возвращает индекс или -1, если нужного входжения не найдено 
 //* str - строка
 //* sym - символ
 //* n - номер входжения 
-uint8_t uSST_strchrn(char* str, const char sym, const uint8_t n);
+int8_t uSST_strchrn(char* str, const char sym, const uint8_t n);
