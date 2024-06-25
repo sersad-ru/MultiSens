@@ -19,10 +19,39 @@ uint8_t uSST_ReadString(const SoftwareSerial &ser, char* buf, const uint8_t buf_
   return i;
 }//uSST_ReadString
 
+uint8_t uSST_ReadString(const HardwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms)
+{
+  uint8_t i = 0;
+  uint32_t t_start = millis();
+  while((millis() - t_start) < timeout_ms){
+    while(ser.available()){
+      buf[i] = ser.read();
+      if((buf[i] == 0x0D) || (buf[i] == 0x0A) || (i == (buf_size - 1))){ // Дошли до /n или /r или до конца буфера
+        buf[i] = 0;
+        return i;
+      }//if
+      i++;
+    }//while
+  }//while
+  buf[i] = 0;
+  return i;
+}//uSST_ReadString
+
 
 //** Последовательно открыват порт на разных скоростях (от большей к меньшей) и вызывает функцию проверки. 
 //*  Если проверка прошла - возвращает скорость порта. Если ни одной проверка не прошло - возвращает 0.
-uint32_t uSST_FindSpeed(const SoftwareSerial &ser, uSST_ProbeFunction probe, char* buf, const uint8_t buf_size, const uint32_t timeout_ms){
+uint32_t uSST_FindSpeed(const SoftwareSerial &ser, uSST_ProbeFunction probe, char* buf, const uint8_t buf_size, const uint32_t timeout_ms, const uint32_t guess_speed){
+  // Проверяем соединение на предполагаемой скорости
+  if(guess_speed){
+    ser.begin(guess_speed);
+    if(probe(ser, buf, buf_size, timeout_ms)){
+      ser.end();
+      return guess_speed;
+    }//if
+    ser.end();    
+  }//if
+  
+  //Не подошло. Перебираем все скорости по списку.
   const uint32_t speed[] = {115200, 57600, 38400, 19200, 9600, 4800, 2400, 1200};  
   for(uint8_t i = 0; i < arraySize(speed) - 1; i++){
     ser.begin(speed[i]);

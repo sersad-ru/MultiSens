@@ -1,6 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include <SoftwareSerial.h>
+#include <HardwareSerial.h>
 /*
 * Micro SoftwareSerial Tools Library
 * 
@@ -32,16 +33,19 @@ typedef uint8_t (*uSST_ProbeFunction)(const SoftwareSerial &ser, char* buf, cons
 //* buf_size - размер буфера
 //* timeout_ms - таймаут в ms
 uint8_t uSST_ReadString(const SoftwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
+uint8_t uSST_ReadString(const HardwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
 
 
-//** Последовательно открыват порт на разных скоростях (от большей к меньшей) и вызывает функцию проверки. 
+//** Последовательно открывеат порт на разных скоростях (от большей к меньшей) и вызывает функцию проверки. 
 //*  Если проверка прошла - возвращает скорость порта. Если ни одной проверка не прошло - возвращает 0.
+//*  В первый раз открывает порт на скорости guess_speed (если она не нулевая), а потом уже идет по списку скоростей.
 //* ser - Ссылка на Software serial
 //* probe - ссылка на функцию проверки соединения (см. typedef выше)
 //* buf - буфер для приема строки
 //* buf_size - размер буфера
 //* timeout_ms - таймаут в ms
-uint32_t uSST_FindSpeed(const SoftwareSerial &ser, uSST_ProbeFunction probe, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
+//* guess_speed [0] - предполагаемая скорость. Сначала проверяем на ней, если нет, то тогда уже все по списку.
+uint32_t uSST_FindSpeed(const SoftwareSerial &ser, uSST_ProbeFunction probe, char* buf, const uint8_t buf_size, const uint32_t timeout_ms, const uint32_t guess_speed = 0);
 
 
 //** Ищет n-ое входжение символа в строку. Возвращает индекс или -1, если нужного входжения не найдено 

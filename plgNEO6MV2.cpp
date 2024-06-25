@@ -5,6 +5,7 @@
 
 #define RX_PIN P0
 #define TX_PIN P1
+
 #define TIMEOUT_MS 1000
 #define BUF_SIZE 80
 #define DISPLAY_DELAY_MS 1000
@@ -26,17 +27,17 @@ namespace NEO6MV2 {
     char     dir = '?';  // Направление (N, S, W, E)
   } gpsDegree;
   
-  // GPS-данные 
+  // GPS-данные The
   typedef struct {
     char sys_type[3]  = "??"; // Тип системы GP - GPS, GL - Glonass, GA - Galileo, BD - Beidou, GQ - QZSS, GN - Various
     uint8_t sat_total = 0;    // Количество наблюдаемых спутников 
     uint8_t sat_act = 0;      // Количество активных спутников 
-    uint8_t hours;            // Часы
-    uint8_t minutes;          // Минуты
-    uint8_t seconds;          // Секунды
-    uint8_t day;              // День
-    uint8_t month;            // Месяц
-    uint16_t year;            // Год
+    uint8_t hours = 0;        // Часы
+    uint8_t minutes = 0;      // Минуты
+    uint8_t seconds = 0;      // Секунды
+    uint8_t day = 0;          // День
+    uint8_t month = 0;        // Месяц
+    uint16_t year = 0;        // Год
     char status = '?';        // Достоверность данных 'A'- данные достоверны, 'V' - ошибоные данные     
     gpsDegree lat;            // Широта
     gpsDegree lng;            // Долгота      
@@ -222,7 +223,7 @@ namespace NEO6MV2 {
        p.print(F("GPS"));
        return;
     }//if
-/*    
+
     if(!strncmp(type, "GL", 2)){
        p.print(F("Glonass"));
        return;
@@ -247,7 +248,7 @@ namespace NEO6MV2 {
        p.print(F("Various"));
        return;
     }//if
-*/    
+
     p.print(F("??"));
   }//_print_type
 
@@ -353,10 +354,10 @@ namespace NEO6MV2 {
   }//_display
 }// namespace
 
+
 using namespace NEO6MV2;
 
 /*
- * Добавить быструю проверку на предполагаемую скорость перед поиском сокрости (лучше прямо в библиотеку).
  * Написать доку
  * Проверить при ловящемся GPS
 */
@@ -364,7 +365,7 @@ using namespace NEO6MV2;
 void plgNEO6MV2(){
   char buf[BUF_SIZE]; // Буфер для чтения строки
   gpsData gps;
-  
+
   // Init
   SoftwareSerial ser(RX_PIN, TX_PIN);
   
@@ -373,9 +374,7 @@ void plgNEO6MV2(){
   core.println(FF(uSST_CONNECTING_MSG));
   Serial.println(FF(uSST_CONNECTING_MSG));
   
-  //uint8_t _probe(const SoftwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms); 0- нет, 1 - ok
-  // 
-  uint32_t ser_speed = uSST_FindSpeed(ser, &_probe, buf, BUF_SIZE, TIMEOUT_MS);
+  uint32_t ser_speed = uSST_FindSpeed(ser, &_probe, buf, BUF_SIZE, TIMEOUT_MS, 9600);
   if(!ser_speed){ // Не нашли устройство
     core.moveCursor(0, 1);
     core.println(FF(uSST_NO_DEV_MSG));
@@ -393,13 +392,14 @@ void plgNEO6MV2(){
   ser.begin(ser_speed);
 
   int8_t mode = MODE_LAT;
+  uint8_t raw2serial = 0;
   
   // Main loop  
   while(1){
     // Получаем и разбираем данные от приемника
     if(uSST_ReadString(ser, buf, BUF_SIZE, TIMEOUT_MS)){ 
       _parse(gps, buf, BUF_SIZE);
-      //Serial.println(buf);
+      if(raw2serial) Serial.println(buf);
      }//if
      
     // Process user input    
@@ -410,8 +410,8 @@ void plgNEO6MV2(){
       case DOWN:
       case DOWN_LONG: mode ++; break;
 
-      case SELECT: break;  
-      case SELECT_LONG: break;   // save settings to EEPROM
+      case SELECT: raw2serial = !raw2serial; break;  
+      case SELECT_LONG: break;   
       
       default: break;
     }//switch
