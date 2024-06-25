@@ -27,7 +27,7 @@ namespace NEO6MV2 {
     char     dir = '?';  // Направление (N, S, W, E)
   } gpsDegree;
   
-  // GPS-данные The
+  // GPS-данные 
   typedef struct {
     char sys_type[3]  = "??"; // Тип системы GP - GPS, GL - Glonass, GA - Galileo, BD - Beidou, GQ - QZSS, GN - Various
     uint8_t sat_total = 0;    // Количество наблюдаемых спутников 
@@ -44,11 +44,6 @@ namespace NEO6MV2 {
     uint8_t calc = 0;         // Способ вычисления: 0-недоступно, 1-автономно, 2-дифференциально, 3-PPS, 4-фикс RTK, 5-не фикс RTK, 6-экстраполяция, 7-фикс коорд, 8-симуляця  
   } gpsData;
 
-/*
-0 - fix not available,
-1 - GPS fix,
-2 - Differential GPS fix
-*/
 
   // Функия проверки соединения по COM-порту
   uint8_t _probe(const SoftwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms){
@@ -357,10 +352,6 @@ namespace NEO6MV2 {
 
 using namespace NEO6MV2;
 
-/*
- * Написать доку
- * Проверить при ловящемся GPS
-*/
 // == Main plugin function ==
 void plgNEO6MV2(){
   char buf[BUF_SIZE]; // Буфер для чтения строки
