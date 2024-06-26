@@ -206,7 +206,7 @@ Let's look into [`plgSample.h`](/plgSample.h).
 /* The main plugin function declaration */
 void plgSample();
 ```
-In this file we include standard arduino header `#include <Arduino.h>` and MuiltSens Core header `#include "mscore.h"`.
+In this file we include standard arduino header `#include <Arduino.h>` and [MultiSens Core](docs/Core.md) header `#include "mscore.h"`.
 Then we add some plugin description in comment and declare the main plugin function `void plgSample();`. 
 This function should no return or accept any params and should never terminate. 
 Switching from one plugin to another always occurs through a device reset.
