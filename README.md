@@ -323,7 +323,7 @@ core.moveCursor(0, 1); // First symbol of second line
 core.print(F("Value: "));
 core.println(value);
 ```
-To send current value of the pin to the Serial we use `Serial.println(value);` from the standard arnuino library.
+To send current value of the pin to the Serial we use `Serial.println(value);` from the standard arduino library.
 
 The last part of the main loop is the delay between attempts `delay(READ_DELAY_MS);`.
 
