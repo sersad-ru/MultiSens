@@ -10,6 +10,7 @@ uint8_t uSST_ReadString(const SoftwareSerial &ser, char* buf, const uint8_t buf_
       buf[i] = ser.read();
       if((buf[i] == 0x0D) || (buf[i] == 0x0A) || (i == (buf_size - 1))){ // Дошли до /n или /r или до конца буфера
         buf[i] = 0;
+        while(ser.available()) ser.read(); // Подчищаем буфер
         return i;
       }//if
       i++;
@@ -18,6 +19,7 @@ uint8_t uSST_ReadString(const SoftwareSerial &ser, char* buf, const uint8_t buf_
   buf[i] = 0;
   return i;
 }//uSST_ReadString
+
 
 uint8_t uSST_ReadString(const HardwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms)
 {
