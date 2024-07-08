@@ -355,4 +355,4 @@ And of course, pray that we have no errors in the code and that everything works
 
 
 ## History
-* 1.0 - First stable release. 29 plugins. 2024-07-08.
+* 1.0 - First stable release. 23/29 plugins. 2024-07-08.
