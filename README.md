@@ -97,7 +97,7 @@ arduino power jack socket.
 
 <p align="center"><img src="docs/CaseModel.jpg"/></p>
 
-[.stl files for 3D print](https://www.thingiverse.com/thing:6689722)
+[3D model of the case](https://www.thingiverse.com/thing:6689722)
 
 ## Software
 
