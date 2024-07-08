@@ -96,7 +96,7 @@ To use this version of the case you need an Arduino Uno with a `USB Type-C` conn
 arduino power jack socket.
 
 <p align="center"><img src="docs/CaseModel.jpg"/></p>
-_Link to the thingverse._
+***Link to the thingverse.***
 
 ## Software
 
