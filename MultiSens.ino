@@ -2,13 +2,29 @@
 * Arduino Multi Senstor Tester
 * 
 * v.1.0
-* (c)2023-2024 by sersad
+* (c)2023-2024 by Sergey Sadovnikov (sersad@gmail.com)
 * 
 * 01.11.2023
 * 11.12.2023
 * 09.01.2024
+* 08.07.2024
 * 
 * Arduino AVR Boards / Arduino UNO
+*/
+
+/*
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <www.gnu.org/licenses/>.
 */
 
 #include "mscore.h"
@@ -50,11 +66,10 @@
 
 // Registred plugins
 MultiSensPlugin plugins[] = {
-/*
   {&plgFindPin,       "FindPin",          0},
   {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)}, 
-  {&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
-  {&plgAnalogRead,    "AnalogRead",       sizeof(plgAnalogReadCfg)},
+  //{&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
+  //{&plgAnalogRead,    "AnalogRead",       sizeof(plgAnalogReadCfg)},
   {&plgPWM,           "PWM",              sizeof(plgPWMCfg)},
   {&plgAM2302,        "AM2302/DHT22",     0},
   {&plgDS18B20,       "DS18B20",          0},
@@ -75,13 +90,11 @@ MultiSensPlugin plugins[] = {
   {&plgServo,         "Servo",            sizeof(plgServoCfg)},
   {&plgStepper,       "Stepper",          sizeof(plgStepperCfg)},
   {&plgTSOP312,       "TSOP312",          0},
-*/
+  {&plgHC06,          "HC-05/06",         0},  
   //{&plgREncoder,      "Encoder",          0}, 
   //{&plgW5500Lite,     "W5500 Lite",       0},  
-  //{&plgHX711,         "HX711",          sizeof(plgHX711Cfg)},
-  {&plgHC06,          "HC-05/06",         0},  
+  //{&plgHX711,         "HX711",          sizeof(plgHX711Cfg)}, 
   //{&plgNEO6MV2,       "GY-NEO6MV2",       0},  
-
   //{&plgSample,        "Sample Plugin",  0},   
 }; // 
 

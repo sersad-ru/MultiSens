@@ -11,6 +11,7 @@ The Arduino Multi Sensor Tester
 * [Hardware](#hardware)
 * [Software](#software)
 * [Adding plugins](#adding-plugins)
+* [History](#history)
 
 
 ## Overview
@@ -30,8 +31,8 @@ Currently MuliSens supports following list of devices:
 |[FindPin](docs/FindPin.md)|Displays the `msPin` number of selected wire|Yes|
 |[I²CScan](docs/I2CScan.md)|Searches for I²C devices|Yes|
 |[DigitalAnalog](docs/DigitalAnalog.md)|Reads one digital and one analog pin|Yes|
-|[DigitalRead](docs/DigitalRead.md)|Reads digital pins|Yes|
-|[AnalogRead](docs/AnalogRead.md)|Reads analog pins|Yes|
+|[DigitalRead](docs/DigitalRead.md)|Reads digital pins|No<sup>*</sup>|
+|[AnalogRead](docs/AnalogRead.md)|Reads analog pins|No<sup>*</sup>|
 |[PWM](docs/PWM.md)|Creates the PWM signal on pins|Yes|
 |[DS18B20](docs/DS18B20.md)|Temperature sensor|Yes|
 |[AM2320/DHT22](docs/AM2302.md)|Temperature and Humidity sensor|Yes|
@@ -51,9 +52,9 @@ Currently MuliSens supports following list of devices:
 |[Servo](docs/Servo.md)|Servo drive|Yes|
 |[Stepper](docs/Stepper.md)|Stepper motor|Yes|
 |[TSOP312](docs/TSOP312.md)|TSOP312xx IR receiver|Yes|
+|[HC-05/06](docs/HC-06.md)|Bluetooth module|Yes|
 |[REncoder](docs/REncoder.md)|Rotary Encoder|No<sup>*</sup>|
 |[HX711](docs/HX711.md)|Weighing sensor|No<sup>*</sup>|
-|[HC-05/06](docs/HC-06.md)|Bluetooth module|No<sup>*</sup>|
 |[NEO6MV2](docs/NEO6MV2.md)|GPS module|No<sup>*</sup>|
 |[W5500Lite](docs/W5500Lite.md)|W5500 Lite Ethernet module|No<sup>*</sup>|
 
@@ -95,7 +96,7 @@ To use this version of the case you need an Arduino Uno with a `USB Type-C` conn
 arduino power jack socket.
 
 <p align="center"><img src="docs/CaseModel.jpg"/></p>
-Link to the thingverse.
+*Link to the thingverse.*
 
 ## Software
 
@@ -351,3 +352,7 @@ More about settings block and how to store it to the `EEPROM` see in [`EEPROM Fu
 The last thing we need to do is to save [`MultiSens.ino`](/MultiSens.ino), recompile it and send it to the device. 
 
 And of course, pray that we have no errors in the code and that everything works fine. :)
+
+
+## History
+* 1.0 - First stable release. 29 plugins. 2024-07-08.
