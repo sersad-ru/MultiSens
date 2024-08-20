@@ -39,7 +39,7 @@ const char uSST_FOUND_MSG[]      PROGMEM = "Found at ";
 //* buf - буфер для приема строки
 //* buf_size - размер буфера
 //* timeout_ms - таймаут в ms
-typedef uint8_t (*uSST_ProbeFunction)(const SoftwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
+typedef uint8_t (*uSST_ProbeFunction)(SoftwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
 
 
 //** Читает строку из Serial в буфер до появления /n, /r или таймаута. Отрезает /n, /r. Ставит ноль в конце. 
@@ -48,8 +48,24 @@ typedef uint8_t (*uSST_ProbeFunction)(const SoftwareSerial &ser, char* buf, cons
 //* buf - буфер для приема строки
 //* buf_size - размер буфера
 //* timeout_ms - таймаут в ms
-uint8_t uSST_ReadString(const SoftwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
-uint8_t uSST_ReadString(const HardwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms);
+template <typename T>
+uint8_t uSST_ReadString(T &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms)
+{
+  uint8_t i = 0;
+  uint32_t t_start = millis();
+  while((millis() - t_start) < timeout_ms){
+    while(ser.available()){
+      buf[i] = ser.read();
+      if((buf[i] == 0x0D) || (buf[i] == 0x0A) || (i == (buf_size - 1))){ // Дошли до /n или /r или до конца буфера
+        buf[i] = 0;
+        return i;
+      }//if
+      i++;
+    }//while
+  }//while
+  buf[i] = 0;
+  return i;
+}//uSST_ReadString
 
 
 //** Последовательно открывеат порт на разных скоростях (от большей к меньшей) и вызывает функцию проверки. 
@@ -61,7 +77,7 @@ uint8_t uSST_ReadString(const HardwareSerial &ser, char* buf, const uint8_t buf_
 //* buf_size - размер буфера
 //* timeout_ms - таймаут в ms
 //* guess_speed [0] - предполагаемая скорость. Сначала проверяем на ней, если нет, то тогда уже все по списку.
-uint32_t uSST_FindSpeed(const SoftwareSerial &ser, uSST_ProbeFunction probe, char* buf, const uint8_t buf_size, const uint32_t timeout_ms, const uint32_t guess_speed = 0);
+uint32_t uSST_FindSpeed(SoftwareSerial &ser, uSST_ProbeFunction probe, char* buf, const uint8_t buf_size, const uint32_t timeout_ms, const uint32_t guess_speed = 0);
 
 
 //** Ищет n-ое входжение символа в строку. Возвращает индекс или -1, если нужного входжения не найдено 

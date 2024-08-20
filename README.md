@@ -57,6 +57,7 @@ Currently MuliSens supports following list of devices:
 |[HX711](docs/HX711.md)|Weighing sensor|No<sup>*</sup>|
 |[NEO6MV2](docs/NEO6MV2.md)|GPS module|No<sup>*</sup>|
 |[W5500Lite](docs/W5500Lite.md)|W5500 Lite Ethernet module|No<sup>*</sup>|
+|[ModBusScan](docs/ModBusScan.md)|ModBus RTU device scanner|No<sup>*</sup>|
 
 <sup>*</sup>Due to the memory limit of the hardware you can not use all plugins simuatinely. 
 For example, the [W5500Lite](docs/W5500Lite.md) plugin is deactivated by default. 

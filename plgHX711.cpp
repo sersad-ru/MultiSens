@@ -26,7 +26,7 @@ along with this program. If not, see <www.gnu.org/licenses/>.
 namespace HX711 {
   
   // 1 - если новые данные готовы, иначе 0
-  _is_ready(){
+  uint8_t _is_ready(){
     return !digitalRead(DT_PIN);
   }//is_ready
 

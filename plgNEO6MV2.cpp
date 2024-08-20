@@ -64,7 +64,7 @@ namespace NEO6MV2 {
 
 
   // Функия проверки соединения по COM-порту
-  uint8_t _probe(const SoftwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms){
+  uint8_t _probe(SoftwareSerial &ser, char* buf, const uint8_t buf_size, const uint32_t timeout_ms){
     const char* prefix[] = {"GP", "GL", "GA", "BD", "GQ", "GN"};
     for(uint8_t i = 0; i < 3; i++){ // Пробуем 3 раз
       if(!uSST_ReadString(ser, buf, buf_size, timeout_ms)) continue; // Не прочлась строка
@@ -78,7 +78,7 @@ namespace NEO6MV2 {
 
 
   // Ищем позицию заданного по счету параметр. -1, если не нашли
-  int8_t _locate_param(const char *str, const uint8_t n){
+  int8_t _locate_param(char *str, const uint8_t n){
     int8_t res = uSST_strchrn(str, ',', n); 
     if(res < 0) return -1; // Не нашли
     if(str[res + 1] == ',') return -1; // Параметр пустой
@@ -111,7 +111,7 @@ namespace NEO6MV2 {
 
 
   // Получить градусы
-  void _parse_degree(gpsDegree &degree, const char *str, const uint8_t param_num, const uint8_t deg_size){
+  void _parse_degree(gpsDegree &degree, char *str, const uint8_t param_num, const uint8_t deg_size){
     int8_t st = _locate_param(str, param_num); // Ищем параметр
     if(st < 0) return; // Не нашли
     degree.deg = _param2long(str + st + 1, deg_size);
