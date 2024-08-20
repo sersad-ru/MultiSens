@@ -15,8 +15,8 @@ Due to some limitations of `SoftwareSerial` library this plugin can search for d
 * You can interrupt the search process any time by pressing the `SELECT` button.
 * When the search process will be finished or interrupted the list of founded devices will be displayed. 
   You can scroll it by pressing the `UP` and `DOWN` buttons.
-* The maximum number of devices to find is stored in `SCAN_MAX` constant (see [plgModBusSearch.cpp](/plgModBusSearch.cpp)).
-* The device reply timeout (in milliseconds) is stored in `TIMEOUT_MS` constant (see [plgModBusSearch.cpp](/plgModBusSearch.cpp)).
+* The maximum number of devices to find is stored in `SCAN_MAX` constant (see [plgModBusScan.cpp](/plgModBusScan.cpp)).
+* The device reply timeout (in milliseconds) is stored in `TIMEOUT_MS` constant (see [plgModBusScan.cpp](/plgModBusScan.cpp)).
 
 
 ### Connection
