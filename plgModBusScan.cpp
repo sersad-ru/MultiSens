@@ -209,7 +209,6 @@ namespace ModBusScan {
         if(old_elapsed != elapsed_sec){ // Пора выводить прогресс (секунда прошла)
           old_elapsed = elapsed_sec;
           // Хитрим, что б время не ушло в минус из-за неточности коллбэков
-          //prog_callback(map(cnt * (conf_cnt + 1), 0, total, 0, 1000), (time_total_sec > elapsed_sec) ? (time_total_sec - elapsed_sec) : 0, dev_num); 
           prog_callback(map(cnt, 0, total, 0, 1000), (time_total_sec > elapsed_sec) ? (time_total_sec - elapsed_sec) : 0, dev_num); 
         }//if old_elapsed
       }//if prog_callback  
