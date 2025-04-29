@@ -60,6 +60,7 @@ Currently MuliSens supports following list of devices:
 |[ModBusScan](docs/ModBusScan.md)|ModBus RTU device scanner|No<sup>*</sup>|
 |[TM1637](docs/TM1637.md)|TM1637 7-segment LED controller|No<sup>*</sup>|
 |[Buzzer](docs/Buzzer.md)|Passive buzzer tone generator|No<sup>*</sup>|
+|[MAX9814](docs/MAX9814.md)|MAX9814 microphone|No<sup>*</sup>|
 
 <sup>*</sup>Due to the memory limit of the hardware you can not use all plugins simuatinely. 
 For example, the [W5500Lite](docs/W5500Lite.md) plugin is deactivated by default. 

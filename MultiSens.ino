@@ -1,13 +1,14 @@
 /*
-* Arduino Multi Senstor Tester
+* Arduino Multi Sensor Tester
 * 
 * v.1.0
-* (c)2023-2024 by Sergey Sadovnikov (sersad@gmail.com)
+* (c)2023-2025 by Sergey Sadovnikov (sersad@gmail.com)
 * 
 * 01.11.2023
 * 11.12.2023
 * 09.01.2024
 * 08.07.2024
+* 29.04.2025
 * 
 * Arduino AVR Boards / Arduino UNO
 */
@@ -60,12 +61,9 @@ along with this program. If not, see <www.gnu.org/licenses/>.
 #include "plgModBusScan.h"
 #include "plgTM1637.h"
 #include "plgBuzzer.h"
+#include "plgMAX9814.h"
 #include "plgSample.h"
 
-/*
- * HC-05
- * 
-*/
 
 // Registred plugins
 MultiSensPlugin plugins[] = {
@@ -100,9 +98,10 @@ MultiSensPlugin plugins[] = {
   //{&plgW5500Lite,     "W5500 Lite",       0},  
   //{&plgHX711,         "HX711",          sizeof(plgHX711Cfg)}, 
   //{&plgNEO6MV2,       "GY-NEO6MV2",       0},  
-  //{&plgModBusScan,    "ModBus Scanner",     0},
+  //{&plgModBusScan,    "ModBus Scanner",   0},
   //{&plgTM1637,        "TM1637",           0},
   //{&plgBuzzer,        "Buzzer",           sizeof(plgBuzzerCfg)},
+  //{&plgMAX9814,       "MAX9814",          0},
   //{&plgSample,        "Sample Plugin",  0},   
 }; // 
 

@@ -144,7 +144,6 @@ public:
   //** Returns the code of released button. Returns NONE until the button is pressed but not released.
   MultiSensButton buttonReleased();
 
-
   //** Saves settings block in EEPROM. Size of the block MUST be provided in MultiSensPlugin structire.
   //* data - pointer for settings block
   void saveSettings(uint8_t * data);
@@ -225,7 +224,7 @@ private:
   volatile MultiSensButton _btn_released_code; // Текущий код отпущенной кнопки
   volatile uint8_t _btn_pressed_count;  // Сколько вызовов таймера кнопка остается нажатой
   volatile uint8_t _btn_released_count; // Сколько вызовов таймера кнопка была нажатой до отпускания
-  
+
   uint8_t _lcd_cursor_offset; // Текущее положение курсора в буфере
   uint8_t _lcd_stored_cursor; // Тут можно сохранить позицию курсора и потом давать кучу принтов в одно место, используя lcdRestoreCursor;  
   
