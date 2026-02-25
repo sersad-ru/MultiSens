@@ -69,7 +69,7 @@ along with this program. If not, see <www.gnu.org/licenses/>.
 
 // Registred plugins
 MultiSensPlugin plugins[] = {
-/*
+
   {&plgFindPin,       "FindPin",          0},
   {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)}, 
   //{&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
@@ -95,7 +95,7 @@ MultiSensPlugin plugins[] = {
   {&plgStepper,       "Stepper",          sizeof(plgStepperCfg)},
   {&plgTSOP312,       "TSOP312",          0},
   {&plgHC06,          "HC-05/06",         0},  
-*/
+
   //{&plgREncoder,      "Encoder",          0}, 
   //{&plgW5500Lite,     "W5500 Lite",       0},  
   //{&plgHX711,         "HX711",          sizeof(plgHX711Cfg)}, 
