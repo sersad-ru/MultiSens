@@ -199,7 +199,7 @@ You can create your own plugin in 3 steps.
 ### Step 1. The plugin header
 First of all choose the plugins name. Plugin files and main function name should start with "plg".  
 For example, `plgSample.h` for plugin named "Sample".
-Let's look into [`plgSample.h`](/plgSample.h).
+Let's look into [`plgSample.h`](/src/plgSample.h).
 ```cpp
 #pragma once
 #include <Arduino.h>
@@ -220,7 +220,7 @@ Switching from one plugin to another always occurs through a device reset.
 
 
 ### Step 2. The plugin code
-The plugin code is placed in the [`plgSample.cpp`](/plgSample.cpp) file.
+The plugin code is placed in the [`plgSample.cpp`](/src/plgSample.cpp) file.
 ```cpp
 #include "plgSample.h"
 
@@ -297,7 +297,7 @@ The first line of the screen always contains current plugin name and is not avai
 
 The `core.print` function prints the data at the current cursor position.
 `MS_SYM_SELECT_CODE` is the predefined symbol to display `SELECT` button. Other predefined symbols 
-are in [mscustomsymbols.h](mscustomsymbols.h).
+are in [mscustomsymbols.h](/src/mscustomsymbols.h).
 More information about MuitiSens Core functions are in [MultiSens Core API](docs/Core.md).
 
 Next important part is the main infinity cycle.
