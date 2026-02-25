@@ -10,7 +10,7 @@ are decoded and collected and then displayed in human-readable format.
 
 * Connect the module and run the plugin.
 * The MultiSens will try to find the module. 
-* Decoded information will be dispayed every `DISPLAY_DELAY_MS` milliseconds (see [plgNEO6MV2.cpp](/plgNEO6MV2.cpp))
+* Decoded information will be dispayed every `DISPLAY_DELAY_MS` milliseconds (see [plgNEO6MV2.cpp](/src/plgNEO6MV2.cpp))
 * Press the `UP` and `DOWN` keys to switch information on the screen.
 * Press the `SELECT` key to turn on/off sending raw GPS data to the `Serial`.
 

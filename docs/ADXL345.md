@@ -22,9 +22,9 @@ It will be auto loaded and applied next time.
   (**ATTENTION!** All stored data will be cleared. **FOR ALL** plugins!)
 
 * You can specify the delay between sensors calls using `READ_DELAY_MS` 
-  in [plgADXL345.cpp](/plgADXL345.cpp)
+  in [plgADXL345.cpp](/src/plgADXL345.cpp)
 
-* ADXL345 I²C address is stored in `ADXL_ADDRESS` in [plgADXL345.cpp](/plgADXL345.cpp)
+* ADXL345 I²C address is stored in `ADXL_ADDRESS` in [plgADXL345.cpp](/src/plgADXL345.cpp)
 
 ### Connection
 ![ADXL345Connection](ADXL345-CONN.png)

@@ -1,7 +1,7 @@
 /*
 * Arduino Multi Sensor Tester
 * 
-* v.1.0
+* v.1.1
 * (c)2023-2025 by Sergey Sadovnikov (sersad@gmail.com)
 * 
 * 01.11.2023
@@ -9,6 +9,7 @@
 * 09.01.2024
 * 08.07.2024
 * 29.04.2025
+* 24.02.2026
 * 
 * Arduino AVR Boards / Arduino UNO
 */
@@ -28,46 +29,47 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <www.gnu.org/licenses/>.
 */
 
-#include "mscore.h"
-#include "plgFindPin.h"
-#include "plgDigitalAnalog.h"
-#include "plgDigitalRead.h"
-#include "plgAnalogRead.h"
-#include "plgPWM.h"
-#include "plgAM2302.h"
-#include "plgDS18B20.h"
-#include "plgIButton.h"
-#include "plgMHZ19.h"
-#include "plgQRE1113.h"
-#include "plgHCSR04.h"
-#include "plgRDM6300.h"
-#include "plgADXL345.h"
-#include "plgWS2812.h"
-#include "plgI2CScan.h"
-#include "plgBME280.h"
-#include "plgAHT20.h"
-#include "plgBMP280AHT20.h"
-#include "plgHTU21D.h"
-#include "plgRC522.h"
-#include "plgMPU6050.h"
-#include "plgServo.h"
-#include "plgStepper.h"
-#include "plgTSOP312.h"
-#include "plgREncoder.h"
-#include "plgHX711.h"
-#include "plgW5500Lite.h"
-#include "plgHC06.h"
-#include "plgNEO6MV2.h"
-#include "plgModBusScan.h"
-#include "plgTM1637.h"
-#include "plgBuzzer.h"
-#include "plgMAX9814.h"
-#include "plgSample.h"
+#include "src/mscore.h"
+#include "src/plgFindPin.h"
+#include "src/plgDigitalAnalog.h"
+#include "src/plgDigitalRead.h"
+#include "src/plgAnalogRead.h"
+#include "src/plgPWM.h"
+#include "src/plgAM2302.h"
+#include "src/plgDS18B20.h"
+#include "src/plgIButton.h"
+#include "src/plgMHZ19.h"
+#include "src/plgQRE1113.h"
+#include "src/plgHCSR04.h"
+#include "src/plgRDM6300.h"
+#include "src/plgADXL345.h"
+#include "src/plgWS2812.h"
+#include "src/plgI2CScan.h"
+#include "src/plgBME280.h"
+#include "src/plgAHT20.h"
+#include "src/plgBMP280AHT20.h"
+#include "src/plgHTU21D.h"
+#include "src/plgRC522.h"
+#include "src/plgMPU6050.h"
+#include "src/plgServo.h"
+#include "src/plgStepper.h"
+#include "src/plgTSOP312.h"
+#include "src/plgREncoder.h"
+#include "src/plgHX711.h"
+#include "src/plgW5500Lite.h"
+#include "src/plgHC06.h"
+#include "src/plgNEO6MV2.h"
+#include "src/plgModBusScan.h"
+#include "src/plgTM1637.h"
+#include "src/plgBuzzer.h"
+#include "src/plgMAX9814.h"
+#include "src/plgBH1750.h"
+#include "src/plgSample.h"
 
 
 // Registred plugins
 MultiSensPlugin plugins[] = {
-
+/*
   {&plgFindPin,       "FindPin",          0},
   {&plgDigitalAnalog, "DigAn Read",       sizeof(plgDigitalAnalogCfg)}, 
   //{&plgDigitalRead,   "DigitalRead",      sizeof(plgDigitalReadCfg)},
@@ -93,7 +95,7 @@ MultiSensPlugin plugins[] = {
   {&plgStepper,       "Stepper",          sizeof(plgStepperCfg)},
   {&plgTSOP312,       "TSOP312",          0},
   {&plgHC06,          "HC-05/06",         0},  
-
+*/
   //{&plgREncoder,      "Encoder",          0}, 
   //{&plgW5500Lite,     "W5500 Lite",       0},  
   //{&plgHX711,         "HX711",          sizeof(plgHX711Cfg)}, 
@@ -102,6 +104,7 @@ MultiSensPlugin plugins[] = {
   //{&plgTM1637,        "TM1637",           0},
   //{&plgBuzzer,        "Buzzer",           sizeof(plgBuzzerCfg)},
   //{&plgMAX9814,       "MAX9814",          0},
+  //{&plgBH1750,        "BH1750",           0},
   //{&plgSample,        "Sample Plugin",  0},   
 }; // 
 

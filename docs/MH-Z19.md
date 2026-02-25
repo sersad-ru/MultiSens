@@ -7,7 +7,7 @@ Results are displayed on the device screen and sends to the serial in human-read
 Arduino `SerialPlotter` compartible format.
 
 * You can specify the delay between sensors calls using `READ_DELAY_MS` 
-  in [plgMHZ19.cpp](/plgMHZ19.cpp)
+  in [plgMHZ19.cpp](/src/plgMHZ19.cpp)
 
 
 ### Connection

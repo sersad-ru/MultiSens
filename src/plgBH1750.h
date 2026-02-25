@@ -1,6 +1,6 @@
 /*
 Arduino Multi Senstor Tester
-(c)2023-2024 by Sergey Sadovnikov (sersad@gmail.com)
+(c)2023-2026 by Sergey Sadovnikov (sersad@gmail.com)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,23 +20,24 @@ along with this program. If not, see <www.gnu.org/licenses/>.
 #include <Arduino.h>
 #include "mscore.h"
 /*
-* HTU21D plugin recieves temperature and humidity from the HTU21D sensor.
+* BH1750 plugin receives ambient light intensity from the BH1750 sensor.
 * Connection:
+* VCC (+5V) - red
 * GND - black 
-* VIN (+5V) - red
-* SDA - P6 - yellow-black
 * SCL - P7 - gray-black
+* SDA - P6 - yellow-black
 * 
 * Results are printed on screen and sends to serial in human readable and SerialPlotter compartible format.
 * 
-* You can specify the delay between sensor calls using READ_DELAY_MS in plgHTU21D.cpp
-* HTU21D I²C address in HTU_ADDRESS (plgHTU21D.cpp)
+* You can specify the delay between sensor calls using READ_DELAY_MS in plgBH1750.cpp
+* (Keep in mind that the sensor needs about 120 ms to measure light intensity).
+* BH1750 I²C address in BH_ADDRESS (plgBH1750.cpp)
 * 
 */
 
 /*
 struct{
     
-} plgHTU21DCfg;
+} plgBH1750Cfg;
 */
-void plgHTU21D();
+void plgBH1750();

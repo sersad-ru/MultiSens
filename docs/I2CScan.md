@@ -1,6 +1,6 @@
 # I²C Scan Plugin
 
-The I²C Scan plugin searches for first `I2C_MAX_DEVICES` (see [plgI2CScan.cpp](/plgI2CScan.cpp)) 
+The I²C Scan plugin searches for first `I2C_MAX_DEVICES` (see [plgI2CScan.cpp](/src/plgI2CScan.cpp)) 
 devices on I²C bus. 
 
 ### Connection

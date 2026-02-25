@@ -7,7 +7,7 @@ Results are displayed on the device screen and sends to the serial in human-read
 Arduino `SerialPlotter` compartible format.
 
 * You can specify the delay between sensors calls using `READ_DELAY_MS` 
-  in [plgHCSR04.cpp](/plgHCSR04.cpp)
+  in [plgHCSR04.cpp](/src/plgHCSR04.cpp)
 
 * Use the `UP` and `DOWN` buttons to change current temperature. Available range is -50°C - +50°C. 
 
