@@ -62,6 +62,7 @@ Currently MuliSens supports following list of devices:
 |[Buzzer](docs/Buzzer.md)|Passive buzzer tone generator|No<sup>*</sup>|
 |[MAX9814](docs/MAX9814.md)|MAX9814 microphone|No<sup>*</sup>|
 |[BH1750](docs/BH1750.md)|BH1750 Ambient Light sensor|No<sup>*</sup>|
+|[VEML7700](docs/VEML7700.md)|VEML7700 Ambient Light sensor|No<sup>*</sup>|
 
 <sup>*</sup>Due to the memory limit of the hardware you can not use all plugins simuatinely. 
 For example, the [W5500Lite](docs/W5500Lite.md) plugin is deactivated by default. 
@@ -363,3 +364,4 @@ And of course, pray that we have no errors in the code and that everything works
 ## History
 * 1.0 - First stable release. 23/29 plugins. 2024-07-08.
 * 1.1 - Added `ModBus Scanner`, `TM1637`, `Buzzer`, `MAX9814`, `BH1750` plugins. 23/32 plugins 2026-02-25.
+* 1.2 - Added `VEML7700` plugin. 23/33 plugins 2026-03-02.

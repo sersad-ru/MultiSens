@@ -64,6 +64,7 @@ along with this program. If not, see <www.gnu.org/licenses/>.
 #include "src/plgBuzzer.h"
 #include "src/plgMAX9814.h"
 #include "src/plgBH1750.h"
+#include "src/plgVEML7700.h"
 #include "src/plgSample.h"
 
 
@@ -105,6 +106,7 @@ MultiSensPlugin plugins[] = {
   //{&plgBuzzer,        "Buzzer",           sizeof(plgBuzzerCfg)},
   //{&plgMAX9814,       "MAX9814",          0},
   //{&plgBH1750,        "BH1750",           0},
+  //{&plgVEML7700,      "VEML7700",         0},
   //{&plgSample,        "Sample Plugin",  0},   
 }; // 
 

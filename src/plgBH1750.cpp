@@ -34,7 +34,7 @@ namespace BH1750 {
 #define BH1750_MT_REG_DEF 69   // Default MTReg value (31-254)
 #define BH1750_SCALE_X100 120  // Scale factor x100 (1.2 * 100 = 120)
 
- uint32_t _init(){
+ uint8_t _init(){
   // Пишем MTReg. Старшие биты 01000_MT[7,6,5], младшие: 011_MT[4,3,2,1,0]
   Wire.beginTransmission(BH1750_ADDRESS);
   Wire.write(0x40 | (BH1750_MT_REG >> 5)); // Старшие 3
