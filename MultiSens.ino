@@ -1,8 +1,8 @@
 /*
 * Arduino Multi Sensor Tester
 * 
-* v.1.1
-* (c)2023-2025 by Sergey Sadovnikov (sersad@gmail.com)
+* v.1.3
+* (c)2023-2026 by Sergey Sadovnikov (sersad@gmail.com)
 * 
 * 01.11.2023
 * 11.12.2023
@@ -10,6 +10,7 @@
 * 08.07.2024
 * 29.04.2025
 * 24.02.2026
+* 10.11.2026
 * 
 * Arduino AVR Boards / Arduino UNO
 */
@@ -65,6 +66,7 @@ along with this program. If not, see <www.gnu.org/licenses/>.
 #include "src/plgMAX9814.h"
 #include "src/plgBH1750.h"
 #include "src/plgVEML7700.h"
+#include "src/plgSCD41.h"
 #include "src/plgSample.h"
 
 
@@ -107,6 +109,7 @@ MultiSensPlugin plugins[] = {
   //{&plgMAX9814,       "MAX9814",          0},
   //{&plgBH1750,        "BH1750",           0},
   //{&plgVEML7700,      "VEML7700",         0},
+  //{&plgSCD41,         "SCD41",            0},
   //{&plgSample,        "Sample Plugin",  0},   
 }; // 
 
