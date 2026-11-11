@@ -26,7 +26,8 @@ along with this program. If not, see <www.gnu.org/licenses/>.
 #define READ_DELAY_MS 5000 // 5 seconds between attempt
 
 #define SCD41_ADDRESS          0x62 // SCD41 I²C address 
-#define CMD_START_PERIODIC   0x21B1 // Pereodic measurement command
+#define CMD_STOP_PERIODIC    0x3f86 // Stop pereodic measurement command
+#define CMD_START_PERIODIC   0x21B1 // Start pereodic measurement command
 #define CMD_READ_MEASUREMENT 0xEC05 // Read values command
 
 #define READ_ERROR -1 // I²C read error
@@ -114,6 +115,14 @@ void plgSCD41(){
   uint8_t need_header = 1;
   uint32_t start_time = millis();
   bool is_ready = false;
+
+  // Stop periodic measurement mode
+  Wire.beginTransmission(SCD41_ADDRESS);
+  Wire.write((uint8_t)(CMD_STOP_PERIODIC >> 8));
+  Wire.write((uint8_t)(CMD_STOP_PERIODIC & 0xFF));
+  Wire.endTransmission();  
+
+  delay(500);
 
   // Start periodic measurement mode
   Wire.beginTransmission(SCD41_ADDRESS);
